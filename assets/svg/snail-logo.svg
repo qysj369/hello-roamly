@@ -1,0 +1,23 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 360 200" fill="none" aria-hidden="true">
+  <path d="M40 168 H320" stroke="#285948" stroke-width="1.6" stroke-linecap="round"/>
+  <path d="M210 128 L248 98" stroke="#285948" stroke-width="1.35" stroke-linecap="round"/>
+  <path d="M218 138 L258 106" stroke="#285948" stroke-width="1.35" stroke-linecap="round"/>
+  <path d="M108 78 C96 52 80 34 64 22" stroke="#285948" stroke-width="1.6" stroke-linecap="round"/>
+  <circle cx="60" cy="18" r="3.2" fill="#285948"/>
+  <path d="M120 76 C128 48 144 30 162 20" stroke="#285948" stroke-width="1.6" stroke-linecap="round"/>
+  <circle cx="166" cy="16" r="3.2" fill="#285948"/>
+  <path d="M132 118 C124 94 102 82 82 88 C62 94 54 118 66 136 C76 150 102 150 120 138 C128 132 132 126 132 118" stroke="#285948" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/>
+  <circle cx="84" cy="112" r="1.8" fill="#285948"/>
+  <path d="M70 140 C52 150 48 160 64 166 C88 170 130 164 168 148 C178 144 186 136 190 128" stroke="#285948" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/>
+  <g transform="translate(232 108)">
+    <circle r="58" stroke="#285948" stroke-width="1.6"/>
+    <g fill="none" stroke="#285948" stroke-width="1.35" stroke-linejoin="round">
+      <path d="M-18 -28 C-8 -36 6 -32 10 -20 C12 -10 4 -4 -4 -8 C-14 -12 -22 -18 -18 -28Z"/>
+      <path d="M-6 -4 C6 -8 14 2 12 16 C10 28 0 34 -8 28 C-16 20 -14 6 -6 -4Z"/>
+      <path d="M16 -14 C26 -18 36 -8 34 4 C32 12 22 14 16 8 C12 4 12 -6 16 -14Z"/>
+      <circle cx="-8" cy="-22" r="1.5" fill="#285948" stroke="none"/>
+      <circle cx="2" cy="8" r="1.4" fill="#285948" stroke="none"/>
+      <circle cx="24" cy="-4" r="1.4" fill="#285948" stroke="none"/>
+    </g>
+  </g>
+</svg>

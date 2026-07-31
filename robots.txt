@@ -1,0 +1,9 @@
+# https://www.robotstxt.org/robotstxt.html
+User-agent: *
+Allow: /
+
+# 私信会话页已在页面 meta 中标记 noindex
+Disallow: /messages
+Disallow: /messages/
+
+Sitemap: https://helloroamly.com/sitemap.xml
