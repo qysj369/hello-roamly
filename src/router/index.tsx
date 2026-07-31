@@ -1,0 +1,54 @@
+import { createBrowserRouter } from 'react-router-dom';
+import { AppShell } from '@/components/layout';
+import {
+  AboutPage,
+  AiChatPage,
+  AiSnailGuidePage,
+  DiscoverPage,
+  GuideDetailPage,
+  PublishGuidePage,
+  GuidesPage,
+  DrivePanoramaPage,
+  HomePage,
+  MessagesPage,
+  NotFoundPage,
+  SnailCulturePage,
+  TravelBuddiesPage,
+  TravelBuddyNewPage,
+  TravelPlanDetailPage,
+  SavedUserPlanDetailPage,
+  UserSavedPlansPage,
+  UserProfilePage,
+} from '@/router/lazyPages';
+import MapRedirectPage from '@/pages/map/MapRedirectPage';
+import { paths } from '@/router/paths';
+
+export const appRouter = createBrowserRouter([
+  {
+    path: paths.home,
+    element: <AppShell />,
+    children: [
+      { index: true, element: <HomePage /> },
+      { path: paths.discover.slice(1), element: <DiscoverPage /> },
+      { path: paths.ai.slice(1), element: <AiChatPage /> },
+      { path: paths.aiSnail.slice(1), element: <AiSnailGuidePage /> },
+      { path: paths.map.slice(1), element: <MapRedirectPage /> },
+      { path: paths.guides.slice(1), element: <GuidesPage /> },
+      { path: `${paths.guides.slice(1)}/publish`, element: <PublishGuidePage /> },
+      { path: `${paths.guides.slice(1)}/:guideId`, element: <GuideDetailPage /> },
+      { path: `${paths.plans.slice(1)}/:planId`, element: <TravelPlanDetailPage /> },
+      { path: `${paths.savedPlans.slice(1)}/:planId`, element: <SavedUserPlanDetailPage /> },
+      { path: paths.profilePlans.slice(1), element: <UserSavedPlansPage /> },
+      { path: paths.profile.slice(1), element: <UserProfilePage /> },
+      { path: `${paths.users.slice(1)}/:userId`, element: <UserProfilePage /> },
+      { path: paths.messages.slice(1), element: <MessagesPage /> },
+      { path: `${paths.messages.slice(1)}/:peerUserId`, element: <MessagesPage /> },
+      { path: paths.travelBuddies.slice(1), element: <TravelBuddiesPage /> },
+      { path: paths.travelBuddyNew.slice(1), element: <TravelBuddyNewPage /> },
+      { path: paths.about.slice(1), element: <AboutPage /> },
+      { path: paths.snailCulture.slice(1), element: <SnailCulturePage /> },
+      { path: `${paths.drive.slice(1)}/:cityName`, element: <DrivePanoramaPage /> },
+      { path: '*', element: <NotFoundPage /> },
+    ],
+  },
+]);

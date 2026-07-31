@@ -1,0 +1,36 @@
+# hello-roamly（蜗牛旅行）Agent 规范
+
+## 技术栈（以仓库实际为准）
+- 前端：React 18 + TypeScript + Vite + Three.js（R3F）
+- 状态：Zustand / React Query（文档中的 Home.vue / EarthGlobe.vue 对应 `HoloHomePage.tsx` / `EarthGlobe.tsx`）
+- 禁止无必要地把项目重写为 Vue / Pinia
+
+## 硬性红线
+1. 完整保留现有技术栈、AI 穷游攻略、3D 地球、驾驶舱功能
+2. 禁止改动穷游 AI 攻略生成底层业务代码（`server/lib/mapPlanStreamPipeline*`、`src/lib/plan/*`、AI 流式解析装配等）
+3. 追求阶段性可用，拒绝无休止底层重构
+4. 首页改版优先：`HoloHomePage`（Home）+ `EarthGlobe`；其余内页延后
+
+## 全局品牌
+1. 导航左上角使用全局 `SnailBrandLogo`：极简线条蜗牛 +「蜗牛旅行 HelloRoamly」+ slogan「极简于心 · 慢行致远」
+2. 全站浅米白极简视觉；永久移除赛博朋克、霓虹发光
+3. 颜色 / 圆角 / 阴影统一来自 `src/styles/theme.scss`，禁止页面内硬编码色值与阴影
+
+## 首页结构（固定顺序）
+1. 导航栏
+2. Hero（PC 重 3D 地球；移动端缩小球体 + 四大快捷入口）
+3. 小众旅行赛道分区
+4. UGC 社交板块
+5. 品牌页脚（预留中英文 i18n 切换）
+
+## 3D 地球约束
+1. 短点击选城，拖拽旋转；隔离画布内外滚动冲突
+2. 设备性能自动降级；卸载时释放纹理 / 定时器
+3. 选城后平滑镜头，再跳转 `/drive/:city`
+
+## 首页蜗牛插画（已锁定，禁止再改）
+1. 最终素材：`src/assets/snail-drag-earth.png`（及 `public/assets/snail-drag-earth.png`）
+2. 源备份：`src/assets/snail-drag-earth.source.png`
+3. 禁止：重绘、临摹、骨架化/腐蚀收细、换 SVG 造型、再跑 `scripts/thin_snail.py` 覆盖
+4. 仅允许：外层容器尺寸 / 位置 / 外边距 / CSS 动画
+5. 组件入口：`src/components/home/holo/HeroSnailGraphic.tsx`

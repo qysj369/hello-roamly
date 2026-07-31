@@ -1,0 +1,52 @@
+name: CI
+
+on:
+  pull_request:
+    branches: [main, master]
+
+concurrency:
+  group: ci-${{ github.head_ref || github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  quality:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: pnpm/action-setup@v4
+        with:
+          version: 9
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: pnpm
+
+      - name: Install dependencies
+        run: pnpm install --frozen-lockfile
+
+      - name: Install Playwright Chromium
+        run: pnpm exec playwright install chromium --with-deps
+
+      - name: Typecheck
+        run: pnpm run typecheck
+
+      - name: Lint
+        run: pnpm run lint
+        continue-on-error: true
+
+      - name: Build with SSG
+        run: pnpm run build:ssg
+        env:
+          VITE_SITE_URL: https://helloroamly.com
+          SKIP_PRERENDER: ${{ vars.SKIP_PRERENDER || '0' }}
+
+      - name: Verify prerendered home
+        run: test -f dist/index.html && grep -q "首页" dist/index.html
+
+      - name: Header stability contract tests
+        run: pnpm test -- homeMapTrailWall.stability headerNav.stability pageHeader.search.stability useMapPlanningAssistant.stability mapPlanStreamPipeline.stability userTravelSearchPipeline.test
+
+      - name: Header smoke (preview + Playwright)
+        run: pnpm run test:smoke-header:local

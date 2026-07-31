@@ -1,0 +1,13 @@
+# Netlify / 兼容平台（构建时复制到 dist/）
+# 与 deploy/siteRedirects.ts、vercel.json 保持一致
+
+/home           /           301
+/index.html     /           301
+/me             /profile    301
+/chat           /ai         301
+/explore        /discover   301
+/guide          /guides     301
+/plan           /discover   301
+
+# 预渲染的 **/index.html 优先；无静态文件时 SPA 回退
+/*              /index.html 200

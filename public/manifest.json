@@ -1,0 +1,28 @@
+{
+  "name": "Hello Roamly — 旅行发现",
+  "short_name": "Roamly",
+  "description": "攻略、计划与旅行瞬间，一站探索",
+  "start_url": "/",
+  "scope": "/",
+  "display": "standalone",
+  "orientation": "portrait-primary",
+  "lang": "zh-CN",
+  "dir": "ltr",
+  "theme_color": "#8B5CF6",
+  "background_color": "#f8fafc",
+  "categories": ["travel", "lifestyle"],
+  "icons": [
+    {
+      "src": "/favicon.svg",
+      "sizes": "any",
+      "type": "image/svg+xml",
+      "purpose": "any"
+    },
+    {
+      "src": "/favicon.svg",
+      "sizes": "512x512",
+      "type": "image/svg+xml",
+      "purpose": "maskable"
+    }
+  ]
+}

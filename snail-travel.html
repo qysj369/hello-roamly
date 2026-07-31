@@ -1,0 +1,310 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Snail Travel</title>
+  <style>
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+    }
+
+    html, body {
+      width: 100%;
+      height: 100%;
+      overflow: hidden;
+      background: #FAF9F6;
+      cursor: pointer;
+      transition: background-color 0.6s ease;
+    }
+
+    body.is-dark {
+      background: #000000;
+    }
+
+    #canvas-wrap {
+      position: fixed;
+      inset: 0;
+      width: 100%;
+      height: 100%;
+    }
+
+    canvas {
+      display: block;
+      width: 100%;
+      height: 100%;
+    }
+
+    #loading {
+      position: fixed;
+      left: 50%;
+      top: 50%;
+      transform: translate(-50%, -50%);
+      z-index: 10;
+      font-family: "Segoe UI", "PingFang SC", "Microsoft YaHei", sans-serif;
+      font-size: 14px;
+      letter-spacing: 0.12em;
+      color: #6b6b6b;
+      pointer-events: none;
+      user-select: none;
+      opacity: 1;
+      transition: opacity 0.8s ease, color 0.6s ease;
+    }
+
+    body.is-dark #loading {
+      color: #c8c8c8;
+    }
+
+    #loading.is-hidden {
+      opacity: 0;
+    }
+  </style>
+</head>
+<body>
+  <div id="canvas-wrap"></div>
+  <div id="loading">加载中... 请稍候</div>
+
+  <script src="https://cdn.jsdelivr.net/npm/three@0.128.0/build/three.min.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/gsap@3.12.5/dist/gsap.min.js"></script>
+  <script>
+    (function () {
+      const BG_LIGHT = 0xFAF9F6;
+      const BG_DARK = 0x000000;
+      const SNAIL_GREEN = 0x2E8B57;
+      const EARTH_CYAN = 0x00FFFF;
+
+      let isDark = false;
+      const loadingEl = document.getElementById("loading");
+      const wrap = document.getElementById("canvas-wrap");
+
+      // --- Scene ---
+      const scene = new THREE.Scene();
+      scene.background = new THREE.Color(BG_LIGHT);
+
+      const camera = new THREE.PerspectiveCamera(
+        45,
+        window.innerWidth / window.innerHeight,
+        0.1,
+        200
+      );
+      // Slightly elevated looking down
+      camera.position.set(0, 8, 18);
+      camera.lookAt(0, 0.8, 0);
+
+      const renderer = new THREE.WebGLRenderer({ antialias: true, alpha: false });
+      renderer.setPixelRatio(Math.min(window.devicePixelRatio || 1, 2));
+      renderer.setSize(window.innerWidth, window.innerHeight);
+      wrap.appendChild(renderer.domElement);
+
+      // --- Lights ---
+      scene.add(new THREE.AmbientLight(0xffffff, 0.8));
+
+      const dirLight = new THREE.DirectionalLight(0xffffff, 1);
+      dirLight.position.set(8, 12, 4);
+      scene.add(dirLight);
+
+      // Snail + Earth move as one group (L → R)
+      const travelGroup = new THREE.Group();
+      scene.add(travelGroup);
+
+      const GROUND_Y = 0;
+
+      // ========== SNAIL ==========
+      // Mid-lower; Earth sits to its right-rear on same plane
+      const snailGroup = new THREE.Group();
+      snailGroup.position.set(-2.2, GROUND_Y, 0.4);
+      travelGroup.add(snailGroup);
+
+      const snailMat = new THREE.MeshLambertMaterial({
+        color: SNAIL_GREEN,
+        wireframe: true
+      });
+
+      // Body: SphereGeometry r≈1.5, 32×16, Y scale 0.8
+      const body = new THREE.Mesh(
+        new THREE.SphereGeometry(1.5, 32, 16),
+        snailMat
+      );
+      body.scale.set(1, 0.8, 1);
+      body.position.set(0, 0.9, 0);
+      snailGroup.add(body);
+
+      // Shell: TorusGeometry (r=1.2, tube=0.4) behind body
+      const shell = new THREE.Mesh(
+        new THREE.TorusGeometry(1.2, 0.4, 16, 48),
+        snailMat.clone()
+      );
+      shell.position.set(-1.1, 1.55, 0);
+      shell.rotation.y = Math.PI / 2;
+      shell.rotation.z = -0.35;
+      snailGroup.add(shell);
+
+      // Antennae: CylinderGeometry r=0.05, h=0.8, tilted 30°
+      function makeAntenna(side) {
+        const mesh = new THREE.Mesh(
+          new THREE.CylinderGeometry(0.05, 0.05, 0.8, 8),
+          snailMat.clone()
+        );
+        const pivot = new THREE.Group();
+        pivot.position.set(1.1, 1.35, side * 0.35);
+        mesh.position.y = 0.4;
+        pivot.rotation.z = THREE.MathUtils.degToRad(30) * side;
+        pivot.rotation.x = THREE.MathUtils.degToRad(-30);
+        pivot.add(mesh);
+        snailGroup.add(pivot);
+        return pivot;
+      }
+
+      const antennaL = makeAntenna(-1);
+      const antennaR = makeAntenna(1);
+
+      // ========== EARTH ==========
+      // Right-rear of snail, Y close to snail (same horizontal plane)
+      const earthGroup = new THREE.Group();
+      earthGroup.position.set(3.2, GROUND_Y + 2.5, -2.2);
+      travelGroup.add(earthGroup);
+
+      const earth = new THREE.Mesh(
+        new THREE.SphereGeometry(2.5, 64, 64),
+        new THREE.MeshPhongMaterial({
+          color: EARTH_CYAN,
+          flatShading: true,
+          shininess: 20
+        })
+      );
+      earthGroup.add(earth);
+
+      // ~200 city light points
+      const CITY_COUNT = 200;
+      const cityPositions = new Float32Array(CITY_COUNT * 3);
+      const R = 2.52;
+      for (let i = 0; i < CITY_COUNT; i++) {
+        const u = Math.random();
+        const v = Math.random();
+        const theta = 2 * Math.PI * u;
+        const phi = Math.acos(2 * v - 1);
+        cityPositions[i * 3] = R * Math.sin(phi) * Math.cos(theta);
+        cityPositions[i * 3 + 1] = R * Math.cos(phi);
+        cityPositions[i * 3 + 2] = R * Math.sin(phi) * Math.sin(theta);
+      }
+      const cityGeo = new THREE.BufferGeometry();
+      cityGeo.setAttribute("position", new THREE.BufferAttribute(cityPositions, 3));
+      const cityMat = new THREE.PointsMaterial({
+        color: 0xffffff,
+        size: 0.08,
+        transparent: true,
+        opacity: 0.65,
+        sizeAttenuation: true,
+        depthWrite: false
+      });
+      const cityPoints = new THREE.Points(cityGeo, cityMat);
+      earthGroup.add(cityPoints);
+
+      // ========== ANIMATIONS ==========
+      travelGroup.position.x = -10;
+      gsap.to(travelGroup.position, {
+        x: 10,
+        duration: 40,
+        ease: "none",
+        repeat: -1
+      });
+
+      // Body bob: amplitude 0.1, period 2.5s
+      const bodyBaseY = body.position.y;
+      gsap.to(body.position, {
+        y: bodyBaseY + 0.1,
+        duration: 1.25,
+        ease: "sine.inOut",
+        yoyo: true,
+        repeat: -1
+      });
+      const shellBaseY = shell.position.y;
+      gsap.to(shell.position, {
+        y: shellBaseY + 0.08,
+        duration: 1.25,
+        ease: "sine.inOut",
+        yoyo: true,
+        repeat: -1
+      });
+
+      // Antenna pendulum, period 3s
+      gsap.to(antennaL.rotation, {
+        z: THREE.MathUtils.degToRad(-30) + 0.35,
+        duration: 1.5,
+        ease: "sine.inOut",
+        yoyo: true,
+        repeat: -1
+      });
+      gsap.to(antennaR.rotation, {
+        z: THREE.MathUtils.degToRad(30) - 0.35,
+        duration: 1.5,
+        ease: "sine.inOut",
+        yoyo: true,
+        repeat: -1
+      });
+
+      // City lights opacity 0.3 ↔ 1.0, period 4s
+      const cityOpacity = { value: 0.3 };
+      gsap.to(cityOpacity, {
+        value: 1.0,
+        duration: 2,
+        ease: "sine.inOut",
+        yoyo: true,
+        repeat: -1,
+        onUpdate: function () {
+          cityMat.opacity = cityOpacity.value;
+        }
+      });
+
+      // Earth spin: Math.PI * 2 per 25s
+      const EARTH_SPIN = (Math.PI * 2) / 25;
+
+      requestAnimationFrame(function () {
+        setTimeout(function () {
+          loadingEl.classList.add("is-hidden");
+        }, 1200);
+      });
+
+      // ========== DARK MODE ==========
+      function applyTheme() {
+        const wireColor = isDark ? 0xffffff : SNAIL_GREEN;
+        if (isDark) {
+          document.body.classList.add("is-dark");
+          scene.background.setHex(BG_DARK);
+        } else {
+          document.body.classList.remove("is-dark");
+          scene.background.setHex(BG_LIGHT);
+        }
+        snailGroup.traverse(function (obj) {
+          if (obj.isMesh && obj.material && obj.material.wireframe) {
+            obj.material.color.setHex(wireColor);
+          }
+        });
+      }
+
+      document.addEventListener("click", function () {
+        isDark = !isDark;
+        applyTheme();
+      });
+
+      window.addEventListener("resize", function () {
+        camera.aspect = window.innerWidth / window.innerHeight;
+        camera.updateProjectionMatrix();
+        renderer.setSize(window.innerWidth, window.innerHeight);
+      });
+
+      const clock = new THREE.Clock();
+      function animate() {
+        requestAnimationFrame(animate);
+        const dt = clock.getDelta();
+        earth.rotation.y += EARTH_SPIN * dt;
+        cityPoints.rotation.y = earth.rotation.y;
+        renderer.render(scene, camera);
+      }
+      animate();
+    })();
+  </script>
+</body>
+</html>

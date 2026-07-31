@@ -1,0 +1,9 @@
+[build]
+  command = "pnpm run build:ssg"
+  publish = "dist"
+
+[build.environment]
+  NODE_VERSION = "22"
+  PNPM_VERSION = "9"
+
+# 永久重定向与 SPA 回退见 public/_redirects（构建后位于 dist/_redirects）

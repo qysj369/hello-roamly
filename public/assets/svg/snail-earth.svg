@@ -1,0 +1,27 @@
+<svg viewBox="0 0 600 320" xmlns="http://www.w3.org/2000/svg" fill="none" stroke="#3c6b5c" stroke-width="2.8">
+  <!--地面线 静止-->
+  <path d="M60 260 L540 260"/>
+  <!--蜗牛壳（地球）静止-->
+  <g id="snail-shell">
+    <circle cx="440" cy="180" r="88"/>
+    <circle cx="408" cy="148" r="22"/>
+    <circle cx="452" cy="136" r="24"/>
+    <circle cx="430" cy="192" r="26"/>
+    <line x1="412" y1="168" x2="454" y2="196"/>
+    <line x1="456" y1="142" x2="424" y2="186"/>
+  </g>
+  <!--蜗牛身体-->
+  <path id="snail-body" d="M170 260 Q160 220 185 170 Q250 155 265 210 Q270 250 230 260 Q190 262 170 260"/>
+  <!--头部圆点-->
+  <circle cx="222" cy="190" r="4"/>
+  <!--左触角-->
+  <g id="tentacle-left">
+    <path d="M200 168 Q172 122 164 90"/>
+    <circle cx="164" cy="90" r="6"/>
+  </g>
+  <!--右触角-->
+  <g id="tentacle-right">
+    <path d="M242 166 Q270 120 282 92"/>
+    <circle cx="282" cy="92" r="6"/>
+  </g>
+</svg>

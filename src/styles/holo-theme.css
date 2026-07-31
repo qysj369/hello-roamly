@@ -1,0 +1,2 @@
+/* 兼容入口：主题变量统一来自 theme.scss */
+@import './theme.scss';

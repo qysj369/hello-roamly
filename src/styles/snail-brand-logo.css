@@ -1,0 +1,44 @@
+.snail-brand-logo {
+  display: inline-flex;
+  align-items: center;
+  gap: 10px;
+  min-width: 0;
+}
+
+.snail-brand-logo__icon {
+  flex-shrink: 0;
+}
+
+.snail-brand-logo__text {
+  min-width: 0;
+}
+
+.snail-brand-logo__title {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: baseline;
+  gap: 6px;
+  margin: 0;
+  color: var(--theme-ink);
+  line-height: 1.2;
+}
+
+.snail-brand-logo__zh {
+  font-size: 16px;
+  font-weight: 560;
+  letter-spacing: 0.04em;
+}
+
+.snail-brand-logo__en {
+  font-size: 12px;
+  font-weight: 450;
+  color: var(--theme-muted);
+  letter-spacing: 0.02em;
+}
+
+.snail-brand-logo__slogan {
+  margin: 2px 0 0;
+  color: var(--theme-faint);
+  font-size: 11px;
+  letter-spacing: 0.08em;
+}

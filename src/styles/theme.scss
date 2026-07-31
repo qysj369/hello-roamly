@@ -1,0 +1,72 @@
+/* 蜗牛旅行 · 浅米白极简全局主题（固定色彩系统 · 对齐设计定稿） */
+
+$theme-bg: #fdfbf4;
+$theme-bg-soft: #f6f3e8;
+$theme-surface: #ffffff;
+$theme-ink: #1b3b30;
+$theme-muted: #3d5f52;
+$theme-faint: #6a8a7c;
+$theme-line: #c5d6cc;
+$theme-accent: #1b3b30;
+$theme-accent-soft: #3d5f52;
+$theme-accent-warm: #b07a5a;
+$theme-brand-from: #1b3b30;
+$theme-brand-to: #eef5f1;
+$theme-earth-glow: rgba(27, 59, 48, 0.14);
+
+$theme-radius-sm: 6px;
+$theme-radius-md: 12px;
+$theme-radius-lg: 20px;
+
+$theme-shadow-sm: 0 1px 4px rgba(68, 68, 64, 0.04);
+$theme-shadow-md: 0 4px 14px rgba(68, 68, 64, 0.06);
+$theme-font: 'PingFang SC', 'Noto Sans SC', 'Segoe UI', system-ui, sans-serif;
+
+:root,
+.holo-app-shell,
+:root.holo-home-active {
+  --theme-bg: #{$theme-bg};
+  --theme-bg-soft: #{$theme-bg-soft};
+  --theme-surface: #{$theme-surface};
+  --theme-ink: #{$theme-ink};
+  --theme-muted: #{$theme-muted};
+  --theme-faint: #{$theme-faint};
+  --theme-line: #{$theme-line};
+  --theme-accent: #{$theme-accent};
+  --theme-accent-soft: #{$theme-accent-soft};
+  --theme-accent-warm: #{$theme-accent-warm};
+  --theme-brand-from: #{$theme-brand-from};
+  --theme-brand-to: #{$theme-brand-to};
+  --theme-brand-gradient: linear-gradient(135deg, #{$theme-brand-from} 0%, #{$theme-brand-to} 100%);
+  --theme-earth-glow: #{$theme-earth-glow};
+  --theme-radius-sm: #{$theme-radius-sm};
+  --theme-radius-md: #{$theme-radius-md};
+  --theme-radius-lg: #{$theme-radius-lg};
+  --theme-shadow-sm: #{$theme-shadow-sm};
+  --theme-shadow-md: #{$theme-shadow-md};
+  --theme-font: #{$theme-font};
+  /* 首页主体禁止全屏渐变，仅保留变量供局部装饰复用 */
+  --theme-bg-gradient: #{$theme-bg};
+
+  /* 兼容旧 holo 变量名，统一映射到浅米白主题（无霓虹） */
+  --holo-cyan: #{$theme-accent-soft};
+  --holo-cyan-light: #c5d6cb;
+  --holo-cyan-dark: #{$theme-accent};
+  --holo-text-dark: #{$theme-ink};
+  --holo-text-gray: #{$theme-muted};
+  --holo-text-light: #{$theme-faint};
+  --holo-bg-main: #{$theme-bg};
+  --holo-bg-card: #{$theme-surface};
+  --holo-border-light: #{$theme-line};
+  --holo-radius-sm: #{$theme-radius-sm};
+  --holo-radius-md: #{$theme-radius-md};
+  --holo-radius-lg: #{$theme-radius-lg};
+  --holo-space-xs: 8px;
+  --holo-space-sm: 16px;
+  --holo-space-md: 24px;
+  --holo-space-lg: 40px;
+  --holo-space-xl: 80px;
+  --holo-glow: #{$theme-shadow-sm};
+  --holo-text-glow: none;
+  --holo-bg-gradient: var(--theme-bg-gradient);
+}

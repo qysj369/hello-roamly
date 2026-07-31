@@ -1,0 +1,44 @@
+import {
+  BRAND_NAME,
+  BRAND_DOMAIN,
+  BRAND_NAME_EN,
+  APP_TITLE_SUFFIX,
+  BRAND_PILLARS_LINE,
+  BRAND_POSITIONING,
+  BRAND_SPIRIT_SLOGAN,
+  BRAND_LOCKUP,
+  BRAND_FUNCTION_DESC,
+  BRAND_MARK,
+} from '@/lib/config/brandCopy';
+
+/** 站点展示名 */
+export const APP_NAME = BRAND_NAME;
+
+/** 品牌主色 / 辅助色 */
+export const BRAND_COLORS = {
+  primary: '#3B82F6',
+  secondary: '#8B5CF6',
+} as const;
+
+/** 顶栏 / Logo 展示文案 */
+export const BRAND_LOGO_TEXT = BRAND_NAME;
+
+/** 全站页脚 / SEO 品牌标语 */
+export const BRAND_TAGLINE = BRAND_SPIRIT_SLOGAN;
+
+export {
+  BRAND_NAME,
+  BRAND_NAME_EN,
+  BRAND_DOMAIN,
+  APP_TITLE_SUFFIX,
+  BRAND_MARK,
+  BRAND_SPIRIT_SLOGAN,
+  BRAND_LOCKUP,
+  BRAND_FUNCTION_DESC,
+  BRAND_POSITIONING,
+  BRAND_PILLARS_LINE,
+};
+
+/** @deprecated */
+export const BRAND_SLOGAN = BRAND_SPIRIT_SLOGAN;
+export const BRAND_VALUE_PROPOSITION = BRAND_FUNCTION_DESC;

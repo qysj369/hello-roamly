@@ -1,0 +1,16 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1024 512" width="1024" height="512">
+  <defs>
+    <radialGradient id="wash" cx="50%" cy="45%" r="65%">
+      <stop offset="0%" stop-color="#2c2c2c" stop-opacity="0.18"/>
+      <stop offset="55%" stop-color="#4a6fa5" stop-opacity="0.08"/>
+      <stop offset="100%" stop-color="#f5f2eb" stop-opacity="0"/>
+    </radialGradient>
+    <filter id="soft">
+      <feGaussianBlur stdDeviation="8"/>
+    </filter>
+  </defs>
+  <rect width="1024" height="512" fill="url(#wash)"/>
+  <path filter="url(#soft)" fill="#2c2c2c" fill-opacity="0.12" d="M0 340 C120 300 220 320 340 290 S560 250 680 280 860 260 1024 300 L1024 512 L0 512 Z"/>
+  <path filter="url(#soft)" fill="#2c2c2c" fill-opacity="0.08" d="M0 380 C180 350 300 370 460 340 S720 310 1024 360 L1024 512 L0 512 Z"/>
+  <ellipse cx="520" cy="210" rx="280" ry="90" fill="#4a6fa5" fill-opacity="0.06" filter="url(#soft)"/>
+</svg>

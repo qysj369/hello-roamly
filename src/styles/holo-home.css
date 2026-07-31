@@ -1,0 +1,809 @@
+.holo-app-shell {
+  min-height: 100dvh;
+  overflow-x: hidden;
+  overflow-y: auto;
+  background: var(--theme-bg);
+}
+
+.holo-app-shell:has(.holo-home) {
+  --theme-bg: #f9f7eb;
+  --theme-accent: #2c6b58;
+  --theme-muted: #54786c;
+  --theme-line: #b7cdc4;
+  background: #f9f7eb;
+}
+
+.holo-home {
+  /* 品牌锁定色（首页作用域） */
+  --theme-bg: #f9f7eb;
+  --theme-surface: #fffef6;
+  --theme-accent: #2c6b58;
+  --theme-muted: #54786c;
+  --theme-line: #b7cdc4;
+  --theme-faint: #54786c;
+  width: 100%;
+  min-height: 100dvh;
+  overflow-x: clip;
+  overflow-y: visible;
+  background: var(--theme-bg);
+  color: var(--theme-accent);
+  font-family: var(--theme-font);
+  --holo-header-h: 56px;
+  padding-top: var(--holo-header-h);
+  box-sizing: border-box;
+}
+
+@keyframes holo-header-in {
+  from {
+    transform: translateY(-8px);
+  }
+  to {
+    transform: translateY(0);
+  }
+}
+
+@keyframes holo-title-in {
+  from {
+    transform: translateY(14px);
+  }
+  to {
+    transform: translateY(0);
+  }
+}
+
+@keyframes holo-desc-in {
+  from {
+    transform: translateY(6px);
+  }
+  to {
+    transform: translateY(0);
+  }
+}
+
+@keyframes holo-pill-in {
+  from {
+    translate: 0 10px;
+  }
+  to {
+    translate: 0 0;
+  }
+}
+
+@keyframes holo-card-in {
+  from {
+    translate: 0 12px;
+  }
+  to {
+    translate: 0 0;
+  }
+}
+
+@keyframes holo-line-draw {
+  from {
+    transform: none;
+  }
+  to {
+    transform: none;
+  }
+}
+
+@keyframes holo-breathe {
+  0%,
+  100% {
+    transform: translate3d(0, 0, 0);
+  }
+  50% {
+    transform: translate3d(4px, 0, 0);
+  }
+}
+
+/* —— ① 顶栏：品牌 + 标语 + 极细底部分割线 —— */
+.holo-home__header {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  z-index: 999;
+  width: 100%;
+  height: var(--holo-header-h);
+  box-sizing: border-box;
+  background: var(--theme-bg);
+  border-bottom: 1px solid var(--theme-line);
+  animation: holo-header-in 0.65s ease both;
+}
+
+.holo-home__header-inner {
+  display: flex;
+  width: 100%;
+  max-width: 1280px;
+  height: 100%;
+  margin: 0 auto;
+  align-items: center;
+  justify-content: space-between;
+  gap: 16px;
+  padding: 0 28px;
+  box-sizing: border-box;
+}
+
+.holo-home__brand-wrap {
+  min-width: 0;
+  display: flex;
+  align-items: center;
+}
+
+.holo-home__brand-wrap .snail-brand-logo {
+  gap: 10px;
+}
+
+.holo-home__brand-wrap .snail-brand-logo__title {
+  flex-direction: column;
+  flex-wrap: nowrap;
+  align-items: flex-start;
+  gap: 0;
+}
+
+.holo-home__brand-wrap .snail-brand-logo__zh {
+  font-size: 17px;
+  font-weight: 700;
+  color: var(--theme-accent);
+  letter-spacing: 0.04em;
+  line-height: 1.2;
+}
+
+.holo-home__brand-wrap .snail-brand-logo__en {
+  color: var(--theme-accent);
+  font-size: 12px;
+  font-weight: 450;
+  letter-spacing: 0.03em;
+  line-height: 1.25;
+  opacity: 0.92;
+}
+
+.holo-home__brand-wrap .snail-brand-logo__slogan {
+  display: none;
+}
+
+.holo-home__header-right {
+  display: flex;
+  align-items: center;
+  gap: 18px;
+  min-width: 0;
+}
+
+.holo-home__header-slogan {
+  margin: 0;
+  color: var(--theme-muted);
+  font-size: 13px;
+  font-weight: 400;
+  letter-spacing: 0.14em;
+  white-space: nowrap;
+}
+
+.holo-home__header-slogan-core,
+.holo-home__header-slogan-tail {
+  font-weight: 400;
+}
+
+.holo-home__search {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 32px;
+  height: 32px;
+  color: var(--theme-muted);
+  opacity: 0.72;
+  text-decoration: none;
+  border-radius: 50%;
+  transition:
+    background-color 0.2s ease,
+    opacity 0.2s ease,
+    color 0.2s ease;
+}
+
+.holo-home__search:hover,
+.holo-home__search:focus-visible {
+  background: color-mix(in srgb, var(--theme-accent) 6%, transparent);
+  color: var(--theme-accent);
+  opacity: 1;
+  outline: none;
+}
+
+.holo-home__search-icon {
+  width: 18px;
+  height: 18px;
+}
+
+/* —— Main —— */
+.holo-home__main {
+  width: 100%;
+  max-width: 1280px;
+  margin: 0 auto;
+  padding: 0 28px 28px;
+  box-sizing: border-box;
+}
+
+/* —— ② Hero —— */
+.holo-home__hero {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 18px;
+  width: 100%;
+  max-width: 1120px;
+  margin-inline: auto;
+  padding: 16px 0 12px;
+  box-sizing: border-box;
+  overflow: visible;
+}
+
+.holo-home__hero-stage {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 16px;
+  width: 100%;
+}
+
+.holo-home__hero-copy {
+  width: 100%;
+  max-width: 520px;
+  margin: 0;
+  text-align: center;
+}
+
+.holo-home__hero-title {
+  margin: 0 0 14px;
+  color: var(--theme-accent);
+  font-size: clamp(30px, 7.2vw, 42px);
+  font-weight: 700;
+  letter-spacing: 0.06em;
+  line-height: 1.15;
+  text-align: center;
+  animation: holo-title-in 0.75s ease 0.15s both;
+}
+
+.holo-home__hero-desc {
+  margin: 0;
+  color: var(--theme-muted);
+  font-size: 14px;
+  font-weight: 400;
+  line-height: 1.75;
+  letter-spacing: 0.02em;
+  text-align: center;
+  animation: holo-desc-in 0.65s ease 0.35s both;
+}
+
+.holo-home__hero-graphic {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  width: 100%;
+  min-width: 0;
+  overflow: visible;
+  background: transparent;
+  border: none;
+  box-shadow: none;
+}
+
+.holo-home__graphic-stage {
+  display: block;
+  width: min(92vw, 560px);
+  margin-inline: auto;
+  color: var(--theme-accent);
+  background: transparent;
+  border: none;
+  box-shadow: none;
+  border-radius: 0;
+  pointer-events: none;
+  animation: holo-breathe 7s ease-in-out 1.6s infinite;
+}
+
+.holo-home__snail-deco {
+  display: block;
+  width: 100%;
+  line-height: 0;
+  color: var(--theme-accent);
+  background: transparent;
+  border: none;
+  box-shadow: none;
+  pointer-events: none;
+  user-select: none;
+  /* 不用淡入动画，避免加载瞬间/异常时几乎看不见 */
+  opacity: 1;
+}
+
+.holo-home__snail-img {
+  display: block;
+  width: 100%;
+  height: auto;
+  aspect-ratio: 837 / 377;
+  object-fit: contain;
+  object-position: center;
+  background: transparent;
+  border: none;
+  box-shadow: none;
+  border-radius: 0;
+  filter: none;
+  opacity: 1;
+  mix-blend-mode: normal;
+  user-select: none;
+  -webkit-user-drag: none;
+}
+
+/* —— ③ 三入口 pill —— */
+.holo-home__hero-pills {
+  display: flex;
+  flex-wrap: nowrap;
+  justify-content: center;
+  align-items: center;
+  gap: 14px;
+  width: 100%;
+  max-width: 100%;
+  box-sizing: border-box;
+  overflow: visible;
+}
+
+.holo-home__pill {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  flex: 1 1 0;
+  min-height: 44px;
+  min-width: 0;
+  max-width: 220px;
+  padding: 10px 20px;
+  border: 1.5px solid var(--theme-line);
+  border-radius: 999px;
+  background: transparent;
+  color: var(--theme-accent);
+  font-size: 14px;
+  font-weight: 500;
+  letter-spacing: 0.08em;
+  text-decoration: none;
+  white-space: nowrap;
+  animation: holo-pill-in 0.55s ease both;
+  transition:
+    border-color 0.2s ease,
+    transform 0.2s ease,
+    background-color 0.2s ease;
+}
+
+.holo-home__pill:nth-child(1) {
+  animation-delay: 0.85s;
+}
+
+.holo-home__pill:nth-child(2) {
+  animation-delay: 1s;
+}
+
+.holo-home__pill:nth-child(3) {
+  animation-delay: 1.15s;
+}
+
+.holo-home__pill:hover,
+.holo-home__pill:active,
+.holo-home__pill:focus-visible {
+  border-color: var(--theme-accent);
+  transform: translateY(-1px);
+  outline: none;
+  background: transparent;
+}
+
+/* —— ④ 分类卡片 —— */
+.holo-home__cards {
+  width: 100%;
+  max-width: 1120px;
+  margin: 12px auto 0;
+  padding: 16px 0 4px;
+  border-top: 1px solid var(--theme-line);
+}
+
+.holo-home__cards-title {
+  margin: 0 0 14px;
+  color: var(--theme-muted);
+  font-size: 14px;
+  font-weight: 600;
+  letter-spacing: 0.16em;
+}
+
+.holo-home__card-row {
+  display: grid;
+  grid-template-columns: repeat(4, minmax(0, 1fr));
+  gap: 14px;
+  width: 100%;
+}
+
+.holo-home__card {
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  gap: 14px;
+  min-height: 132px;
+  padding: 18px 18px 16px;
+  overflow: hidden;
+  border: 1.5px solid var(--theme-line);
+  border-radius: 14px;
+  background: var(--theme-surface);
+  color: var(--theme-accent);
+  text-decoration: none;
+  animation: holo-card-in 0.5s ease 1.05s both;
+  transition:
+    transform 0.22s ease,
+    border-color 0.22s ease,
+    box-shadow 0.22s ease;
+}
+
+.holo-home__card:hover,
+.holo-home__card:active,
+.holo-home__card:focus-visible {
+  border-color: var(--theme-accent);
+  transform: translateY(-2px);
+  box-shadow: var(--theme-shadow-sm);
+  outline: none;
+}
+
+.holo-home__card-icon-wrap {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 36px;
+  height: 36px;
+  color: var(--theme-accent);
+  pointer-events: none;
+}
+
+.holo-home__card-icon {
+  display: block;
+  width: 32px;
+  height: 32px;
+}
+
+.holo-home__card-label {
+  position: relative;
+  z-index: 1;
+  display: inline-flex;
+  align-items: center;
+  font-size: 14px;
+  font-weight: 500;
+  letter-spacing: 0.06em;
+  color: var(--theme-accent);
+}
+
+/* —— Footer —— */
+.holo-home__footer {
+  margin-top: 28px;
+  padding-top: 20px;
+  border-top: 1px solid var(--theme-line);
+  text-align: center;
+}
+
+.holo-home__footer-line {
+  margin: 0 0 14px;
+  color: var(--theme-muted);
+  font-size: 13px;
+  letter-spacing: 0.1em;
+}
+
+.holo-home__lang {
+  display: inline-flex;
+  gap: 2px;
+  margin-bottom: 12px;
+  padding: 2px;
+  border: 1px solid var(--theme-line);
+  border-radius: var(--theme-radius-lg);
+  background: var(--theme-surface);
+}
+
+.holo-home__lang button {
+  min-width: 48px;
+  padding: 5px 10px;
+  border: none;
+  border-radius: var(--theme-radius-lg);
+  background: transparent;
+  color: var(--theme-muted);
+  font-size: 12px;
+  cursor: pointer;
+}
+
+.holo-home__lang button.is-active {
+  background: color-mix(in srgb, var(--theme-accent) 10%, var(--theme-surface));
+  color: var(--theme-accent);
+}
+
+.holo-home__beian {
+  margin-top: 8px;
+  color: var(--theme-faint);
+  font-size: 10px;
+  line-height: 1.45;
+}
+
+.holo-home__beian a {
+  color: inherit;
+  text-decoration: none;
+}
+
+/* —— Mobile tabbar —— */
+.holo-home__tabbar {
+  position: fixed;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  z-index: 1000;
+  display: grid;
+  grid-template-columns: repeat(5, minmax(0, 1fr));
+  padding: 6px 4px calc(6px + env(safe-area-inset-bottom));
+  border-top: 1px solid var(--theme-line);
+  background: var(--theme-surface);
+}
+
+.holo-home__tab {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 2px;
+  min-height: 44px;
+  color: var(--theme-faint);
+  font-size: 10px;
+  text-decoration: none;
+}
+
+.holo-home__tab svg {
+  width: 20px;
+  height: 20px;
+}
+
+.holo-home__tab.is-active,
+.holo-home__tab:hover,
+.holo-home__tab:active {
+  color: var(--theme-accent);
+}
+
+/* —— Mobile：上下堆叠 —— */
+@media (max-width: 1023px) {
+  .holo-home {
+    --holo-header-h: 52px;
+    padding-bottom: calc(64px + env(safe-area-inset-bottom));
+  }
+
+  .holo-home__header-inner,
+  .holo-home__main {
+    padding-left: 16px;
+    padding-right: 16px;
+  }
+
+  .holo-home__header-right {
+    gap: 10px;
+  }
+
+  .holo-home__header-slogan {
+    max-width: 40vw;
+    overflow: hidden;
+    font-size: 11px;
+    letter-spacing: 0.04em;
+    text-overflow: ellipsis;
+  }
+
+  .holo-home__brand-wrap .snail-brand-logo__zh {
+    font-size: 15px;
+  }
+
+  .holo-home__brand-wrap .snail-brand-logo__en {
+    font-size: 11px;
+  }
+
+  .holo-home__hero {
+    gap: 16px;
+    padding: 14px 0 16px;
+  }
+
+  /* 移动端：上下堆叠，文案与 SVG 居中 */
+  .holo-home__hero-stage {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 12px;
+  }
+
+  .holo-home__hero-copy {
+    text-align: center;
+  }
+
+  .holo-home__hero-title {
+    font-size: clamp(26px, 7vw, 34px);
+    text-align: center;
+  }
+
+  .holo-home__hero-desc {
+    padding: 0 8px;
+    font-size: 13px;
+    text-align: center;
+  }
+
+  .holo-home__hero-graphic {
+    justify-content: center;
+    width: 100%;
+  }
+
+  .holo-home__graphic-stage {
+    width: min(94vw, 420px);
+    margin-inline: auto;
+  }
+
+  .holo-home__hero-pills {
+    gap: 8px;
+    flex-wrap: nowrap;
+  }
+
+  .holo-home__pill {
+    flex: 1 1 0;
+    min-height: 40px;
+    min-width: 0;
+    padding: 8px 6px;
+    font-size: 12px;
+    letter-spacing: 0.04em;
+  }
+
+  .holo-home__cards {
+    margin-top: 16px;
+    padding-top: 16px;
+  }
+
+  .holo-home__cards-title {
+    margin-bottom: 12px;
+    font-size: 13px;
+  }
+
+  .holo-home__card-row {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: 12px;
+  }
+
+  .holo-home__card {
+    min-height: 118px;
+    gap: 12px;
+    padding: 14px;
+    border-radius: 12px;
+  }
+
+  .holo-home__card-label {
+    font-size: 13px;
+  }
+}
+
+/* —— PC：左文右图 —— */
+@media (min-width: 1024px) {
+  .holo-home {
+    --holo-header-h: 72px;
+    padding-bottom: 0;
+  }
+
+  .holo-home__header-inner {
+    padding: 0 56px;
+  }
+
+  .holo-home__brand-wrap .snail-brand-logo__zh {
+    font-size: 18px;
+  }
+
+  .holo-home__brand-wrap .snail-brand-logo__en {
+    font-size: 12.5px;
+  }
+
+  .holo-home__header-slogan {
+    font-size: 14px;
+    letter-spacing: 0.16em;
+  }
+
+  .holo-home__main {
+    padding: 0 56px 48px;
+  }
+
+  /* PC：左文右图 — 对齐定稿图留白与字号 */
+  .holo-home__hero {
+    gap: 36px;
+    padding: 48px 0 28px;
+  }
+
+  .holo-home__hero-stage {
+    display: grid;
+    grid-template-columns: minmax(0, 0.9fr) minmax(0, 1.25fr);
+    align-items: center;
+    gap: 24px 48px;
+    min-width: 0;
+    min-height: 320px;
+  }
+
+  .holo-home__hero-copy {
+    max-width: none;
+    text-align: left;
+    justify-self: start;
+    padding-left: 12px;
+    min-width: 0;
+  }
+
+  .holo-home__hero-title {
+    margin-bottom: 18px;
+    font-size: clamp(44px, 4.4vw, 56px);
+    letter-spacing: 0.06em;
+    text-align: left;
+    line-height: 1.2;
+  }
+
+  .holo-home__hero-desc {
+    max-width: 17em;
+    margin-inline: 0;
+    padding: 0;
+    font-size: 15px;
+    line-height: 1.85;
+    text-align: left;
+  }
+
+  .holo-home__hero-graphic {
+    justify-content: center;
+    min-width: 0;
+  }
+
+  .holo-home__graphic-stage {
+    width: min(100%, 640px);
+    margin-inline: auto;
+  }
+
+  .holo-home__hero-pills {
+    gap: 16px;
+    flex-wrap: nowrap;
+  }
+
+  .holo-home__pill {
+    flex: 1 1 0;
+    min-height: 46px;
+    min-width: 0;
+    max-width: 200px;
+    padding: 11px 24px;
+    font-size: 15px;
+  }
+
+  .holo-home__cards {
+    margin-top: 12px;
+    padding-top: 16px;
+  }
+
+  .holo-home__cards-title {
+    margin-bottom: 16px;
+    font-size: 15px;
+  }
+
+  .holo-home__card-row {
+    grid-template-columns: repeat(4, minmax(0, 1fr));
+    gap: 16px;
+  }
+
+  .holo-home__card {
+    min-height: 140px;
+    padding: 20px;
+  }
+
+  .holo-home__card-label {
+    font-size: 15px;
+  }
+
+  .holo-home__tabbar {
+    display: none;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .holo-home__header,
+  .holo-home__hero-title,
+  .holo-home__hero-desc,
+  .holo-home__pill,
+  .holo-home__card,
+  .holo-home__graphic-stage,
+  .holo-home__snail-deco {
+    animation: none !important;
+    opacity: 1 !important;
+    transform: none !important;
+    translate: none !important;
+  }
+}

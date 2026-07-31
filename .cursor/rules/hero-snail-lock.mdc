@@ -1,0 +1,15 @@
+---
+description: 首页蜗牛拖地球插画已锁定，禁止再改线条与造型
+globs: src/assets/snail-drag-earth*.png,src/components/home/holo/HeroSnailGraphic.tsx,scripts/thin_snail.py
+alwaysApply: false
+---
+
+# 首页蜗牛插画锁定
+
+用户已确认最终稿，禁止再改来改去。
+
+- 锁定文件：`src/assets/snail-drag-earth.png`、`public/assets/snail-drag-earth.png`
+- 源备份：`src/assets/snail-drag-earth.source.png`
+- 禁止重绘、临摹、细化脚本覆盖、换成另一套 SVG 造型
+- 只可改外层布局尺寸、位置、边距与 CSS 动画
+- 入口组件：`HeroSnailGraphic.tsx`

@@ -1,0 +1,775 @@
+.holo-drive {
+  min-height: 100dvh;
+  display: flex;
+  flex-direction: column;
+  background: var(--holo-bg-gradient);
+  color: var(--holo-text-dark);
+  font-family: 'PingFang SC', Inter, system-ui, sans-serif;
+}
+
+.holo-drive--cabin {
+  background:
+    radial-gradient(120% 80% at 50% 0%, rgba(120, 170, 190, 0.22), transparent 55%),
+    linear-gradient(180deg, #d9e4ea 0%, #eaf0f3 42%, #dfe8ed 100%);
+}
+
+.holo-drive__header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 10px;
+  padding: 8px 12px;
+  background: rgba(234, 240, 243, 0.88);
+  backdrop-filter: blur(8px);
+  border-bottom: 1px solid var(--holo-border-light);
+  z-index: 5;
+}
+
+.holo-drive__back {
+  color: var(--holo-text-gray);
+  font-size: 13px;
+  text-decoration: none;
+  white-space: nowrap;
+}
+
+.holo-drive__brand {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  color: var(--holo-text-dark);
+  font-size: 14px;
+}
+
+.holo-drive__header-meta {
+  display: flex;
+  align-items: baseline;
+  gap: 8px;
+  min-width: 0;
+}
+
+.holo-drive__city-inline {
+  font-size: 14px;
+  font-weight: 500;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.holo-drive__main {
+  display: flex;
+  flex: 1 1 auto;
+  width: min(100%, 960px);
+  min-height: 0;
+  flex-direction: column;
+  align-items: stretch;
+  gap: 10px;
+  margin: 0 auto;
+  padding: 12px 14px calc(12px + env(safe-area-inset-bottom));
+  text-align: center;
+}
+
+.holo-drive--cabin .holo-drive__main {
+  width: min(100%, 1100px);
+  gap: 8px;
+  padding: 8px 10px calc(8px + env(safe-area-inset-bottom));
+}
+
+.holo-drive__intro {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+
+.holo-drive__badge {
+  margin: 0;
+  color: var(--holo-cyan-dark);
+  font-size: 11px;
+  letter-spacing: 0.14em;
+}
+
+.holo-drive__city {
+  margin: 0;
+  font-size: clamp(26px, 7vw, 34px);
+  font-weight: 500;
+  line-height: 1.1;
+}
+
+.holo-drive__tag {
+  margin: 0;
+  color: var(--holo-text-gray);
+  font-size: 12px;
+}
+
+.holo-drive__cabin {
+  position: relative;
+  flex: 1 1 auto;
+  height: min(72dvh, 620px);
+  min-height: min(72dvh, 620px);
+  display: flex;
+  flex-direction: column;
+}
+
+.holo-drive__street {
+  position: relative;
+  flex: 1 1 auto;
+  height: min(56vh, 460px);
+  min-height: min(56vh, 460px);
+  overflow: hidden;
+  border: 1px solid rgba(44, 52, 56, 0.12);
+  border-radius: 18px;
+  background: #1a2226;
+  box-shadow:
+    0 18px 40px rgba(32, 48, 56, 0.18),
+    inset 0 0 0 1px rgba(255, 255, 255, 0.08);
+}
+
+.holo-drive--cabin .holo-drive__street {
+  height: 100%;
+  min-height: 100%;
+  border-radius: 20px;
+}
+
+.holo-drive__street--video {
+  background: #0b1014;
+}
+
+.holo-drive__video {
+  position: absolute;
+  inset: 0;
+  z-index: 0;
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  background: #0b1014;
+}
+
+.holo-drive__route-title {
+  position: absolute;
+  top: 10px;
+  left: 50%;
+  z-index: 5;
+  transform: translateX(-50%);
+  max-width: min(92%, 360px);
+  padding: 5px 12px;
+  border: 1px solid rgba(255, 210, 140, 0.28);
+  border-radius: 999px;
+  background: rgba(20, 28, 34, 0.62);
+  color: rgba(255, 236, 200, 0.95);
+  font-size: 11px;
+  line-height: 1.25;
+  text-align: center;
+  backdrop-filter: blur(8px);
+  pointer-events: none;
+}
+
+.holo-drive__mode-switch {
+  display: flex;
+  justify-content: center;
+  gap: 8px;
+}
+
+.holo-drive__mode-chip {
+  padding: 7px 14px;
+  border: 1px solid var(--holo-border-light);
+  border-radius: 999px;
+  background: rgba(255, 255, 255, 0.9);
+  color: var(--holo-text-gray);
+  font-size: 12px;
+  cursor: pointer;
+}
+
+.holo-drive__mode-chip.is-active {
+  border-color: var(--holo-cyan-dark);
+  background: rgba(182, 240, 255, 0.22);
+  color: var(--holo-text-dark);
+}
+
+.holo-drive__mode-chip--accent {
+  border-color: rgba(210, 160, 90, 0.45);
+  color: #8a5a20;
+  background: rgba(255, 236, 200, 0.55);
+}
+
+.holo-drive__street--mapillary .holo-drive__mapillary {
+  position: absolute;
+  inset: 0;
+  z-index: 0;
+}
+
+.holo-drive__street--mapillary .holo-drive__mapillary .mapillary-viewer {
+  width: 100%;
+  height: 100%;
+}
+
+.holo-drive__modal-mask {
+  position: fixed;
+  inset: 0;
+  z-index: 40;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 16px;
+  background: rgba(12, 18, 22, 0.45);
+  backdrop-filter: blur(4px);
+}
+
+.holo-drive__modal {
+  width: min(100%, 440px);
+  max-height: min(88dvh, 720px);
+  overflow: auto;
+  padding: 16px 16px 14px;
+  border: 1px solid var(--holo-border-light);
+  border-radius: 16px;
+  background: #f4f8fa;
+  box-shadow: 0 18px 40px rgba(20, 32, 40, 0.22);
+  text-align: left;
+}
+
+.holo-drive__modal h2 {
+  margin: 0 0 6px;
+  font-size: 18px;
+  font-weight: 560;
+}
+
+.holo-drive__modal-desc {
+  margin: 0 0 12px;
+  color: var(--holo-text-gray);
+  font-size: 13px;
+  line-height: 1.5;
+}
+
+.holo-drive__field {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  margin-bottom: 10px;
+  font-size: 12px;
+  color: var(--holo-text-gray);
+}
+
+.holo-drive__field input {
+  padding: 9px 11px;
+  border: 1px solid var(--holo-border-light);
+  border-radius: 10px;
+  background: #fff;
+  color: var(--holo-text-dark);
+  font-size: 13px;
+}
+
+.holo-drive__dropzone {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 4px;
+  margin-bottom: 10px;
+  padding: 18px 12px;
+  border: 1px dashed rgba(80, 110, 120, 0.35);
+  border-radius: 12px;
+  background: rgba(255, 255, 255, 0.8);
+  color: var(--holo-text-gray);
+  font-size: 13px;
+  text-align: center;
+  cursor: pointer;
+}
+
+.holo-drive__dropzone.is-active {
+  border-color: var(--holo-cyan-dark);
+  background: rgba(182, 240, 255, 0.16);
+}
+
+.holo-drive__dropzone small {
+  font-size: 11px;
+  opacity: 0.8;
+}
+
+.holo-drive__dropzone strong {
+  margin-top: 4px;
+  color: var(--holo-text-dark);
+  font-size: 12px;
+  word-break: break-all;
+}
+
+.holo-drive__contribute-preview {
+  width: 100%;
+  max-height: 180px;
+  margin-bottom: 10px;
+  border-radius: 10px;
+  background: #111;
+  object-fit: cover;
+}
+
+.holo-drive__modal-error {
+  margin: 0 0 8px;
+  color: #b42318;
+  font-size: 12px;
+}
+
+.holo-drive__modal-success {
+  margin: 0 0 8px;
+  color: #027a48;
+  font-size: 12px;
+}
+
+.holo-drive__modal-actions {
+  display: flex;
+  justify-content: flex-end;
+  gap: 8px;
+  margin-top: 4px;
+}
+
+.holo-drive__pano-stack {
+  position: absolute;
+  inset: 0;
+  z-index: 0;
+  overflow: hidden;
+}
+
+/* 双缓冲交叉淡入：前后两层叠化，不做整屏变黑 */
+.holo-drive__street-canvas {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  opacity: 0;
+  transform: scale(1);
+  transform-origin: 50% 58%;
+  transition: opacity 0.9s ease;
+  will-change: opacity, transform;
+}
+
+.holo-drive__street-canvas.is-front {
+  opacity: 1;
+  z-index: 1;
+  pointer-events: auto;
+}
+
+.holo-drive__street-canvas.is-back {
+  opacity: 0;
+  z-index: 0;
+  pointer-events: none;
+}
+
+.holo-drive__street-canvas.is-back.is-fading-in {
+  opacity: 1;
+  z-index: 2;
+}
+
+.holo-drive__street-canvas.is-front.is-fading-out {
+  opacity: 0;
+  z-index: 1;
+}
+
+.holo-drive__cabin-frame {
+  pointer-events: none;
+  position: absolute;
+  inset: 0;
+  z-index: 4;
+  background:
+    radial-gradient(120% 90% at 50% 42%, transparent 46%, rgba(10, 16, 20, 0.28) 78%, rgba(8, 12, 16, 0.55) 100%),
+    linear-gradient(180deg, rgba(8, 14, 18, 0.18) 0%, transparent 18%, transparent 62%, rgba(8, 12, 16, 0.45) 100%);
+  box-shadow: inset 0 0 60px rgba(0, 0, 0, 0.28);
+}
+
+.holo-drive__street-overlay {
+  position: absolute;
+  inset: 0;
+  z-index: 3;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 6px;
+  padding: 16px;
+  background: rgba(234, 240, 243, 0.88);
+  color: var(--holo-text-gray);
+  font-size: 13px;
+  line-height: 1.5;
+  text-align: center;
+}
+
+.holo-drive__street-overlay strong {
+  color: var(--holo-text-dark);
+  font-size: 14px;
+  font-weight: 500;
+}
+
+.holo-drive__street-overlay p {
+  margin: 0;
+}
+
+.holo-drive__street-overlay--muted {
+  background: rgba(234, 240, 243, 0.94);
+}
+
+/* —— HUD —— */
+.holo-drive__hud {
+  pointer-events: none;
+  position: absolute;
+  inset: 0;
+  z-index: 4;
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+  padding: 12px 12px 10px;
+}
+
+.holo-drive__hud-glass {
+  position: absolute;
+  left: 8%;
+  right: 8%;
+  top: 0;
+  height: 18%;
+  background: linear-gradient(180deg, rgba(255, 255, 255, 0.12), transparent);
+  border-radius: 0 0 40% 40%;
+  opacity: 0.55;
+}
+
+.holo-drive__hud-top {
+  position: relative;
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 10px;
+}
+
+.holo-drive__gauge {
+  min-width: 72px;
+  padding: 8px 10px;
+  border: 1px solid rgba(255, 255, 255, 0.18);
+  border-radius: 14px;
+  background: rgba(16, 22, 26, 0.55);
+  color: #f3f7f8;
+  backdrop-filter: blur(10px);
+  text-align: left;
+  box-shadow: 0 8px 20px rgba(0, 0, 0, 0.18);
+}
+
+.holo-drive__gauge-label {
+  display: block;
+  color: rgba(230, 240, 244, 0.72);
+  font-size: 10px;
+  letter-spacing: 0.08em;
+}
+
+.holo-drive__gauge-value {
+  display: block;
+  margin-top: 2px;
+  font-size: 22px;
+  font-weight: 600;
+  font-variant-numeric: tabular-nums;
+  line-height: 1.1;
+}
+
+.holo-drive__gauge-sub {
+  display: block;
+  margin-top: 2px;
+  color: rgba(230, 240, 244, 0.78);
+  font-size: 11px;
+}
+
+.holo-drive__gauge--speed {
+  min-width: 96px;
+  text-align: right;
+}
+
+.holo-drive__speed-num {
+  display: block;
+  font-size: clamp(28px, 7vw, 36px);
+  font-weight: 650;
+  font-variant-numeric: tabular-nums;
+  line-height: 1;
+  letter-spacing: -0.02em;
+}
+
+.holo-drive__speed-unit {
+  display: block;
+  margin-top: 2px;
+  color: rgba(230, 240, 244, 0.72);
+  font-size: 11px;
+}
+
+.holo-drive__dash {
+  pointer-events: auto;
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  padding: 10px 12px 12px;
+  border: 1px solid rgba(255, 255, 255, 0.14);
+  border-radius: 18px 18px 16px 16px;
+  background:
+    linear-gradient(180deg, rgba(28, 36, 42, 0.72), rgba(14, 18, 22, 0.86));
+  backdrop-filter: blur(14px);
+  box-shadow:
+    0 -8px 28px rgba(0, 0, 0, 0.22),
+    inset 0 1px 0 rgba(255, 255, 255, 0.08);
+}
+
+.holo-drive__dash-hint {
+  color: rgba(230, 240, 244, 0.78);
+  font-size: 11px;
+  letter-spacing: 0.02em;
+}
+
+.holo-drive__dash-controls {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  justify-content: space-between;
+  gap: 8px;
+}
+
+.holo-drive__play {
+  min-width: 84px;
+  padding: 10px 16px;
+  border: 1px solid rgba(182, 240, 255, 0.45);
+  border-radius: 999px;
+  background: rgba(182, 240, 255, 0.18);
+  color: #f5fbfc;
+  font-size: 13px;
+  cursor: pointer;
+  transition: background 0.2s ease, transform 0.15s ease;
+}
+
+.holo-drive__play:hover:not(:disabled) {
+  background: rgba(182, 240, 255, 0.28);
+}
+
+.holo-drive__play:disabled {
+  opacity: 0.45;
+  cursor: not-allowed;
+}
+
+.holo-drive__play.is-playing {
+  border-color: rgba(255, 210, 160, 0.5);
+  background: rgba(255, 180, 120, 0.22);
+}
+
+.holo-drive__speed-presets {
+  display: flex;
+  flex: 1 1 auto;
+  justify-content: flex-end;
+  gap: 6px;
+}
+
+.holo-drive__speed-chip {
+  display: inline-flex;
+  flex-direction: column;
+  align-items: center;
+  min-width: 58px;
+  padding: 6px 8px;
+  border: 1px solid rgba(255, 255, 255, 0.14);
+  border-radius: 12px;
+  background: rgba(255, 255, 255, 0.06);
+  color: rgba(240, 246, 248, 0.88);
+  font-size: 11px;
+  line-height: 1.2;
+  cursor: pointer;
+  transition: background 0.2s ease, border-color 0.2s ease;
+}
+
+.holo-drive__speed-chip span {
+  margin-top: 2px;
+  font-size: 12px;
+  font-variant-numeric: tabular-nums;
+  opacity: 0.85;
+}
+
+.holo-drive__speed-chip.is-active {
+  border-color: rgba(182, 240, 255, 0.55);
+  background: rgba(182, 240, 255, 0.2);
+  color: #fff;
+}
+
+.holo-drive__speed-chip:disabled {
+  opacity: 0.4;
+  cursor: not-allowed;
+}
+
+.holo-drive__panel {
+  padding: 14px 14px 12px;
+  border: 1px solid var(--holo-border-light);
+  border-radius: var(--holo-radius-md);
+  background: rgba(255, 255, 255, 0.92);
+  box-shadow: var(--holo-glow);
+  text-align: left;
+}
+
+.holo-drive__panel h2 {
+  margin: 0 0 6px;
+  font-size: 16px;
+  font-weight: 500;
+  text-align: center;
+}
+
+.holo-drive__panel p {
+  margin: 0;
+  color: var(--holo-text-gray);
+  font-size: 13px;
+  line-height: 1.5;
+}
+
+.holo-drive__provider {
+  margin-top: 8px !important;
+  color: var(--holo-text-light) !important;
+  font-size: 11px !important;
+  text-align: center;
+}
+
+.holo-drive__alt-cities {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: center;
+  gap: 8px;
+}
+
+.holo-drive--cabin .holo-drive__alt-cities {
+  gap: 6px;
+}
+
+.holo-drive__alt-chip {
+  padding: 7px 12px;
+  border: 1px solid var(--holo-border-light);
+  border-radius: 999px;
+  background: rgba(255, 255, 255, 0.92);
+  color: var(--holo-cyan-dark);
+  font-size: 12px;
+  text-decoration: none;
+}
+
+.holo-drive__actions {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 8px;
+}
+
+.holo-drive--cabin .holo-drive__actions {
+  max-width: 420px;
+  margin: 0 auto;
+}
+
+.holo-drive__btn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  padding: 10px 12px;
+  border-radius: 999px;
+  font-size: 13px;
+  text-decoration: none;
+  transition: background 0.2s ease, box-shadow 0.2s ease;
+}
+
+.holo-drive__btn--primary {
+  border: 1px solid var(--holo-cyan-dark);
+  background: rgba(182, 240, 255, 0.18);
+  color: var(--holo-text-dark);
+}
+
+.holo-drive__btn--ghost {
+  border: 1px solid var(--holo-border-light);
+  background: rgba(255, 255, 255, 0.88);
+  color: var(--holo-text-gray);
+}
+
+@media (max-width: 768px) {
+  .holo-drive__header {
+    padding: 8px 10px;
+  }
+
+  .holo-drive__back {
+    font-size: 12px;
+  }
+
+  .holo-drive__brand span {
+    display: none;
+  }
+
+  .holo-drive__header-meta .holo-drive__badge {
+    display: none;
+  }
+
+  .holo-drive__main {
+    gap: 8px;
+    padding: 8px 10px calc(8px + env(safe-area-inset-bottom));
+  }
+
+  .holo-drive__cabin {
+    height: min(74dvh, 560px);
+    min-height: min(74dvh, 560px);
+  }
+
+  .holo-drive--cabin .holo-drive__street {
+    height: 100%;
+    min-height: 100%;
+    border-radius: 16px;
+  }
+
+  .holo-drive__hud {
+    padding: 10px 8px 8px;
+  }
+
+  .holo-drive__gauge {
+    min-width: 64px;
+    padding: 7px 8px;
+  }
+
+  .holo-drive__gauge-value {
+    font-size: 18px;
+  }
+
+  .holo-drive__speed-num {
+    font-size: 28px;
+  }
+
+  .holo-drive__dash {
+    padding: 8px 10px 10px;
+    border-radius: 16px;
+  }
+
+  .holo-drive__speed-chip {
+    min-width: 52px;
+    padding: 5px 6px;
+  }
+
+  .holo-drive__play {
+    min-width: 72px;
+    padding: 9px 14px;
+    font-size: 12px;
+  }
+
+  .holo-drive__intro {
+    gap: 2px;
+  }
+
+  .holo-drive__city {
+    font-size: clamp(24px, 7vw, 28px);
+  }
+
+  .holo-drive__panel {
+    padding: 12px;
+  }
+
+  .holo-drive__panel h2 {
+    font-size: 15px;
+  }
+
+  .holo-drive__panel p {
+    font-size: 12px;
+  }
+
+  .holo-drive__btn {
+    padding: 9px 10px;
+    font-size: 12px;
+  }
+}
+
+@media (min-width: 769px) {
+  .holo-drive__main {
+    min-height: calc(100dvh - 52px);
+  }
+
+  .holo-drive--cabin .holo-drive__cabin {
+    height: calc(100dvh - 140px);
+    min-height: calc(100dvh - 140px);
+  }
+}

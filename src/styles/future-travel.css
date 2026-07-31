@@ -1,0 +1,188 @@
+/*
+ * 未来旅行风 · 全站安全适配版
+ *
+ * 对应「终极适配版」设计意图，但不做以下破坏性全局重置：
+ * - 不禁用全部 animation / filter / shadow（Capsule 3D 地球与 framer-motion 依赖它们）
+ * - 不把 section 默认设为 opacity:0（项目无 .active 滚动监听，会整页空白）
+ *
+ * Capsule 驾驶舱 (.capsule-app-shell) 与全息首页 (.holo-app-shell) 单独控制，此处排除。
+ */
+
+@keyframes ft-star-float {
+  0% {
+    background-position: 0% 0%;
+  }
+  100% {
+    background-position: 35px 35px;
+  }
+}
+
+@keyframes ft-view-scale {
+  0% {
+    transform: scale(1);
+  }
+  100% {
+    transform: scale(1.025);
+  }
+}
+
+@keyframes ft-btn-breathe {
+  0%,
+  100% {
+    box-shadow: 0 0 10px rgba(0, 209, 255, 0.25);
+  }
+  50% {
+    box-shadow: 0 0 20px rgba(157, 125, 255, 0.35);
+  }
+}
+
+@keyframes ft-tag-float {
+  0% {
+    transform: translateX(0);
+  }
+  100% {
+    transform: translateX(5px);
+  }
+}
+
+/* 1. 全站柔光星空背景 */
+body:not(:has(.capsule-app-shell)):not(:has(.holo-app-shell)) {
+  background-color: #f2f5f9 !important;
+  background-image:
+    radial-gradient(rgba(0, 209, 255, 0.2) 1px, transparent 1px),
+    radial-gradient(rgba(157, 125, 255, 0.12) 1px, transparent 1px) !important;
+  background-size: 32px 32px, 48px 48px !important;
+  animation: ft-star-float 18s ease-in-out infinite alternate !important;
+}
+
+/* 2. Hero / Banner 温柔微缩放 */
+body:not(:has(.capsule-app-shell)):not(:has(.holo-app-shell)) section[class*='hero'],
+body:not(:has(.capsule-app-shell)):not(:has(.holo-app-shell)) .hero,
+body:not(:has(.capsule-app-shell)):not(:has(.holo-app-shell)) .banner,
+body:not(:has(.capsule-app-shell)):not(:has(.holo-app-shell)) .home-map-trail-hero-stack,
+body:not(:has(.capsule-app-shell)):not(:has(.holo-app-shell)) section.rounded-2xl.bg-gradient-to-br {
+  animation: ft-view-scale 14s ease-in-out infinite alternate;
+  transition: transform 1s ease;
+}
+
+/* 3. 景点 / 攻略卡片：玻璃白底 + 悬浮柔光 */
+body:not(:has(.capsule-app-shell)):not(:has(.holo-app-shell)) .home-guide-card,
+body:not(:has(.capsule-app-shell)):not(:has(.holo-app-shell)) .home-snail-trail-card,
+body:not(:has(.capsule-app-shell)):not(:has(.holo-app-shell)) a.group.rounded-2xl.border,
+body:not(:has(.capsule-app-shell)):not(:has(.holo-app-shell)) article.rounded-2xl.border,
+body:not(:has(.capsule-app-shell)):not(:has(.holo-app-shell)) .rounded-2xl.border-slate-200.bg-white,
+body:not(:has(.capsule-app-shell)):not(:has(.holo-app-shell)) .rounded-2xl.border-slate-200\/90.bg-white {
+  transition: all 0.45s cubic-bezier(0.25, 0.8, 0.25, 1) !important;
+  background: rgba(255, 255, 255, 0.85) !important;
+  backdrop-filter: blur(8px);
+  text-shadow: none;
+}
+
+body:not(:has(.capsule-app-shell)):not(:has(.holo-app-shell)) .home-guide-card:hover,
+body:not(:has(.capsule-app-shell)):not(:has(.holo-app-shell)) .home-snail-trail-card:hover,
+body:not(:has(.capsule-app-shell)):not(:has(.holo-app-shell)) a.group.rounded-2xl.border:hover,
+body:not(:has(.capsule-app-shell)):not(:has(.holo-app-shell)) article.rounded-2xl.border:hover {
+  transform: translateY(-4px) !important;
+  box-shadow: 0 10px 30px rgba(0, 209, 255, 0.15) !important;
+}
+
+body:not(:has(.capsule-app-shell)):not(:has(.holo-app-shell)) .home-guide-card:hover img,
+body:not(:has(.capsule-app-shell)):not(:has(.holo-app-shell)) a.group.rounded-2xl.border:hover img {
+  filter: brightness(1.07) saturate(1.03);
+}
+
+/* 4. 主行动按钮：青紫渐变呼吸（不影响图标按钮 / ghost 按钮） */
+body:not(:has(.capsule-app-shell)):not(:has(.holo-app-shell)) button[class*='bg-brand'],
+body:not(:has(.capsule-app-shell)):not(:has(.holo-app-shell)) button[class*='from-brand'],
+body:not(:has(.capsule-app-shell)):not(:has(.holo-app-shell)) button[class*='from-violet'],
+body:not(:has(.capsule-app-shell)):not(:has(.holo-app-shell)) button[class*='from-emerald'],
+body:not(:has(.capsule-app-shell)):not(:has(.holo-app-shell)) a[class*='button'][class*='bg-brand'],
+body:not(:has(.capsule-app-shell)):not(:has(.holo-app-shell)) .action-btn {
+  animation: ft-btn-breathe 4.5s ease-in-out infinite;
+  transition: all 0.35s ease !important;
+  background: linear-gradient(135deg, rgba(0, 209, 255, 0.82), rgba(157, 125, 255, 0.82)) !important;
+  color: #fff !important;
+  border: none !important;
+}
+
+/* 5. 板块滚动渐入（由 futureTravelMotion.ts 添加 .ft-active）
+ * 隐藏态必须带 :not(.ft-active)，否则 :not(.sticky):not(.fixed) 比 .ft-active 更高，
+ * 会导致已激活板块仍 opacity:0 → 首页地图整块空白。
+ * 地图 hero 首屏直出，不参与渐入（避免 WebGL 底图被透明度藏住）。 */
+body:not(:has(.capsule-app-shell)):not(:has(.holo-app-shell))
+  #main-content
+  section:not(.sticky):not(.fixed):not(.ft-active):not(.home-map-trail-wall):not([aria-label='地图一键规划']),
+body:not(:has(.capsule-app-shell)):not(:has(.holo-app-shell)) #main-content .ft-fade-block:not(.ft-active) {
+  opacity: 0;
+  transform: translateY(28px);
+  transition:
+    opacity 0.75s ease-out,
+    transform 0.75s ease-out;
+}
+
+body:not(:has(.capsule-app-shell)):not(:has(.holo-app-shell)) #main-content section.ft-active,
+body:not(:has(.capsule-app-shell)):not(:has(.holo-app-shell)) #main-content .ft-fade-block.ft-active,
+body:not(:has(.capsule-app-shell)):not(:has(.holo-app-shell)) #main-content section.home-map-trail-wall,
+body:not(:has(.capsule-app-shell)):not(:has(.holo-app-shell)) #main-content section[aria-label='地图一键规划'] {
+  opacity: 1;
+  transform: translateY(0);
+}
+
+/* 6. 顶部 / 底部导航：轻量化玻璃风 */
+body:not(:has(.capsule-app-shell)):not(:has(.holo-app-shell)) header.sticky.top-0,
+body:not(:has(.capsule-app-shell)):not(:has(.holo-app-shell)) nav[aria-label='底部导航'] {
+  background: rgba(255, 255, 255, 0.88) !important;
+  backdrop-filter: blur(12px) !important;
+  box-shadow: 0 2px 15px rgba(0, 209, 255, 0.08) !important;
+  border-color: rgba(0, 209, 255, 0.12) !important;
+}
+
+/* 7. 标签角标微动 */
+body:not(:has(.capsule-app-shell)):not(:has(.holo-app-shell)) .tag,
+body:not(:has(.capsule-app-shell)):not(:has(.holo-app-shell)) .label,
+body:not(:has(.capsule-app-shell)):not(:has(.holo-app-shell)) .badge,
+body:not(:has(.capsule-app-shell)):not(:has(.holo-app-shell)) .hot-tag,
+body:not(:has(.capsule-app-shell)):not(:has(.holo-app-shell)) span.rounded-full[class*='bg-'] {
+  animation: ft-tag-float 7s ease-in-out infinite alternate;
+}
+
+/* 8. 去除普通内容区赛博发光字（保留代码块等特殊场景） */
+body:not(:has(.capsule-app-shell)):not(:has(.holo-app-shell)) :where(h1, h2, h3, h4, p, span, a, li, label):not(.hljs):not([class*='hljs']) {
+  text-shadow: none;
+}
+
+/* 9. 移动端：减慢动效、缩小星点、关闭 Hero 缩放 */
+@media (max-width: 768px) {
+  body:not(:has(.capsule-app-shell)):not(:has(.holo-app-shell)) {
+    background-size: 25px 25px !important;
+  }
+
+  body:not(:has(.capsule-app-shell)):not(:has(.holo-app-shell)) section[class*='hero'],
+  body:not(:has(.capsule-app-shell)):not(:has(.holo-app-shell)) .hero,
+  body:not(:has(.capsule-app-shell)):not(:has(.holo-app-shell)) .banner,
+  body:not(:has(.capsule-app-shell)):not(:has(.holo-app-shell)) .home-map-trail-hero-stack,
+  body:not(:has(.capsule-app-shell)):not(:has(.holo-app-shell)) section.rounded-2xl.bg-gradient-to-br {
+    animation: none !important;
+  }
+
+  body:not(:has(.capsule-app-shell)):not(:has(.holo-app-shell)) button[class*='bg-brand'],
+  body:not(:has(.capsule-app-shell)):not(:has(.holo-app-shell)) button[class*='from-brand'],
+  body:not(:has(.capsule-app-shell)):not(:has(.holo-app-shell)) span.rounded-full[class*='bg-'] {
+    animation-duration: 20s !important;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  body:not(:has(.capsule-app-shell)):not(:has(.holo-app-shell)) #main-content section,
+  body:not(:has(.capsule-app-shell)):not(:has(.holo-app-shell)) #main-content .ft-fade-block {
+    opacity: 1 !important;
+    transform: none !important;
+    transition: none !important;
+  }
+
+  body:not(:has(.capsule-app-shell)):not(:has(.holo-app-shell)),
+  body:not(:has(.capsule-app-shell)):not(:has(.holo-app-shell)) * {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+  }
+}

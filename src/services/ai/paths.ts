@@ -1,0 +1,14 @@
+export const AI_API = {
+  generateGuide: '/api/ai/generate-guide',
+  generateTravelPlan: '/api/ai/generate-travel-plan',
+  deepseek: '/api/ai/deepseek',
+  generatePlan: '/api/ai/generate-plan',
+  generatePlanStream: '/api/ai/generate-plan-stream',
+  continueChat: '/api/ai/continue-chat',
+  continueChatStream: '/api/ai/continue-chat-stream',
+  planTools: '/api/ai/plan-tools',
+  speechTranscribe: '/api/ai/speech-transcribe',
+  speechWarmup: '/api/ai/speech-warmup',
+  speechConfig: '/api/ai/speech-config',
+  chatStream: '/api/ai/chat-stream',
+} as const;
