@@ -1,10 +1,12 @@
+/** 弹窗顶层里挂到 body 的下载常被浏览器丢掉，优先挂到当前 dialog */
 export function downloadBlob(blob: Blob, filename: string): void {
   const url = URL.createObjectURL(blob);
   const anchor = document.createElement('a');
   anchor.href = url;
   anchor.download = filename;
   anchor.rel = 'noopener';
-  document.body.appendChild(anchor);
+  const host = document.querySelector('dialog[open]') ?? document.body;
+  host.appendChild(anchor);
   anchor.click();
   anchor.remove();
   window.setTimeout(() => URL.revokeObjectURL(url), 1000);

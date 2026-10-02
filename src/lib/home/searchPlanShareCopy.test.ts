@@ -1,0 +1,53 @@
+import { describe, expect, it } from 'vitest';
+import {
+  searchPlanCatchyTitle,
+  searchPlanHeaderLine,
+  searchPlanPublicHashtags,
+  searchPlanShareHashtags,
+  searchPlanShareHook,
+} from '@/lib/home/searchPlanShareCopy';
+import type { SearchStructuredPlan } from '@/types/domain/searchStructuredPlan';
+
+const plan: SearchStructuredPlan = {
+  baseInfo: {
+    startCity: '济南',
+    targetCity: '上海',
+    days: 3,
+    peopleType: '好友结伴',
+    budget: null,
+    theme: null,
+  },
+  budgetList: [{ item: '合计', perPerson: 1800, tip: '' }],
+  globalTips: [],
+  dayList: [
+    {
+      day: 1,
+      title: '老城厢慢行',
+      hotelArea: '豫园',
+      tips: '绕开城隍庙主街，钻进小巷吃生煎。',
+      traffic: [],
+      spots: [{ name: '豫园', intro: '必体验' }],
+      foods: [{ shop: '南翔馒头店', dish: '蟹粉小笼', perCost: 40 }],
+    },
+  ],
+};
+
+describe('searchPlanShareCopy', () => {
+  it('writes city days party and local budget range', () => {
+    expect(searchPlanHeaderLine(plan)).toMatch(/^上海 · 3天 · 好友结伴 · 约/);
+    expect(searchPlanHeaderLine(plan)).not.toContain('未设置预算');
+  });
+
+  it('builds a catchy share title instead of a flat 行程 label', () => {
+    expect(searchPlanCatchyTitle(plan)).toBe('《上海3天｜和好友避开人流的老城松弛路线》');
+    expect(searchPlanCatchyTitle(plan)).not.toContain('上海3天行程');
+  });
+
+  it('builds platform hashtags and a forwardable hook', () => {
+    expect(searchPlanShareHashtags(plan)).toEqual(['上海好友旅行', '上海老城慢游', '上海平价探店']);
+    expect(searchPlanPublicHashtags(plan)).toEqual(['上海好友旅行', '上海老城慢游', '上海街巷漫游']);
+    expect(searchPlanShareHook(plan)).toBe(
+      '这条路线躲开网红扎堆点位，节奏松弛，适合好友慢悠悠逛吃上海',
+    );
+  });
+});

@@ -44,6 +44,13 @@ export function wrapTextLines(
   let current = '';
 
   chars.forEach((char) => {
+    if (char === '\n') {
+      if (current) {
+        lines.push(current);
+        current = '';
+      }
+      return;
+    }
     const next = current + char;
     if (ctx.measureText(next).width > maxWidth && current) {
       lines.push(current);

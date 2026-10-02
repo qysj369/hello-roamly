@@ -1,0 +1,195 @@
+import type { CityTravelKnowledge } from '@/lib/agent/cityTravelKnowledge';
+
+const META = {
+  staticMeta: {
+    layer: 'static' as const,
+    updatedAt: '2026-09-01',
+    source: 'curated' as const,
+    staleAfterDays: 180,
+  },
+  dynamicMeta: {
+    layer: 'dynamic' as const,
+    updatedAt: '2026-09-01',
+    source: 'curated' as const,
+    staleAfterDays: 45,
+  },
+};
+
+/** 热门城第二批：重庆/大理等，给管家本地出方案 */
+export const MORE_CITY_KNOWLEDGE: Record<string, CityTravelKnowledge> = {
+  重庆: {
+    city: '重庆',
+    ...META,
+    spots: [
+      { name: '磁器口侧街', note: '避开主街摊，走背巷茶馆', crowd: '主街全天密' },
+      { name: '洪崖洞外缘', note: '江边看灯，不必挤观景台', crowd: '晚上观景台挤' },
+      { name: '李子坝轻轨', note: '看一眼穿楼就走，少排队', crowd: '打卡位午后密' },
+      { name: '三峡博物馆', note: '室内半日，雨天替代山城台阶', crowd: '周末早场更好' },
+    ],
+    foods: [
+      { shop: '佩姐老火锅', dish: '清油火锅', perCost: 98, parties: ['friends', 'couple'] },
+      { shop: '吴抄手', dish: '抄手', perCost: 22, parties: ['friends', 'solo', 'family'] },
+      { shop: '陈麻花', dish: '麻花', perCost: 16, parties: ['friends', 'family', 'solo'] },
+    ],
+    rainAlts: ['三峡博物馆', '重庆自然博物馆', '来福士室内廊'],
+    holidayAlts: ['南山一棵树清晨', '磁器口侧街', '李子坝早场'],
+    transit: '轨道交通为主；山城少开车，过江优先轻轨。',
+    pitfalls: ['洪崖洞观景台夜市挤', '磁器口主街摊密', '台阶多，带娃量力'],
+    partyBudget: {
+      friends: '市内人均约1100-1700元，火锅与山城步行为主',
+      couple: '市内人均约1300-2000元，可留江景一顿',
+      family: '市内人均约1200-1800元，博物馆+少台阶',
+      solo: '市内人均约1000-1600元，抄手与轻轨即可',
+    },
+  },
+  大理: {
+    city: '大理',
+    ...META,
+    spots: [
+      { name: '洱海骑行', note: '骑一段即可，不必环海', crowd: '才村午后密' },
+      { name: '大理古城侧巷', note: '避开洋人街主摊', crowd: '晚上主街挤' },
+      { name: '喜洲', note: '近郊古镇半日，清晨更松', crowd: '周末主路车多' },
+      { name: '大理州博物馆', note: '室内半日，雨天替代骑行', crowd: '工作日更静' },
+    ],
+    foods: [
+      { shop: '破酥粑粑', dish: '破酥粑粑', perCost: 12, parties: ['friends', 'family', 'solo'] },
+      { shop: '喜洲粑粑', dish: '喜洲粑粑', perCost: 10, parties: ['friends', 'solo'] },
+      { shop: '酸辣鱼', dish: '酸辣鱼', perCost: 68, parties: ['friends', 'couple', 'family'] },
+    ],
+    rainAlts: ['大理州博物馆', '古城骑楼茶馆', '喜洲民居室内'],
+    holidayAlts: ['喜洲清晨', '洱海北段', '古城侧巷'],
+    transit: '古城步行或租车；洱海骑行一段即可，少自驾环海堵车。',
+    pitfalls: ['古城主街夜市密', '环海骑行风大，带娃量力', '才村码头排队拍照'],
+    partyBudget: {
+      friends: '市内人均约1000-1600元，粑粑与骑行为主',
+      couple: '市内人均约1200-1900元，可留洱海日落',
+      family: '市内人均约1100-1700元，博物馆+喜洲',
+      solo: '市内人均约900-1500元，古城侧巷即可',
+    },
+  },
+  昆明: {
+    city: '昆明',
+    ...META,
+    spots: [
+      { name: '翠湖', note: '环湖慢走，喂海鸥看季节', crowd: '周末湖东密' },
+      { name: '西南联大博物馆', note: '室内半日，少走路', crowd: '工作日更松' },
+      { name: '滇池海埂', note: '看一眼草海即可', crowd: '节假日停车场挤' },
+      { name: '云南省博物馆', note: '室内亲子友好，雨天替代', crowd: '周末早场更好' },
+    ],
+    foods: [
+      { shop: '建新园', dish: '过桥米线', perCost: 38, parties: ['friends', 'family', 'solo'] },
+      { shop: '桥香园', dish: '小锅米线', perCost: 22, parties: ['friends', 'solo'] },
+      { shop: '汽锅鸡', dish: '汽锅鸡', perCost: 88, parties: ['couple', 'family'] },
+    ],
+    rainAlts: ['云南省博物馆', '西南联大博物馆', '南屏街室内廊'],
+    holidayAlts: ['翠湖西岸', '海埂清晨', '联大旧址'],
+    transit: '地铁3号线接翠湖、博物馆；滇池坐公交，少开车进海埂。',
+    pitfalls: ['海埂周末停车难', '翠湖海鸥季人密，改西岸', '石林当天往返会赶'],
+    partyBudget: {
+      friends: '市内人均约1000-1600元，米线与翠湖为主',
+      couple: '市内人均约1200-1800元，可留一顿汽锅鸡',
+      family: '市内人均约1100-1700元，博物馆+翠湖',
+      solo: '市内人均约900-1500元，小锅米线即可',
+    },
+  },
+  丽江: {
+    city: '丽江',
+    ...META,
+    spots: [
+      { name: '束河古镇', note: '比大研松，清晨最好', crowd: '下午主街密' },
+      { name: '黑龙潭', note: '看雪山倒影，短停即可', crowd: '周末售票口挤' },
+      { name: '大研侧巷', note: '避开酒吧街，走金虹路一带', crowd: '晚上酒吧街挤' },
+      { name: '丽江博物馆', note: '室内短停，雨天替代古镇', crowd: '工作日更静' },
+    ],
+    foods: [
+      { shop: '腊排骨', dish: '腊排骨火锅', perCost: 78, parties: ['friends', 'couple', 'family'] },
+      { shop: '鸡豆凉粉', dish: '凉粉', perCost: 12, parties: ['friends', 'solo'] },
+      { shop: '粑粑', dish: '丽江粑粑', perCost: 10, parties: ['friends', 'family', 'solo'] },
+    ],
+    rainAlts: ['丽江博物馆', '束河民居茶馆', '古城室内廊'],
+    holidayAlts: ['束河清晨', '黑龙潭早场', '大研侧巷'],
+    transit: '古城步行；束河坐公交或短打车，少开车进大研。',
+    pitfalls: ['大研酒吧街夜市密', '玉龙雪山台阶和高原，带娃量力', '束河下午也开始挤'],
+    partyBudget: {
+      friends: '市内人均约1100-1700元，束河与腊排骨为主',
+      couple: '市内人均约1300-2000元，可留一顿火锅',
+      family: '市内人均约1200-1800元，博物馆+束河',
+      solo: '市内人均约1000-1600元，粑粑与侧巷即可',
+    },
+  },
+  长沙: {
+    city: '长沙',
+    ...META,
+    spots: [
+      { name: '橘子洲', note: '看江一段即可，不必全岛', crowd: '周末东门密' },
+      { name: '太平街侧巷', note: '晚饭后闲逛，少进主摊', crowd: '晚上主街挤' },
+      { name: '湖南省博物馆', note: '室内半日，需预约', crowd: '周末早场更好' },
+      { name: '岳麓山前山', note: '走一段石阶，不必冲顶', crowd: '节假日登山口挤' },
+    ],
+    foods: [
+      { shop: '文和友', dish: '小龙虾', perCost: 88, parties: ['friends'] },
+      { shop: '火宫殿', dish: '臭豆腐', perCost: 18, parties: ['friends', 'family', 'solo'] },
+      { shop: '茶颜悦色', dish: '奶茶', perCost: 16, parties: ['friends', 'couple', 'solo'] },
+    ],
+    rainAlts: ['湖南省博物馆', '长沙博物馆', 'IFS室内廊'],
+    holidayAlts: ['橘子洲清晨', '太平街侧巷', '岳麓书院早场'],
+    transit: '地铁2/4号线接橘子洲、五一广场；过江优先地铁。',
+    pitfalls: ['太平街主摊密', '文和友排队长，错开晚饭', '岳麓山节假日台阶挤'],
+    partyBudget: {
+      friends: '市内人均约1000-1600元，小吃与江边为主',
+      couple: '市内人均约1200-1800元，可留江景一顿',
+      family: '市内人均约1100-1700元，博物馆+橘子洲',
+      solo: '市内人均约900-1500元，臭豆腐与江边即可',
+    },
+  },
+  武汉: {
+    city: '武汉',
+    ...META,
+    spots: [
+      { name: '东湖绿道', note: '骑行或步行一段，不必全线', crowd: '听涛周末密' },
+      { name: '户部巷外缘', note: '吃一家就走，少进主街', crowd: '主街全天挤' },
+      { name: '湖北省博物馆', note: '室内半日，看编钟', crowd: '周末早场更好' },
+      { name: '黎黄陂路', note: '老洋房慢走', crowd: '下午拍照位密' },
+    ],
+    foods: [
+      { shop: '蔡林记', dish: '热干面', perCost: 16, parties: ['friends', 'family', 'solo'] },
+      { shop: '小桃园', dish: '排骨藕汤', perCost: 48, parties: ['friends', 'family', 'couple'] },
+      { shop: '户部巷面窝', dish: '面窝', perCost: 8, parties: ['friends', 'solo'] },
+    ],
+    rainAlts: ['湖北省博物馆', '武汉美术馆', '楚河汉街室内'],
+    holidayAlts: ['东湖磨山清晨', '黎黄陂路', '户部巷外缘'],
+    transit: '地铁2/4号线接黄鹤楼、东湖；过江优先地铁，少高峰打车。',
+    pitfalls: ['户部巷主街人密', '黄鹤楼周末排队，可改东湖', '东湖绿道听涛段挤'],
+    partyBudget: {
+      friends: '市内人均约1000-1600元，热干面与绿道为主',
+      couple: '市内人均约1200-1800元，可留一顿藕汤',
+      family: '市内人均约1100-1700元，博物馆+东湖',
+      solo: '市内人均约900-1500元，热干面+绿道一段即可',
+    },
+  },
+  天津: {
+    city: '天津',
+    ...META,
+    spots: [
+      { name: '五大道', note: '骑行或步行几条街即可', crowd: '民园周末密' },
+      { name: '意式风情区侧街', note: '避开主街摊，走背巷', crowd: '晚上主街挤' },
+      { name: '天津博物馆', note: '室内半日，雨天替代街巷', crowd: '周末早场更好' },
+      { name: '古文化街外缘', note: '看一眼即可，少进主摊', crowd: '主街全天密' },
+    ],
+    foods: [
+      { shop: '狗不理', dish: '包子', perCost: 48, parties: ['friends', 'family'] },
+      { shop: '耳朵眼', dish: '炸糕', perCost: 12, parties: ['friends', 'solo', 'family'] },
+      { shop: '煎饼果子', dish: '煎饼果子', perCost: 10, parties: ['friends', 'solo'] },
+    ],
+    rainAlts: ['天津博物馆', '天津美术馆', '大悦城室内'],
+    holidayAlts: ['五大道清晨', '意式风情区侧街', '民园早场'],
+    transit: '地铁1/3号线接和平路、营口道；五大道优先步行或骑行。',
+    pitfalls: ['古文化街主摊密', '狗不理排队长，可改街边包子', '五大道观光马车可跳过'],
+    partyBudget: {
+      friends: '市内人均约1000-1600元，煎饼与五大道为主',
+      couple: '市内人均约1200-1800元，可留一顿包子',
+      family: '市内人均约1100-1700元，博物馆+五大道',
+      solo: '市内人均约900-1500元，煎饼果子即可',
+    },
+  },
+};

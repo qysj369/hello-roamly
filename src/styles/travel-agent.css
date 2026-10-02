@@ -1,0 +1,245 @@
+.travel-agent-host {
+  position: fixed;
+  right: 16px;
+  bottom: calc(84px + env(safe-area-inset-bottom));
+  z-index: 70;
+  display: flex;
+  flex-direction: column;
+  align-items: flex-end;
+  gap: 10px;
+  pointer-events: none;
+}
+
+.travel-agent-host > * {
+  pointer-events: auto;
+}
+
+.travel-agent-fab {
+  width: 48px;
+  height: 48px;
+  border: 1px solid var(--theme-accent, var(--color-main));
+  border-radius: 50%;
+  background: var(--theme-surface, var(--bg-card));
+  color: var(--theme-accent, var(--color-main));
+  box-shadow: var(--theme-shadow-sm);
+  cursor: pointer;
+  font: inherit;
+  font-size: 12px;
+  font-weight: 650;
+  letter-spacing: 0.04em;
+}
+
+.travel-agent-fab:hover,
+.travel-agent-fab:focus-visible {
+  background: var(--theme-accent, var(--color-main));
+  color: var(--theme-surface, var(--bg-card));
+  outline: none;
+}
+
+.travel-agent-panel {
+  width: min(380px, calc(100vw - 24px));
+  max-height: min(72vh, 640px);
+  display: flex;
+  flex-direction: column;
+  border: 1px solid var(--theme-line);
+  border-radius: var(--theme-radius-lg, 20px);
+  background: var(--theme-surface, var(--bg-card));
+  box-shadow: var(--theme-shadow-md);
+  overflow: hidden;
+}
+
+.travel-agent-panel__head {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 8px;
+  padding: 12px 14px 8px;
+  border-bottom: 1px solid var(--theme-line);
+}
+
+.travel-agent-panel__title {
+  margin: 0;
+  color: var(--theme-title, var(--text-title));
+  font-size: 15px;
+  font-weight: 700;
+}
+
+.travel-agent-panel__memory {
+  margin: 4px 0 0;
+  color: var(--theme-muted, #5a6f66);
+  font-size: 11px;
+  line-height: 1.4;
+}
+
+.travel-agent-chip--next {
+  border-color: var(--theme-accent, var(--color-main));
+  font-weight: 650;
+}
+
+.travel-agent-panel__close {
+  border: 0;
+  background: transparent;
+  color: var(--theme-muted);
+  cursor: pointer;
+  font-size: 20px;
+  line-height: 1;
+}
+
+.travel-agent-panel__log {
+  flex: 1 1 auto;
+  min-height: 0;
+  overflow: auto;
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  padding: 10px 14px;
+}
+
+.travel-agent-msg {
+  margin: 0;
+  max-width: 92%;
+  padding: 8px 10px;
+  border-radius: 12px;
+  font-size: 13px;
+  line-height: 1.55;
+  color: var(--theme-ink, var(--text-body));
+}
+
+.travel-agent-msg--user {
+  align-self: flex-end;
+  background: color-mix(in srgb, var(--theme-accent, var(--color-main)) 12%, transparent);
+}
+
+.travel-agent-msg--assistant {
+  align-self: flex-start;
+  background: var(--theme-bg-soft, #f3f0e4);
+}
+
+.travel-agent-plan {
+  margin: 0 14px 8px;
+  padding: 10px 12px;
+  border: 1px solid var(--theme-line);
+  border-radius: 12px;
+  background: color-mix(in srgb, var(--theme-surface) 88%, var(--theme-bg-soft, #f3f0e4));
+}
+
+.travel-agent-plan__meta,
+.travel-agent-plan li {
+  margin: 0;
+  color: var(--theme-ink);
+  font-size: 12px;
+  line-height: 1.5;
+}
+
+.travel-agent-plan ol {
+  margin: 6px 0 0;
+  padding-left: 18px;
+}
+
+.travel-agent-recs {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  margin: 0 14px 8px;
+}
+
+.travel-agent-rec {
+  display: block;
+  padding: 8px 10px;
+  border: 1px solid var(--theme-line);
+  border-radius: 10px;
+  color: var(--theme-accent);
+  text-decoration: none;
+  font-size: 12px;
+  line-height: 1.45;
+}
+
+.travel-agent-rec span {
+  display: block;
+  color: var(--theme-muted);
+}
+
+.travel-agent-tools,
+.travel-agent-chips {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px;
+  margin: 0 14px 8px;
+}
+
+.travel-agent-chip {
+  display: inline-flex;
+  align-items: center;
+  border: 1px solid var(--theme-line);
+  border-radius: 999px;
+  background: transparent;
+  color: var(--theme-accent);
+  cursor: pointer;
+  font: inherit;
+  font-size: 12px;
+  padding: 4px 10px;
+  text-decoration: none;
+}
+
+.travel-agent-chip:disabled {
+  opacity: 0.45;
+  cursor: not-allowed;
+}
+
+.travel-agent-remix {
+  border: 1px solid var(--theme-accent, var(--color-main));
+  border-radius: 999px;
+  background: transparent;
+  color: var(--theme-accent, var(--color-main));
+  cursor: pointer;
+  font: inherit;
+  font-size: 12px;
+  font-weight: 650;
+  padding: 6px 12px;
+}
+
+.travel-agent-form {
+  display: flex;
+  gap: 8px;
+  padding: 8px 14px 12px;
+  border-top: 1px solid var(--theme-line);
+}
+
+.travel-agent-form input {
+  flex: 1;
+  min-width: 0;
+  height: 36px;
+  padding: 0 10px;
+  border: 1px solid var(--theme-line);
+  border-radius: 10px;
+  background: var(--bg-search, var(--theme-surface));
+  color: var(--theme-ink);
+  font: inherit;
+  font-size: 13px;
+}
+
+.travel-agent-form button {
+  border: 1px solid var(--theme-accent);
+  border-radius: 10px;
+  background: var(--theme-accent);
+  color: var(--theme-surface);
+  cursor: pointer;
+  font: inherit;
+  font-size: 13px;
+  padding: 0 12px;
+}
+
+.travel-agent-form button:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+}
+
+.travel-agent-poster {
+  margin: 0 14px 10px;
+}
+
+@media (min-width: 1024px) {
+  .travel-agent-host {
+    bottom: 24px;
+  }
+}
