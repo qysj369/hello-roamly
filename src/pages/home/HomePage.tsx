@@ -17,14 +17,14 @@ import { usePageSeo } from '@/hooks/browser/usePageSeo';
 import { homePageSeo } from '@/lib/seo';
 import { cn } from '@/utils/cn';
 
-/** 首页 — 全息极简 / Capsule One / 旧版地图 Hero */
+/** 首页 — 蜗牛号座舱（默认）/ 浅米白旧首页 / 旧版地图 Hero */
 export default function HomePage() {
-  if (isHoloHomeEnabled()) {
-    return <HoloHomePage />;
-  }
-
   if (isCapsuleOneHomeEnabled()) {
     return <CapsuleOneHomePage />;
+  }
+
+  if (isHoloHomeEnabled()) {
+    return <HoloHomePage />;
   }
 
   return <LegacyHomePage />;
@@ -62,7 +62,7 @@ function LegacyHomePage() {
         isLaunchLayout ? 'home-page--launch' : 'home-page--plan-a',
       )}
     >
-      <h1 className="sr-only">蜗牛旅行 — 输入城市与天数，地图一键规划穷游方案</h1>
+      <h1 className="sr-only">蜗牛旅行 — 输入城市与天数，地图一键规划漫行方案</h1>
 
       <section
         id={HOME_MAP_TRAIL_SECTION_ID}

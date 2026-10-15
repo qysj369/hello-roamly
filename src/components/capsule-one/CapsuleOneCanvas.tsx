@@ -1,11 +1,10 @@
 import { OrbitControls } from '@react-three/drei';
 import { Canvas } from '@react-three/fiber';
-import { useEffect, useState } from 'react';
+import { useEffect, useMemo, useState } from 'react';
 import * as THREE from 'three';
 import EarthGlobe from '@/components/capsule-one/EarthGlobe';
-import GlazeOrbitRing from '@/components/capsule-one/GlazeOrbitRing';
-import type { CapsuleCityPoint } from '@/data/capsuleHotRoutes';
-import { GLAZE_PAPER, PAPER_ROAM_EARTH } from '@/lib/capsule/earthGlazeCore';
+import { latLngToVector3 } from '@/components/capsule-one/geoMath';
+import { getCapsuleCityById, type CapsuleCityPoint } from '@/data/capsuleHotRoutes';
 
 type CapsuleOneCanvasProps = {
   onCitySelect: (city: CapsuleCityPoint) => void;
@@ -27,54 +26,67 @@ function useCapsuleMobileLayout() {
   return isMobile;
 }
 
+/** 基础地球：拖拽旋转/缩放；城市圆点点击由上层处理。不做云层与高级光影 */
 export default function CapsuleOneCanvas({ onCitySelect }: CapsuleOneCanvasProps) {
   const isMobile = useCapsuleMobileLayout();
-  const earthLift = isMobile ? 0.42 : 1.05;
+  const earthLift = isMobile ? 0.28 : 0.55;
+  const lookAtChina = useMemo(() => {
+    const city = getCapsuleCityById('chengdu') ?? { lat: 30.57, lng: 104.07 };
+    const dir = latLngToVector3(city.lat, city.lng).normalize();
+    const distance = isMobile ? 16 : 13.5;
+    return {
+      position: [dir.x * distance, dir.y * distance + earthLift, dir.z * distance] as [
+        number,
+        number,
+        number,
+      ],
+      target: [0, earthLift, 0] as [number, number, number],
+    };
+  }, [earthLift, isMobile]);
 
   return (
     <Canvas
       className="capsule-scene__canvas"
       camera={{
-        position: [0, isMobile ? 0.75 : 1.2, isMobile ? 17 : 14.5],
-        fov: isMobile ? 44 : 42,
+        position: lookAtChina.position,
+        fov: isMobile ? 46 : 42,
         near: 0.1,
-        far: 1000,
+        far: 400,
       }}
-      dpr={[1, 2]}
+      dpr={isMobile ? [1, 1.25] : [1, 1.5]}
       gl={{
-        antialias: true,
+        antialias: !isMobile,
         alpha: false,
         powerPreference: 'high-performance',
       }}
-      onCreated={({ gl, scene }) => {
-        scene.background = new THREE.Color(GLAZE_PAPER);
-        gl.setClearColor(GLAZE_PAPER, 1);
-        gl.toneMapping = THREE.ACESFilmicToneMapping;
-        gl.toneMappingExposure = PAPER_ROAM_EARTH.exposure;
+      onCreated={({ gl, scene, camera }) => {
+        scene.background = new THREE.Color('#eaf0f3');
+        gl.setClearColor('#eaf0f3', 1);
+        if (import.meta.env.DEV) {
+          Object.assign(gl.domElement, { __capsule: { scene, camera } });
+        }
       }}
     >
-      {/* 宣纸日光 — 柔和、均匀，突出真实地球本色 */}
-      <ambientLight intensity={0.52} color="#fffaf4" />
-      <directionalLight position={[5, 8, 6]} intensity={1.05} color="#fffef8" />
-      <directionalLight position={[-4, 3, -7]} intensity={0.28} color="#dce8f0" />
-      <hemisphereLight args={['#faf6ee', '#9ec0d8', 0.42]} />
+      <ambientLight intensity={0.7} color="#fffaf4" />
+      <directionalLight position={[6, 8, 4]} intensity={1.05} color="#fffef8" />
+      <hemisphereLight args={['#f4f7fa', '#9eb4c4', 0.45]} />
 
       <group position={[0, earthLift, 0]}>
-        <GlazeOrbitRing />
-        <EarthGlobe onCitySelect={onCitySelect} variant="glaze" />
+        <EarthGlobe onCitySelect={onCitySelect} variant="daylight" interactionMode="display" />
       </group>
 
       <OrbitControls
         enableDamping
-        dampingFactor={0.05}
+        dampingFactor={0.08}
         autoRotate
-        autoRotateSpeed={0.45}
-        minDistance={isMobile ? 7.5 : 8}
-        maxDistance={isMobile ? 28 : 30}
+        autoRotateSpeed={0.35}
+        minDistance={isMobile ? 7 : 7.5}
+        maxDistance={isMobile ? 24 : 26}
         enablePan={false}
         enableZoom
-        zoomSpeed={isMobile ? 0.85 : 1}
-        target={[0, earthLift, 0]}
+        zoomSpeed={isMobile ? 0.8 : 1}
+        rotateSpeed={isMobile ? 0.7 : 0.85}
+        target={lookAtChina.target}
       />
     </Canvas>
   );

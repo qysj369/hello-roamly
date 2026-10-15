@@ -8,6 +8,7 @@ import {
   earthFocusSpinProgress,
   lerpAngleRadians,
 } from '@/components/capsule-one/earthMotion';
+import EarthCityDots from '@/components/capsule-one/EarthCityDots';
 import EarthClickShockwave from '@/components/capsule-one/EarthClickShockwave';
 import EarthDataStream from '@/components/capsule-one/EarthDataStream';
 import EarthEntryBurst from '@/components/capsule-one/EarthEntryBurst';
@@ -148,7 +149,12 @@ function EarthGlazeGlobeCore({
   );
 }
 
-function EarthGlobeCore({ autoRotate = false, variant = 'daylight' }: EarthGlobeCoreProps) {
+function EarthGlobeCore({
+  autoRotate = false,
+  variant = 'daylight',
+  onCitySelect,
+  interactionMode = 'blindbox',
+}: EarthGlobeCoreProps) {
   const isInk = variant === 'ink';
   const isDaylight = variant === 'daylight' || isInk;
   const groupRef = useRef<THREE.Group>(null);
@@ -164,6 +170,8 @@ function EarthGlobeCore({ autoRotate = false, variant = 'daylight' }: EarthGlobe
   const earthFocusLng = useCapsuleOneStore((state) => state.earthFocusLng);
   const lockedCity = useCapsuleOneStore((state) => state.lockedCity);
   const addRipple = useCapsuleOneStore((state) => state.addRipple);
+  const pointerDownRef = useRef<{ x: number; y: number } | null>(null);
+  const draggedRef = useRef(false);
   const [colorMap, specMap, bumpMap] = useTexture([
     EARTH_TEXTURES.color,
     EARTH_TEXTURES.specular,
@@ -201,7 +209,7 @@ function EarthGlobeCore({ autoRotate = false, variant = 'daylight' }: EarthGlobe
         if (progress >= 1) {
           focusStartedAtRef.current = null;
         }
-      } else if (entryProgressRef.current < 0.95) {
+      } else if (entryProgressRef.current < 0.95 && interactionMode !== 'display') {
         groupRef.current.rotation.y +=
           delta * (0.45 * (1 - entryProgressRef.current) + EARTH_SPIN_SPEED);
       } else if (autoRotate && earthFocusLng == null) {
@@ -240,7 +248,8 @@ function EarthGlobeCore({ autoRotate = false, variant = 'daylight' }: EarthGlobe
    */
   const handleGlobeClick = (event: ThreeEvent<MouseEvent>) => {
     event.stopPropagation();
-    if (!groupRef.current) {
+    if (!groupRef.current || draggedRef.current) {
+      draggedRef.current = false;
       return;
     }
 
@@ -248,12 +257,42 @@ function EarthGlobeCore({ autoRotate = false, variant = 'daylight' }: EarthGlobe
     const { lat, lng } = vector3ToLatLng(localPoint);
 
     addRipple(lat, lng);
+    if (interactionMode === 'display') {
+      return;
+    }
+    if (interactionMode === 'navigate') {
+      onCitySelect(findNearestHoloCity(lat, lng));
+      return;
+    }
     handleEarthClick(event, [event], lat, lng);
   };
 
   return (
     <group ref={groupRef}>
-      <mesh onClick={handleGlobeClick}>
+      <mesh
+        onClick={handleGlobeClick}
+        onPointerDown={(event) => {
+          pointerDownRef.current = { x: event.clientX, y: event.clientY };
+          draggedRef.current = false;
+        }}
+        onPointerMove={(event) => {
+          const start = pointerDownRef.current;
+          if (!start) {
+            return;
+          }
+          const dx = event.clientX - start.x;
+          const dy = event.clientY - start.y;
+          if (dx * dx + dy * dy > 36) {
+            draggedRef.current = true;
+          }
+        }}
+        onPointerUp={() => {
+          pointerDownRef.current = null;
+        }}
+        onPointerLeave={() => {
+          pointerDownRef.current = null;
+        }}
+      >
         <sphereGeometry args={[EARTH_RADIUS, 64, 64]} />
         <meshStandardMaterial
           map={colorMap}
@@ -268,6 +307,7 @@ function EarthGlobeCore({ autoRotate = false, variant = 'daylight' }: EarthGlobe
           opacity={1}
         />
       </mesh>
+      <EarthCityDots onCityClick={onCitySelect} />
 
       {!isDaylight ? <EarthHologramReveal progressRef={entryProgressRef} /> : null}
       {!isDaylight ? <EarthEntryBurst progressRef={entryProgressRef} /> : null}
@@ -299,7 +339,7 @@ function EarthGlobeCore({ autoRotate = false, variant = 'daylight' }: EarthGlobe
   );
 }
 
-function EarthGlobeFallback({ autoRotate = false }: EarthGlobeCoreProps) {
+function EarthGlobeFallback({ autoRotate = false, onCitySelect }: EarthGlobeCoreProps) {
   const groupRef = useRef<THREE.Group>(null);
   const addRipple = useCapsuleOneStore((state) => state.addRipple);
 
@@ -339,6 +379,7 @@ function EarthGlobeFallback({ autoRotate = false }: EarthGlobeCoreProps) {
           toneMapped
         />
       </mesh>
+      <EarthCityDots onCityClick={onCitySelect} />
     </group>
   );
 }
@@ -362,7 +403,12 @@ export default function EarthGlobe({
 
   return (
     <Suspense fallback={<EarthGlobeFallback onCitySelect={onCitySelect} autoRotate={autoRotate} />}>
-      <EarthGlobeCore onCitySelect={onCitySelect} autoRotate={autoRotate} variant={variant} />
+      <EarthGlobeCore
+        onCitySelect={onCitySelect}
+        autoRotate={autoRotate}
+        variant={variant}
+        interactionMode={interactionMode}
+      />
     </Suspense>
   );
 }

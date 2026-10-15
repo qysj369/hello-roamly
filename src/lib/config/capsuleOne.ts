@@ -1,11 +1,18 @@
 import { readEnv } from '@/lib/config/env';
 import { isHoloHomeEnabled } from '@/lib/config/holoHome';
 
-/** Capsule One 旅行智能驾驶舱 — 默认启用；设 VITE_HOME_LEGACY=1 回退旧首页 */
+/** 蜗牛号飞行漫游座舱 — 默认首页；VITE_HOME_LAYOUT=holo / launch / plan-a 或 VITE_HOME_LEGACY=1 回退 */
 export function isCapsuleOneHomeEnabled(): boolean {
   if (isHoloHomeEnabled()) {
     return false;
   }
   const legacy = readEnv('VITE_HOME_LEGACY')?.toLowerCase();
-  return legacy !== '1' && legacy !== 'true';
+  if (legacy === '1' || legacy === 'true') {
+    return false;
+  }
+  const layout = readEnv('VITE_HOME_LAYOUT')?.toLowerCase();
+  if (layout === 'plan-a' || layout === 'launch') {
+    return false;
+  }
+  return true;
 }
