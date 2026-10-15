@@ -26,7 +26,7 @@ function useCapsuleMobileLayout() {
   return isMobile;
 }
 
-/** 基础地球：拖拽旋转/缩放；城市圆点点击由上层处理。不做云层与高级光影 */
+/** 基础地球：拖拽旋转/缩放。不做云层与高级光影 */
 export default function CapsuleOneCanvas({ onCitySelect }: CapsuleOneCanvasProps) {
   const isMobile = useCapsuleMobileLayout();
   const earthLift = isMobile ? 0.28 : 0.55;

@@ -8,7 +8,6 @@ import {
   earthFocusSpinProgress,
   lerpAngleRadians,
 } from '@/components/capsule-one/earthMotion';
-import EarthCityDots from '@/components/capsule-one/EarthCityDots';
 import EarthClickShockwave from '@/components/capsule-one/EarthClickShockwave';
 import EarthDataStream from '@/components/capsule-one/EarthDataStream';
 import EarthEntryBurst from '@/components/capsule-one/EarthEntryBurst';
@@ -315,7 +314,6 @@ function EarthGlobeCore({
           opacity={1}
         />
       </mesh>
-      <EarthCityDots onCityClick={onCitySelect} />
 
       {!isDaylight ? <EarthHologramReveal progressRef={entryProgressRef} /> : null}
       {!isDaylight ? <EarthEntryBurst progressRef={entryProgressRef} /> : null}
@@ -398,7 +396,6 @@ function EarthGlobeFallback({
           toneMapped
         />
       </mesh>
-      <EarthCityDots onCityClick={onCitySelect} />
     </group>
   );
 }
