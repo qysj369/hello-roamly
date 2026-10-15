@@ -480,6 +480,47 @@ html.capsule-one-active body::-webkit-scrollbar {
   );
 }
 
+.earth-fly-to {
+  position: absolute;
+  top: max(4.6rem, calc(env(safe-area-inset-top) + 3.6rem));
+  left: max(1.15rem, env(safe-area-inset-left));
+  z-index: 4;
+  display: flex;
+  flex-direction: column;
+  gap: 0.45rem;
+}
+
+.earth-fly-to__btn {
+  min-height: 2.35rem;
+  padding: 0.38rem 0.85rem;
+  border: 1px solid var(--theme-line, rgba(197, 212, 203, 0.9));
+  border-radius: var(--theme-radius-md, 12px);
+  background: color-mix(in srgb, var(--theme-surface, #fffffb) 86%, transparent);
+  color: var(--theme-title, #222c28);
+  font-family: var(--theme-font, inherit);
+  font-size: 0.8rem;
+  letter-spacing: 0.05em;
+  line-height: 1.2;
+  box-shadow: var(--theme-shadow-sm, 0 1px 4px rgba(34, 44, 40, 0.05));
+  backdrop-filter: blur(8px);
+  cursor: pointer;
+  text-align: left;
+}
+
+.earth-fly-to__btn:hover,
+.earth-fly-to__btn:focus-visible {
+  border-color: color-mix(in srgb, var(--theme-accent, #285948) 34%, transparent);
+  outline: none;
+}
+
+.earth-fly-to__btn[aria-pressed='true'] {
+  background: color-mix(
+    in srgb,
+    var(--theme-accent-soft, #72a893) 20%,
+    var(--theme-surface, #fffffb) 80%
+  );
+}
+
 .capsule-scene__fallback {
   display: grid;
   place-items: center;

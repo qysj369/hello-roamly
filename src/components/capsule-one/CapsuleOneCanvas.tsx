@@ -1,7 +1,10 @@
 import { Canvas } from '@react-three/fiber';
-import { useEffect, useMemo, useState } from 'react';
+import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
+import type { OrbitControls as OrbitControlsImpl } from 'three-stdlib';
 import * as THREE from 'three';
 import EarthGlobe from '@/components/capsule-one/EarthGlobe';
+import { useEarthFlyTo } from '@/components/capsule-one/EarthFlyToContext';
+import EarthFlyToRig from '@/components/capsule-one/EarthFlyToRig';
 import { useEarthRoam } from '@/components/capsule-one/EarthRoamContext';
 import EarthRoamControls from '@/components/capsule-one/EarthRoamControls';
 import { latLngToVector3 } from '@/components/capsule-one/geoMath';
@@ -30,7 +33,13 @@ function useCapsuleMobileLayout() {
 /** 基础地球：拖拽旋转/缩放。不做云层与高级光影 */
 export default function CapsuleOneCanvas({ onCitySelect }: CapsuleOneCanvasProps) {
   const { roaming, interruptRoamOnOrbitStart } = useEarthRoam();
+  const { flying, pendingIdRef, flightRef, cancelFly, markFlightEnded } = useEarthFlyTo();
+  const controlsRef = useRef<OrbitControlsImpl | null>(null);
   const isMobile = useCapsuleMobileLayout();
+  const handleOrbitStart = useCallback(() => {
+    cancelFly();
+    interruptRoamOnOrbitStart();
+  }, [cancelFly, interruptRoamOnOrbitStart]);
   const earthLift = isMobile ? 0.28 : 0.55;
   const lookAtChina = useMemo(() => {
     const city = getCapsuleCityById('chengdu') ?? { lat: 30.57, lng: 104.07 };
@@ -83,9 +92,17 @@ export default function CapsuleOneCanvas({ onCitySelect }: CapsuleOneCanvasProps
       </group>
 
       <EarthRoamControls
-        roaming={roaming}
-        onOrbitStart={interruptRoamOnOrbitStart}
+        ref={controlsRef}
+        roaming={roaming && !flying}
+        onOrbitStart={handleOrbitStart}
         target={lookAtChina.target}
+        isMobile={isMobile}
+      />
+      <EarthFlyToRig
+        controlsRef={controlsRef}
+        pendingIdRef={pendingIdRef}
+        flightRef={flightRef}
+        onFlightEnd={markFlightEnded}
         isMobile={isMobile}
       />
     </Canvas>
