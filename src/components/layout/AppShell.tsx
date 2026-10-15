@@ -28,6 +28,7 @@ export default function AppShell() {
   const isHome = Boolean(useMatch({ path: paths.home, end: true }));
   const isAi = Boolean(useMatch({ path: paths.ai, end: true }));
   const isHoloDrive = Boolean(useMatch({ path: `${paths.drive.slice(1)}/:cityName` }));
+  const isSnailFlight = Boolean(useMatch({ path: paths.snailFlight, end: true }));
   const isCapsuleHome = isHome && isCapsuleOneHomeEnabled();
   const isHoloHome = isHome && isHoloHomeEnabled();
   const isHoloExperience = isHoloHomeEnabled() && (isHoloHome || isHoloDrive);
@@ -46,7 +47,7 @@ export default function AppShell() {
     );
   }
 
-  if (isCapsuleHome || isCapsuleAi) {
+  if (isCapsuleHome || isCapsuleAi || isSnailFlight) {
     return (
       <div className="capsule-app-shell">
         <SkipToMainLink />

@@ -20,6 +20,8 @@ interface ImportMetaEnv {
   readonly VITE_MAPILLARY_ACCESS_TOKEN?: string;
   /** 高德 Web Key（中国版推荐，用于 JS 地图展示） */
   readonly VITE_AMAP_KEY?: string;
+  /** 天地图 tk（蜗牛号底图优先；国界遵循中国标准地图） */
+  readonly VITE_TIANDITU_TK?: string;
   /** 高德 Web 服务 Key（逆地理/地理编码 REST API；可与 JS Key 相同或单独创建） */
   readonly VITE_AMAP_WEB_SERVICE_KEY?: string;
   /** 高德 JS API 2.0 安全密钥 */

@@ -18,6 +18,8 @@ export const paths = {
   about: '/about',
   snailCulture: '/snail-culture',
   drive: '/drive',
+  /** 登上蜗牛号 · 国内低空观光（独立入口） */
+  snailFlight: '/snail-flight',
 } as const;
 
 /** 驾驶舱街景页 */

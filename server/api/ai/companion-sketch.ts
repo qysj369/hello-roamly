@@ -5,14 +5,34 @@ import {
   sanitizeCompanionSketchText,
 } from '@/lib/capsule/earthCompanionSketch';
 import { getEarthFlyDestination } from '@/lib/capsule/earthFlyTo';
+import { findSnailFlightCityByLabel, getSnailFlightCity } from '@/lib/snail-flight/cities';
 import { createServerDeepSeekCompleter, type ServerEnv } from '../../lib/deepseekServer';
 import { readJsonBody, sendJson } from '../../lib/http';
 
 type CompanionSketchRequest = {
   cityId?: string;
+  cityLabel?: string;
 };
 
-/** POST /api/ai/companion-sketch — 地球落地点 2-3 天结伴灵感（纯文本，不走穷游装配） */
+function resolveCompanionSketchCity(
+  body: CompanionSketchRequest,
+): { label: string; blurb: string } | null {
+  const cityId = typeof body.cityId === 'string' ? body.cityId.trim() : '';
+  const cityLabel = typeof body.cityLabel === 'string' ? body.cityLabel.trim() : '';
+  if (cityId && isCompanionSketchCityId(cityId)) {
+    const city = getEarthFlyDestination(cityId);
+    return city ? { label: city.label, blurb: city.blurb } : null;
+  }
+  const domestic =
+    (cityId ? getSnailFlightCity(cityId) : undefined) ??
+    findSnailFlightCityByLabel(cityLabel || cityId);
+  if (domestic) {
+    return { label: domestic.label, blurb: domestic.blurb };
+  }
+  return null;
+}
+
+/** POST /api/ai/companion-sketch — 地球落地点 / 蜗牛号国内目的地 2-3 天结伴灵感（纯文本，不走穷游装配） */
 export async function handleCompanionSketchApi(
   req: IncomingMessage,
   res: ServerResponse,
@@ -25,13 +45,7 @@ export async function handleCompanionSketchApi(
 
   try {
     const body = await readJsonBody<CompanionSketchRequest>(req);
-    const cityId = typeof body.cityId === 'string' ? body.cityId.trim() : '';
-    if (!isCompanionSketchCityId(cityId)) {
-      sendJson(res, 400, { error: '目的地无效', code: 'invalid_params' });
-      return;
-    }
-
-    const city = getEarthFlyDestination(cityId);
+    const city = resolveCompanionSketchCity(body);
     if (!city) {
       sendJson(res, 400, { error: '目的地无效', code: 'invalid_params' });
       return;
