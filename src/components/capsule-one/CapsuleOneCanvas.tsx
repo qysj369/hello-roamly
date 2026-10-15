@@ -62,14 +62,17 @@ export default function CapsuleOneCanvas({ onCitySelect }: CapsuleOneCanvasProps
       onCreated={({ gl, scene, camera }) => {
         scene.background = new THREE.Color('#eaf0f3');
         gl.setClearColor('#eaf0f3', 1);
+        gl.toneMapping = THREE.ACESFilmicToneMapping;
+        gl.toneMappingExposure = 1.22;
         if (import.meta.env.DEV) {
           Object.assign(gl.domElement, { __capsule: { scene, camera } });
         }
       }}
     >
-      <ambientLight intensity={0.7} color="#fffaf4" />
-      <directionalLight position={[6, 8, 4]} intensity={1.05} color="#fffef8" />
-      <hemisphereLight args={['#f4f7fa', '#9eb4c4', 0.45]} />
+      <ambientLight intensity={0.98} color="#fff8f0" />
+      <directionalLight position={[6, 8, 4]} intensity={1.28} color="#fffef8" />
+      <directionalLight position={[-5, 2.5, -4]} intensity={0.26} color="#a9cbe0" />
+      <hemisphereLight args={['#e7f3fa', '#7f9eb0', 0.58]} />
 
       <group position={[0, earthLift, 0]}>
         <EarthGlobe onCitySelect={onCitySelect} variant="daylight" interactionMode="display" />

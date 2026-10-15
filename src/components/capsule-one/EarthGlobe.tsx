@@ -1,6 +1,6 @@
 import { useTexture } from '@react-three/drei';
 import { useFrame, type ThreeEvent } from '@react-three/fiber';
-import { Suspense, useEffect, useRef } from 'react';
+import { Suspense, useEffect, useLayoutEffect, useRef } from 'react';
 import * as THREE from 'three';
 import {
   computeEarthFocusRotationY,
@@ -178,6 +178,13 @@ function EarthGlobeCore({
     EARTH_TEXTURES.normal,
   ]);
 
+  useLayoutEffect(() => {
+    colorMap.colorSpace = THREE.SRGBColorSpace;
+    specMap.colorSpace = THREE.NoColorSpace;
+    bumpMap.colorSpace = THREE.NoColorSpace;
+    colorMap.needsUpdate = true;
+  }, [bumpMap, colorMap, specMap]);
+
   useEffect(() => {
     if (earthFocusLng == null || !lockedCity) {
       focusStartedAtRef.current = null;
@@ -298,12 +305,13 @@ function EarthGlobeCore({
           map={colorMap}
           bumpMap={bumpMap}
           bumpScale={isInk ? 0.04 : isDaylight ? 0.05 : 0.08}
-          roughness={isInk ? 0.92 : isDaylight ? 0.62 : 0.78}
-          metalness={isInk ? 0 : isDaylight ? 0.02 : 0.04}
-          color={isInk ? '#42505c' : '#ffffff'}
-          emissive={isInk ? '#1a2430' : isDaylight ? '#8ecae6' : '#0c1e2a'}
-          emissiveIntensity={isInk ? 0.1 : isDaylight ? 0.06 : 0.1}
-          transparent
+          roughness={isInk ? 0.92 : isDaylight ? 0.58 : 0.78}
+          metalness={isInk ? 0 : isDaylight ? 0.03 : 0.04}
+          color={isInk ? '#42505c' : isDaylight ? [1.12, 1.13, 1.16] : '#ffffff'}
+          emissive={isInk ? '#1a2430' : isDaylight ? '#6a9eb8' : '#0c1e2a'}
+          emissiveIntensity={isInk ? 0.1 : isDaylight ? 0.11 : 0.1}
+          envMapIntensity={isDaylight ? 0 : 1}
+          transparent={isInk}
           opacity={1}
         />
       </mesh>
