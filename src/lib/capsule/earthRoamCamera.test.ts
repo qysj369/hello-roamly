@@ -1,6 +1,7 @@
 import { describe, expect, it } from 'vitest';
 import {
   clampOrbitDistance,
+  EARTH_ROAM_CAMERA,
   earthRoamToggleLabel,
   isEarthRoaming,
   nextModeOnOrbitStart,
@@ -20,6 +21,11 @@ describe('earthRoamCamera', () => {
   it('stops roam as soon as the user starts orbiting', () => {
     expect(nextModeOnOrbitStart('roam')).toBe('manual');
     expect(nextModeOnOrbitStart('manual')).toBe('manual');
+  });
+
+  it('keeps roam angular speed visible but gentle', () => {
+    expect(EARTH_ROAM_CAMERA.autoRotateSpeed).toBeGreaterThanOrEqual(1.4);
+    expect(EARTH_ROAM_CAMERA.autoRotateSpeed).toBeLessThanOrEqual(2.4);
   });
 
   it('clamps camera distance so the lens cannot clip or fly away', () => {

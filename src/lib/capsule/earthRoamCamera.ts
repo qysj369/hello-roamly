@@ -3,8 +3,10 @@
 export type EarthViewMode = 'manual' | 'roam';
 
 export const EARTH_ROAM_CAMERA = {
-  /** drei / three OrbitControls：约 2°/s 量级，平缓巡航 */
-  autoRotateSpeed: 0.32,
+  /**
+   * three-stdlib：每帧 2π/3600 * speed。1.8 ≈ 11°/s，约 33 秒一圈，肉眼可见且不眩晕。
+   */
+  autoRotateSpeed: 1.8,
   /** 越小惯性越长；拖拽松开后平滑减速 */
   dampingFactor: 0.055,
   minPolarAngle: 0.38,
