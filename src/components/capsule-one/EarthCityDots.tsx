@@ -1,4 +1,4 @@
-import { useLayoutEffect, useMemo, useRef } from 'react';
+import { useEffect, useLayoutEffect, useMemo, useRef } from 'react';
 import * as THREE from 'three';
 import { EARTH_RADIUS, latLngToVector3 } from '@/components/capsule-one/geoMath';
 import { capsuleCityPoints, type CapsuleCityPoint } from '@/data/capsuleHotRoutes';
@@ -8,18 +8,42 @@ import { themeTokens } from '@/styles/themeTokens';
 const DOT_RADIUS = 0.12;
 const DOT_ALTITUDE = 0.08;
 const DOT_SEGMENTS = 8;
-const DRAG_PX2 = 36;
+/** 超过该像素位移视为拖拽（10px²），避免地球旋转时误点 */
+const DRAG_PX2 = 100;
+
+export type CityDotInteractionMode = 'idle' | 'click' | 'drag';
 
 type EarthCityDotsProps = {
   onCityClick: (city: CapsuleCityPoint) => void;
 };
 
+type PointerSession = {
+  x: number;
+  y: number;
+  instanceId: number;
+};
+
+export function nextCityDotInteractionMode(
+  mode: CityDotInteractionMode,
+  dx: number,
+  dy: number,
+  thresholdPx2 = DRAG_PX2,
+): CityDotInteractionMode {
+  if (mode === 'idle' || mode === 'drag') {
+    return mode;
+  }
+  if (dx * dx + dy * dy > thresholdPx2) {
+    return 'drag';
+  }
+  return 'click';
+}
+
 export function resolveCityDotClick(
   instanceId: number | undefined,
-  dragged: boolean,
+  interactionMode: CityDotInteractionMode,
   cities: readonly CapsuleCityPoint[] = capsuleCityPoints,
 ): CapsuleCityPoint | null {
-  if (dragged || instanceId == null) {
+  if (interactionMode !== 'click' || instanceId == null || instanceId < 0) {
     return null;
   }
   return cities[instanceId] ?? null;
@@ -31,10 +55,13 @@ export function cityDotWorldPosition(lat: number, lng: number): THREE.Vector3 {
 
 export default function EarthCityDots({ onCityClick }: EarthCityDotsProps) {
   const meshRef = useRef<THREE.InstancedMesh>(null);
-  const pointerDownRef = useRef<{ x: number; y: number } | null>(null);
-  const draggedRef = useRef(false);
+  const interactionModeRef = useRef<CityDotInteractionMode>('idle');
+  const sessionRef = useRef<PointerSession | null>(null);
+  const detachRef = useRef<(() => void) | null>(null);
+  const onCityClickRef = useRef(onCityClick);
   const dummy = useMemo(() => new THREE.Object3D(), []);
   const count = capsuleCityPoints.length;
+  onCityClickRef.current = onCityClick;
 
   useLayoutEffect(() => {
     const mesh = meshRef.current;
@@ -51,6 +78,57 @@ export default function EarthCityDots({ onCityClick }: EarthCityDotsProps) {
     mesh.computeBoundingSphere();
   }, [dummy]);
 
+  useEffect(
+    () => () => {
+      detachRef.current?.();
+      detachRef.current = null;
+    },
+    [],
+  );
+
+  const bindWindowPointer = () => {
+    detachRef.current?.();
+    const onMove = (event: PointerEvent) => {
+      const session = sessionRef.current;
+      if (!session) {
+        return;
+      }
+      interactionModeRef.current = nextCityDotInteractionMode(
+        interactionModeRef.current,
+        event.clientX - session.x,
+        event.clientY - session.y,
+      );
+    };
+    const onUp = (event: PointerEvent) => {
+      const session = sessionRef.current;
+      if (session) {
+        interactionModeRef.current = nextCityDotInteractionMode(
+          interactionModeRef.current,
+          event.clientX - session.x,
+          event.clientY - session.y,
+        );
+      }
+      detachRef.current?.();
+      detachRef.current = null;
+      const mode = interactionModeRef.current;
+      const instanceId = session?.instanceId;
+      sessionRef.current = null;
+      interactionModeRef.current = 'idle';
+      const city = resolveCityDotClick(instanceId, mode);
+      if (city) {
+        onCityClickRef.current(city);
+      }
+    };
+    window.addEventListener('pointermove', onMove, { passive: true });
+    window.addEventListener('pointerup', onUp);
+    window.addEventListener('pointercancel', onUp);
+    detachRef.current = () => {
+      window.removeEventListener('pointermove', onMove);
+      window.removeEventListener('pointerup', onUp);
+      window.removeEventListener('pointercancel', onUp);
+    };
+  };
+
   return (
     <instancedMesh
       ref={meshRef}
@@ -58,33 +136,16 @@ export default function EarthCityDots({ onCityClick }: EarthCityDotsProps) {
       args={[undefined, undefined, count]}
       frustumCulled={false}
       onPointerDown={(event) => {
-        pointerDownRef.current = { x: event.clientX, y: event.clientY };
-        draggedRef.current = false;
-      }}
-      onPointerMove={(event) => {
-        const start = pointerDownRef.current;
-        if (!start) {
+        if (event.instanceId == null) {
           return;
         }
-        const dx = event.clientX - start.x;
-        const dy = event.clientY - start.y;
-        if (dx * dx + dy * dy > DRAG_PX2) {
-          draggedRef.current = true;
-        }
-      }}
-      onPointerUp={() => {
-        pointerDownRef.current = null;
-      }}
-      onPointerLeave={() => {
-        pointerDownRef.current = null;
-      }}
-      onClick={(event) => {
-        event.stopPropagation();
-        const city = resolveCityDotClick(event.instanceId, draggedRef.current);
-        draggedRef.current = false;
-        if (city) {
-          onCityClick(city);
-        }
+        sessionRef.current = {
+          x: event.clientX,
+          y: event.clientY,
+          instanceId: event.instanceId,
+        };
+        interactionModeRef.current = 'click';
+        bindWindowPointer();
       }}
     >
       <sphereGeometry args={[DOT_RADIUS, DOT_SEGMENTS, DOT_SEGMENTS]} />
