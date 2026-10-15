@@ -19,7 +19,10 @@ type EarthFlyToRigProps = {
   isMobile: boolean;
 };
 
-/** 在控件之后写相机，避免与 OrbitControls.update 抢同一帧 */
+/**
+ * 默认优先级 0：排在 OrbitControls（-1）之后写相机。
+ * 禁止用正优先级，R3F 会关掉自动 gl.render，画布只剩清屏色。
+ */
 export default function EarthFlyToRig({
   controlsRef,
   pendingIdRef,
@@ -74,7 +77,7 @@ export default function EarthFlyToRig({
     if (linear >= 1) {
       onFlightEnd();
     }
-  }, 1);
+  });
 
   return null;
 }

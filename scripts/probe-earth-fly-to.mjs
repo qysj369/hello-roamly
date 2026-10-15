@@ -23,7 +23,19 @@ page.on('console', (msg) => {
 
 await page.goto(BASE, { waitUntil: 'domcontentloaded', timeout: 60000 });
 await page.locator('.earth-fly-to').waitFor({ timeout: 20000 });
-await page.waitForTimeout(1800);
+await page.waitForTimeout(2200);
+
+async function canvasHasGlobe() {
+  const buf = await page.locator('canvas').first().screenshot();
+  let min = 255;
+  let max = 0;
+  for (let i = 0; i + 3 < buf.length; i += 64) {
+    const lum = (buf[i] + buf[i + 1] + buf[i + 2]) / 3;
+    min = Math.min(min, lum);
+    max = Math.max(max, lum);
+  }
+  return { ok: max - min > 18, min, max, reason: max - min > 18 ? 'globe' : 'flat' };
+}
 
 const labels = await page.locator('.earth-fly-to__btn').allInnerTexts();
 const roamBefore = await page.locator('.earth-roam-toggle').textContent();
@@ -43,6 +55,7 @@ function lookOf(sample) {
   return latLngFromOffset(sample.x, sample.y - sample.targetY, sample.z);
 }
 
+const globeBefore = await canvasHasGlobe();
 const start = lookOf(await cameraLook());
 
 await page.getByRole('button', { name: '巴黎' }).click();
@@ -53,6 +66,7 @@ for (let i = 0; i < 18; i += 1) {
   if (look) parisSamples.push(look);
 }
 const parisEnd = parisSamples.at(-1);
+const globeAfterParis = await canvasHasGlobe();
 
 await page.getByRole('button', { name: '拉萨' }).click();
 await page.waitForTimeout(280);
@@ -88,6 +102,8 @@ const report = {
   labels,
   roamBefore,
   roamAfter,
+  globeBefore,
+  globeAfterParis,
   start,
   parisEnd,
   beforeDrag,
@@ -99,6 +115,8 @@ const report = {
 };
 
 const checks = [
+  ['地球画面可见', globeBefore.ok === true],
+  ['飞到巴黎后地球仍可见', globeAfterParis.ok === true],
   ['三个目的地按钮', labels.join('|') === '巴黎|拉萨|里约热内卢'],
   ['漫游开关仍在', roamBefore?.includes('开启漫游') === true],
   ['飞向巴黎对准北纬西欧', Boolean(parisEnd && Math.abs(parisEnd.lat - 48.8566) < 3 && Math.abs(parisEnd.lng - 2.3522) < 3)],
