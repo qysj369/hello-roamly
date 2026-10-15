@@ -11,12 +11,31 @@ export type OrbitSpherical = {
 export const EARTH_FLY_DESTINATIONS: readonly {
   id: EarthFlyDestinationId;
   label: string;
+  blurb: string;
   lat: number;
   lng: number;
 }[] = [
-  { id: 'paris', label: '巴黎', lat: 48.8566, lng: 2.3522 },
-  { id: 'lhasa', label: '拉萨', lat: 29.65, lng: 91.12 },
-  { id: 'rio', label: '里约热内卢', lat: -22.9068, lng: -43.1729 },
+  {
+    id: 'paris',
+    label: '巴黎',
+    blurb: '浪漫之都，漫步塞纳河畔，邂逅古典建筑与文艺风情。',
+    lat: 48.8566,
+    lng: 2.3522,
+  },
+  {
+    id: 'lhasa',
+    label: '拉萨',
+    blurb: '雪域高原，置身圣洁雪山，感受藏地的宁静与辽阔。',
+    lat: 29.65,
+    lng: 91.12,
+  },
+  {
+    id: 'rio',
+    label: '里约热内卢',
+    blurb: '阳光海岸，群山环抱，感受南美热烈奔放的气息。',
+    lat: -22.9068,
+    lng: -43.1729,
+  },
 ] as const;
 
 export const EARTH_FLY_TO = {

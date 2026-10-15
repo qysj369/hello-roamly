@@ -67,6 +67,11 @@ for (let i = 0; i < 18; i += 1) {
 }
 const parisEnd = parisSamples.at(-1);
 const globeAfterParis = await canvasHasGlobe();
+const parisPanel = page.locator('.earth-fly-card');
+await parisPanel.waitFor({ timeout: 4000 });
+const parisPanelText = (await parisPanel.innerText()).replace(/\s+/g, '');
+await page.getByRole('button', { name: '关闭' }).click();
+const parisPanelClosed = (await page.locator('.earth-fly-card').count()) === 0;
 
 await page.getByRole('button', { name: '拉萨' }).click();
 await page.waitForTimeout(280);
@@ -82,6 +87,19 @@ await page.mouse.up();
 await page.waitForTimeout(2400);
 const afterDrag = lookOf(await cameraLook());
 const lhasaTarget = { lat: 29.65, lng: 91.12 };
+const panelGoneAfterDrag = (await page.locator('.earth-fly-card').count()) === 0;
+
+await page.getByRole('button', { name: '里约热内卢' }).click();
+await page.locator('.earth-fly-card').waitFor({ timeout: 7000 });
+const rioPanelText = (await page.locator('.earth-fly-card').innerText()).replace(/\s+/g, '');
+await page.mouse.move(canvasBox.x + canvasBox.width * 0.5, canvasBox.y + canvasBox.height * 0.5);
+await page.mouse.down();
+await page.mouse.move(canvasBox.x + canvasBox.width * 0.38, canvasBox.y + canvasBox.height * 0.58, {
+  steps: 8,
+});
+await page.mouse.up();
+await page.waitForTimeout(200);
+const rioPanelClosedByDrag = (await page.locator('.earth-fly-card').count()) === 0;
 
 await page.getByRole('button', { name: '开启漫游' }).click();
 await page.waitForTimeout(400);
@@ -111,6 +129,11 @@ const report = {
   minRadius,
   maxStep,
   dragCancelled,
+  parisPanelText,
+  parisPanelClosed,
+  panelGoneAfterDrag,
+  rioPanelText,
+  rioPanelClosedByDrag,
   errors,
 };
 
@@ -124,6 +147,11 @@ const checks = [
   ['飞行无瞬移', maxStep < 25],
   ['最低离地距离', minRadius >= MIN_DISTANCE - 0.05],
   ['拖拽中断拉萨飞行', dragCancelled],
+  ['飞抵后弹出巴黎文案', parisPanelText.includes('巴黎') && parisPanelText.includes('塞纳河畔')],
+  ['点击关闭可收起面板', parisPanelClosed],
+  ['拖拽中断后面板不出现', panelGoneAfterDrag],
+  ['飞抵里约弹出文案', rioPanelText.includes('里约热内卢') && rioPanelText.includes('阳光海岸')],
+  ['抵达后拖拽关闭面板', rioPanelClosedByDrag],
   ['漫游可再开启', roamAfter?.includes('停止漫游') === true],
   ['控制台无报错', errors.length === 0],
 ];

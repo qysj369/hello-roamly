@@ -16,12 +16,14 @@ export type EarthFlight = {
 
 type EarthFlyToContextValue = {
   selectedId: EarthFlyDestinationId | null;
+  panelId: EarthFlyDestinationId | null;
   flying: boolean;
   pendingIdRef: { current: EarthFlyDestinationId | null };
   flightRef: { current: EarthFlight | null };
   requestFlyTo: (id: EarthFlyDestinationId) => void;
   cancelFly: () => void;
-  markFlightEnded: () => void;
+  closePanel: () => void;
+  markFlightEnded: (id: EarthFlyDestinationId) => void;
 };
 
 const EarthFlyToContext = createContext<EarthFlyToContextValue | null>(null);
@@ -29,6 +31,7 @@ const EarthFlyToContext = createContext<EarthFlyToContextValue | null>(null);
 export function EarthFlyToProvider({ children }: { children: ReactNode }) {
   const { stopRoam } = useEarthRoam();
   const [selectedId, setSelectedId] = useState<EarthFlyDestinationId | null>(null);
+  const [panelId, setPanelId] = useState<EarthFlyDestinationId | null>(null);
   const [flying, setFlying] = useState(false);
   const pendingIdRef = useRef<EarthFlyDestinationId | null>(null);
   const flightRef = useRef<EarthFlight | null>(null);
@@ -42,6 +45,7 @@ export function EarthFlyToProvider({ children }: { children: ReactNode }) {
       pendingIdRef.current = id;
       flightRef.current = null;
       setSelectedId(id);
+      setPanelId(null);
       setFlying(true);
     },
     [stopRoam],
@@ -52,25 +56,33 @@ export function EarthFlyToProvider({ children }: { children: ReactNode }) {
     flightRef.current = null;
     setFlying(false);
     setSelectedId(null);
+    setPanelId(null);
   }, []);
 
-  const markFlightEnded = useCallback(() => {
+  const closePanel = useCallback(() => {
+    setPanelId(null);
+  }, []);
+
+  const markFlightEnded = useCallback((id: EarthFlyDestinationId) => {
     flightRef.current = null;
     pendingIdRef.current = null;
     setFlying(false);
+    setPanelId(id);
   }, []);
 
   const value = useMemo(
     () => ({
       selectedId,
+      panelId,
       flying,
       pendingIdRef,
       flightRef,
       requestFlyTo,
       cancelFly,
+      closePanel,
       markFlightEnded,
     }),
-    [cancelFly, flying, markFlightEnded, requestFlyTo, selectedId],
+    [cancelFly, closePanel, flying, markFlightEnded, panelId, requestFlyTo, selectedId],
   );
 
   return <EarthFlyToContext.Provider value={value}>{children}</EarthFlyToContext.Provider>;

@@ -1,6 +1,7 @@
 import { useEffect } from 'react';
 import CapsuleHudChrome from '@/components/capsule-one/CapsuleHudChrome';
 import CapsuleOneScene from '@/components/capsule-one/CapsuleOneScene';
+import EarthFlyArrivalPanel from '@/components/capsule-one/EarthFlyArrivalPanel';
 import EarthFlyToButtons from '@/components/capsule-one/EarthFlyToButtons';
 import { EarthFlyToProvider } from '@/components/capsule-one/EarthFlyToContext';
 import { EarthRoamProvider } from '@/components/capsule-one/EarthRoamContext';
@@ -27,6 +28,7 @@ export default function CapsuleOneHomePage() {
           <CapsuleHudChrome />
           <CapsuleOneScene onCitySelect={() => undefined} />
           <EarthFlyToButtons />
+          <EarthFlyArrivalPanel />
           <EarthRoamToggle />
         </div>
       </EarthFlyToProvider>

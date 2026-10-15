@@ -15,7 +15,7 @@ type EarthFlyToRigProps = {
   controlsRef: MutableRefObject<OrbitControlsImpl | null>;
   pendingIdRef: MutableRefObject<EarthFlyDestinationId | null>;
   flightRef: MutableRefObject<EarthFlight | null>;
-  onFlightEnd: () => void;
+  onFlightEnd: (id: EarthFlyDestinationId) => void;
   isMobile: boolean;
 };
 
@@ -75,7 +75,9 @@ export default function EarthFlyToRig({
     camera.lookAt(controls.target);
 
     if (linear >= 1) {
-      onFlightEnd();
+      const arrivedId = flight.id;
+      flightRef.current = null;
+      onFlightEnd(arrivedId);
     }
   });
 
