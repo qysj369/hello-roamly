@@ -6,7 +6,7 @@ import { usePageSeo } from '@/hooks/browser/usePageSeo';
 import { homePageSeo } from '@/lib/seo';
 import '@/styles/capsule-one.css';
 
-/** 蜗牛号飞行漫游座舱：地球拖拽 + 轻量城市圆点（点击仅打日志，暂不跳行程） */
+/** 蜗牛号飞行漫游座舱：圆点短按打印城市名，暂不跳行程 */
 export default function CapsuleOneHomePage() {
   usePageSeo(homePageSeo());
 

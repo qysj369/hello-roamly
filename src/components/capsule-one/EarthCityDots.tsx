@@ -8,10 +8,12 @@ import { themeTokens } from '@/styles/themeTokens';
 const DOT_RADIUS = 0.12;
 const DOT_ALTITUDE = 0.08;
 const DOT_SEGMENTS = 8;
-/** 超过该像素位移视为拖拽（10px²），避免地球旋转时误点 */
+/** 超过该像素位移视为拖拽（10px），避免地球旋转时误点 */
 const DRAG_PX2 = 100;
+/** 按下到松开超过此时长，视为按住而非单击 */
+const MAX_CLICK_MS = 400;
 
-export type CityDotInteractionMode = 'idle' | 'click' | 'drag';
+export type CityDotPointerMode = 'idle' | 'click' | 'drag';
 
 type EarthCityDotsProps = {
   onCityClick: (city: CapsuleCityPoint) => void;
@@ -21,14 +23,15 @@ type PointerSession = {
   x: number;
   y: number;
   instanceId: number;
+  startedAt: number;
 };
 
 export function nextCityDotInteractionMode(
-  mode: CityDotInteractionMode,
+  mode: CityDotPointerMode,
   dx: number,
   dy: number,
   thresholdPx2 = DRAG_PX2,
-): CityDotInteractionMode {
+): CityDotPointerMode {
   if (mode === 'idle' || mode === 'drag') {
     return mode;
   }
@@ -38,12 +41,21 @@ export function nextCityDotInteractionMode(
   return 'click';
 }
 
+export function isCityDotTap(
+  pointerMode: CityDotPointerMode,
+  elapsedMs: number,
+  maxClickMs = MAX_CLICK_MS,
+): boolean {
+  return pointerMode === 'click' && elapsedMs >= 0 && elapsedMs <= maxClickMs;
+}
+
 export function resolveCityDotClick(
   instanceId: number | undefined,
-  interactionMode: CityDotInteractionMode,
+  pointerMode: CityDotPointerMode,
+  elapsedMs = 0,
   cities: readonly CapsuleCityPoint[] = capsuleCityPoints,
 ): CapsuleCityPoint | null {
-  if (interactionMode !== 'click' || instanceId == null || instanceId < 0) {
+  if (!isCityDotTap(pointerMode, elapsedMs) || instanceId == null || instanceId < 0) {
     return null;
   }
   return cities[instanceId] ?? null;
@@ -55,7 +67,7 @@ export function cityDotWorldPosition(lat: number, lng: number): THREE.Vector3 {
 
 export default function EarthCityDots({ onCityClick }: EarthCityDotsProps) {
   const meshRef = useRef<THREE.InstancedMesh>(null);
-  const interactionModeRef = useRef<CityDotInteractionMode>('idle');
+  const pointerModeRef = useRef<CityDotPointerMode>('idle');
   const sessionRef = useRef<PointerSession | null>(null);
   const detachRef = useRef<(() => void) | null>(null);
   const onCityClickRef = useRef(onCityClick);
@@ -93,8 +105,8 @@ export default function EarthCityDots({ onCityClick }: EarthCityDotsProps) {
       if (!session) {
         return;
       }
-      interactionModeRef.current = nextCityDotInteractionMode(
-        interactionModeRef.current,
+      pointerModeRef.current = nextCityDotInteractionMode(
+        pointerModeRef.current,
         event.clientX - session.x,
         event.clientY - session.y,
       );
@@ -102,19 +114,22 @@ export default function EarthCityDots({ onCityClick }: EarthCityDotsProps) {
     const onUp = (event: PointerEvent) => {
       const session = sessionRef.current;
       if (session) {
-        interactionModeRef.current = nextCityDotInteractionMode(
-          interactionModeRef.current,
+        pointerModeRef.current = nextCityDotInteractionMode(
+          pointerModeRef.current,
           event.clientX - session.x,
           event.clientY - session.y,
         );
       }
       detachRef.current?.();
       detachRef.current = null;
-      const mode = interactionModeRef.current;
+      const pointerMode = pointerModeRef.current;
       const instanceId = session?.instanceId;
+      const elapsedMs = session
+        ? Math.max(0, performance.now() - session.startedAt)
+        : Number.POSITIVE_INFINITY;
       sessionRef.current = null;
-      interactionModeRef.current = 'idle';
-      const city = resolveCityDotClick(instanceId, mode);
+      pointerModeRef.current = 'idle';
+      const city = resolveCityDotClick(instanceId, pointerMode, elapsedMs);
       if (city) {
         onCityClickRef.current(city);
       }
@@ -143,8 +158,9 @@ export default function EarthCityDots({ onCityClick }: EarthCityDotsProps) {
           x: event.clientX,
           y: event.clientY,
           instanceId: event.instanceId,
+          startedAt: performance.now(),
         };
-        interactionModeRef.current = 'click';
+        pointerModeRef.current = 'click';
         bindWindowPointer();
       }}
     >

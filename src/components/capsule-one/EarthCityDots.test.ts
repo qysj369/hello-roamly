@@ -1,6 +1,7 @@
 import { describe, expect, it } from 'vitest';
 import {
   cityDotWorldPosition,
+  isCityDotTap,
   nextCityDotInteractionMode,
   resolveCityDotClick,
 } from '@/components/capsule-one/EarthCityDots';
@@ -26,12 +27,20 @@ describe('EarthCityDots', () => {
     expect(nextCityDotInteractionMode('idle', 40, 40)).toBe('idle');
   });
 
-  it('prints a city only for a stationary click', () => {
+  it('treats a short still press as a tap, not a hold or drag', () => {
+    expect(isCityDotTap('click', 80)).toBe(true);
+    expect(isCityDotTap('click', 400)).toBe(true);
+    expect(isCityDotTap('click', 401)).toBe(false);
+    expect(isCityDotTap('drag', 80)).toBe(false);
+    expect(isCityDotTap('idle', 80)).toBe(false);
+  });
+
+  it('resolves a city name only for a short stationary tap', () => {
     const hangzhouIndex = capsuleCityPoints.findIndex((city) => city.id === 'hangzhou');
-    expect(resolveCityDotClick(hangzhouIndex, 'click')?.label).toBe('杭州');
-    expect(resolveCityDotClick(hangzhouIndex, 'drag')).toBeNull();
-    expect(resolveCityDotClick(hangzhouIndex, 'idle')).toBeNull();
-    expect(resolveCityDotClick(undefined, 'click')).toBeNull();
-    expect(resolveCityDotClick(999, 'click')).toBeNull();
+    expect(resolveCityDotClick(hangzhouIndex, 'click', 90)?.label).toBe('杭州');
+    expect(resolveCityDotClick(hangzhouIndex, 'click', 800)).toBeNull();
+    expect(resolveCityDotClick(hangzhouIndex, 'drag', 90)).toBeNull();
+    expect(resolveCityDotClick(undefined, 'click', 90)).toBeNull();
+    expect(resolveCityDotClick(999, 'click', 90)).toBeNull();
   });
 });

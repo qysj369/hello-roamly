@@ -339,7 +339,11 @@ function EarthGlobeCore({
   );
 }
 
-function EarthGlobeFallback({ autoRotate = false, onCitySelect }: EarthGlobeCoreProps) {
+function EarthGlobeFallback({
+  autoRotate = false,
+  onCitySelect,
+  interactionMode = 'blindbox',
+}: EarthGlobeCoreProps) {
   const groupRef = useRef<THREE.Group>(null);
   const addRipple = useCapsuleOneStore((state) => state.addRipple);
 
@@ -359,6 +363,13 @@ function EarthGlobeFallback({ autoRotate = false, onCitySelect }: EarthGlobeCore
     const { lat, lng } = vector3ToLatLng(localPoint);
 
     addRipple(lat, lng);
+    if (interactionMode === 'display') {
+      return;
+    }
+    if (interactionMode === 'navigate') {
+      onCitySelect(findNearestHoloCity(lat, lng));
+      return;
+    }
     handleEarthClick(event, [event], lat, lng);
   };
 
@@ -402,7 +413,15 @@ export default function EarthGlobe({
   }
 
   return (
-    <Suspense fallback={<EarthGlobeFallback onCitySelect={onCitySelect} autoRotate={autoRotate} />}>
+    <Suspense
+      fallback={
+        <EarthGlobeFallback
+          onCitySelect={onCitySelect}
+          autoRotate={autoRotate}
+          interactionMode={interactionMode}
+        />
+      }
+    >
       <EarthGlobeCore
         onCitySelect={onCitySelect}
         autoRotate={autoRotate}
