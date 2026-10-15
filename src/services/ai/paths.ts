@@ -1,6 +1,7 @@
 export const AI_API = {
   generateGuide: '/api/ai/generate-guide',
   generateTravelPlan: '/api/ai/generate-travel-plan',
+  companionSketch: '/api/ai/companion-sketch',
   deepseek: '/api/ai/deepseek',
   generatePlan: '/api/ai/generate-plan',
   generatePlanStream: '/api/ai/generate-plan-stream',

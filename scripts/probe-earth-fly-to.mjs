@@ -70,6 +70,18 @@ const globeAfterParis = await canvasHasGlobe();
 const parisPanel = page.locator('.earth-fly-card');
 await parisPanel.waitFor({ timeout: 4000 });
 const parisPanelText = (await parisPanel.innerText()).replace(/\s+/g, '');
+const generateVisible = await page.getByRole('button', { name: '生成旅行行程' }).isVisible();
+await page.getByRole('button', { name: '生成旅行行程' }).click();
+await page.getByRole('button', { name: '正在生成行程…' }).waitFor({ timeout: 4000 });
+await page
+  .locator('.earth-fly-card__plan, .earth-fly-card__action:not([disabled])')
+  .first()
+  .waitFor({ timeout: 90000 });
+const afterGenerate = (await parisPanel.innerText()).replace(/\s+/g, '');
+const generateSettled =
+  afterGenerate.includes('塞纳') ||
+  afterGenerate.includes('再试一次') ||
+  Boolean(await page.locator('.earth-fly-card__plan').count());
 await page.getByRole('button', { name: '关闭' }).click();
 const parisPanelClosed = (await page.locator('.earth-fly-card').count()) === 0;
 
@@ -130,6 +142,8 @@ const report = {
   maxStep,
   dragCancelled,
   parisPanelText,
+  generateVisible,
+  generateSettled,
   parisPanelClosed,
   panelGoneAfterDrag,
   rioPanelText,
@@ -148,6 +162,8 @@ const checks = [
   ['最低离地距离', minRadius >= MIN_DISTANCE - 0.05],
   ['拖拽中断拉萨飞行', dragCancelled],
   ['飞抵后弹出巴黎文案', parisPanelText.includes('巴黎') && parisPanelText.includes('塞纳河畔')],
+  ['面板带生成行程按钮', generateVisible === true],
+  ['生成后有行程或可重试', generateSettled === true],
   ['点击关闭可收起面板', parisPanelClosed],
   ['拖拽中断后面板不出现', panelGoneAfterDrag],
   ['飞抵里约弹出文案', rioPanelText.includes('里约热内卢') && rioPanelText.includes('阳光海岸')],

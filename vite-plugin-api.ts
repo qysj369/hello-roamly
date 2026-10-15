@@ -2,6 +2,7 @@ import type { IncomingMessage, ServerResponse } from 'node:http';
 import type { Plugin, ViteDevServer } from 'vite';
 import { loadEnv } from 'vite';
 import { WebSocketServer } from 'ws';
+import { enforceAiRateLimit } from './server/lib/aiRateLimit';
 
 type ApiHandler = (req: IncomingMessage, res: ServerResponse, rootDir: string) => Promise<void>;
 
@@ -135,6 +136,10 @@ type TravelPlanApiModule = {
   handleGenerateTravelPlanApi: GuideApiModule['handleGenerateGuideApi'];
 };
 
+type CompanionSketchApiModule = {
+  handleCompanionSketchApi: GuideApiModule['handleGenerateGuideApi'];
+};
+
 function loadHandler(
   server: ViteDevServer,
   route: ApiRoute,
@@ -209,6 +214,9 @@ function mountApiMiddleware(server: ViteDevServer): void {
     | null = null;
   let travelPlanHandlerPromise:
     | Promise<TravelPlanApiModule['handleGenerateTravelPlanApi']>
+    | null = null;
+  let companionSketchHandlerPromise:
+    | Promise<CompanionSketchApiModule['handleCompanionSketchApi']>
     | null = null;
 
   const getGuideHandler = () => {
@@ -311,6 +319,15 @@ function mountApiMiddleware(server: ViteDevServer): void {
     return travelPlanHandlerPromise;
   };
 
+  const getCompanionSketchHandler = () => {
+    if (!companionSketchHandlerPromise) {
+      companionSketchHandlerPromise = server
+        .ssrLoadModule('/server/api/ai/companion-sketch.ts')
+        .then((mod) => (mod as CompanionSketchApiModule).handleCompanionSketchApi);
+    }
+    return companionSketchHandlerPromise;
+  };
+
   server.middlewares.use((req, res, next) => {
     const route = matchApiRoute(req.url, req.method);
     if (route) {
@@ -326,6 +343,11 @@ function mountApiMiddleware(server: ViteDevServer): void {
     }
 
     const pathname = req.url?.split('?')[0] ?? '';
+
+    if (pathname.startsWith('/api/ai/') && !enforceAiRateLimit(req, res, env, pathname)) {
+      return;
+    }
+
     if (pathname === '/api/ai/generate-guide') {
       void getGuideHandler()
         .then((handle) => handle(req, res, env))
@@ -340,6 +362,18 @@ function mountApiMiddleware(server: ViteDevServer): void {
 
     if (pathname === '/api/ai/generate-travel-plan') {
       void getTravelPlanHandler()
+        .then((handle) => handle(req, res, env))
+        .catch((error: unknown) => {
+          const message = error instanceof Error ? error.message : 'API 处理失败';
+          res.statusCode = 500;
+          res.setHeader('Content-Type', 'application/json; charset=utf-8');
+          res.end(JSON.stringify({ error: message }));
+        });
+      return;
+    }
+
+    if (pathname === '/api/ai/companion-sketch') {
+      void getCompanionSketchHandler()
         .then((handle) => handle(req, res, env))
         .catch((error: unknown) => {
           const message = error instanceof Error ? error.message : 'API 处理失败';

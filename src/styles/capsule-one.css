@@ -527,6 +527,8 @@ html.capsule-one-active body::-webkit-scrollbar {
   right: max(1.15rem, env(safe-area-inset-right));
   z-index: 4;
   width: min(16.5rem, calc(100vw - 7.5rem));
+  max-height: min(52vh, 22rem);
+  overflow: auto;
   padding: 0.85rem 2rem 0.95rem 0.95rem;
   border: 1px solid var(--theme-line, rgba(197, 212, 203, 0.9));
   border-radius: var(--theme-radius-md, 12px);
@@ -573,6 +575,41 @@ html.capsule-one-active body::-webkit-scrollbar {
 .earth-fly-card__close:focus-visible {
   outline: none;
   color: var(--theme-accent, #285948);
+}
+
+.earth-fly-card__plan {
+  margin: 0;
+  font-size: 0.76rem;
+  letter-spacing: 0.02em;
+  line-height: 1.55;
+  white-space: pre-wrap;
+}
+
+.earth-fly-card__action {
+  display: block;
+  width: 100%;
+  margin-top: 0.7rem;
+  min-height: 2.2rem;
+  padding: 0.35rem 0.7rem;
+  border: 1px solid var(--theme-line, rgba(197, 212, 203, 0.9));
+  border-radius: var(--theme-radius-md, 12px);
+  background: color-mix(in srgb, var(--theme-surface, #fffffb) 88%, transparent);
+  color: var(--theme-title, #222c28);
+  font-family: inherit;
+  font-size: 0.78rem;
+  letter-spacing: 0.04em;
+  cursor: pointer;
+}
+
+.earth-fly-card__action:hover,
+.earth-fly-card__action:focus-visible {
+  border-color: color-mix(in srgb, var(--theme-accent, #285948) 34%, transparent);
+  outline: none;
+}
+
+.earth-fly-card__action:disabled {
+  cursor: wait;
+  opacity: 0.72;
 }
 
 .capsule-scene__fallback {
