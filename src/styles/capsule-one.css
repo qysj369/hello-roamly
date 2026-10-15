@@ -446,6 +446,40 @@ html.capsule-one-active body::-webkit-scrollbar {
   cursor: grabbing;
 }
 
+.earth-roam-toggle {
+  position: absolute;
+  right: max(1.15rem, env(safe-area-inset-right));
+  bottom: max(1.15rem, env(safe-area-inset-bottom));
+  z-index: 4;
+  min-height: 2.5rem;
+  padding: 0.42rem 0.95rem;
+  border: 1px solid var(--theme-line, rgba(197, 212, 203, 0.9));
+  border-radius: var(--theme-radius-md, 12px);
+  background: color-mix(in srgb, var(--theme-surface, #fffffb) 86%, transparent);
+  color: var(--theme-title, #222c28);
+  font-family: var(--theme-font, inherit);
+  font-size: 0.82rem;
+  letter-spacing: 0.06em;
+  line-height: 1.2;
+  box-shadow: var(--theme-shadow-sm, 0 1px 4px rgba(34, 44, 40, 0.05));
+  backdrop-filter: blur(8px);
+  cursor: pointer;
+}
+
+.earth-roam-toggle:hover,
+.earth-roam-toggle:focus-visible {
+  border-color: color-mix(in srgb, var(--theme-accent, #285948) 34%, transparent);
+  outline: none;
+}
+
+.earth-roam-toggle[aria-pressed='true'] {
+  background: color-mix(
+    in srgb,
+    var(--theme-accent-soft, #72a893) 20%,
+    var(--theme-surface, #fffffb) 80%
+  );
+}
+
 .capsule-scene__fallback {
   display: grid;
   place-items: center;

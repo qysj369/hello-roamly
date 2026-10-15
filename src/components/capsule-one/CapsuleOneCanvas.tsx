@@ -1,8 +1,9 @@
-import { OrbitControls } from '@react-three/drei';
 import { Canvas } from '@react-three/fiber';
 import { useEffect, useMemo, useState } from 'react';
 import * as THREE from 'three';
 import EarthGlobe from '@/components/capsule-one/EarthGlobe';
+import { useEarthRoam } from '@/components/capsule-one/EarthRoamContext';
+import EarthRoamControls from '@/components/capsule-one/EarthRoamControls';
 import { latLngToVector3 } from '@/components/capsule-one/geoMath';
 import { getCapsuleCityById, type CapsuleCityPoint } from '@/data/capsuleHotRoutes';
 
@@ -28,6 +29,7 @@ function useCapsuleMobileLayout() {
 
 /** 基础地球：拖拽旋转/缩放。不做云层与高级光影 */
 export default function CapsuleOneCanvas({ onCitySelect }: CapsuleOneCanvasProps) {
+  const { roaming, interruptRoamOnOrbitStart } = useEarthRoam();
   const isMobile = useCapsuleMobileLayout();
   const earthLift = isMobile ? 0.28 : 0.55;
   const lookAtChina = useMemo(() => {
@@ -80,18 +82,11 @@ export default function CapsuleOneCanvas({ onCitySelect }: CapsuleOneCanvasProps
         <EarthGlobe onCitySelect={onCitySelect} variant="daylight" interactionMode="display" />
       </group>
 
-      <OrbitControls
-        enableDamping
-        dampingFactor={0.08}
-        autoRotate
-        autoRotateSpeed={0.35}
-        minDistance={isMobile ? 7 : 7.5}
-        maxDistance={isMobile ? 24 : 26}
-        enablePan={false}
-        enableZoom
-        zoomSpeed={isMobile ? 0.8 : 1}
-        rotateSpeed={isMobile ? 0.7 : 0.85}
+      <EarthRoamControls
+        roaming={roaming}
+        onOrbitStart={interruptRoamOnOrbitStart}
         target={lookAtChina.target}
+        isMobile={isMobile}
       />
     </Canvas>
   );

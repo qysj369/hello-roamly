@@ -1,6 +1,8 @@
 import { useEffect } from 'react';
 import CapsuleHudChrome from '@/components/capsule-one/CapsuleHudChrome';
 import CapsuleOneScene from '@/components/capsule-one/CapsuleOneScene';
+import { EarthRoamProvider } from '@/components/capsule-one/EarthRoamContext';
+import EarthRoamToggle from '@/components/capsule-one/EarthRoamToggle';
 import { usePageSeo } from '@/hooks/browser/usePageSeo';
 import { homePageSeo } from '@/lib/seo';
 import '@/styles/capsule-one.css';
@@ -16,10 +18,13 @@ export default function CapsuleOneHomePage() {
   }, []);
 
   return (
-    <div className="capsule-one-home capsule-one-home--cockpit">
-      <h1 className="sr-only">蜗牛旅行 HelloRoamly — 飞行漫游座舱</h1>
-      <CapsuleHudChrome />
-      <CapsuleOneScene onCitySelect={() => undefined} />
-    </div>
+    <EarthRoamProvider>
+      <div className="capsule-one-home capsule-one-home--cockpit">
+        <h1 className="sr-only">蜗牛旅行 HelloRoamly — 飞行漫游座舱</h1>
+        <CapsuleHudChrome />
+        <CapsuleOneScene onCitySelect={() => undefined} />
+        <EarthRoamToggle />
+      </div>
+    </EarthRoamProvider>
   );
 }
