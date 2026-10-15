@@ -13,11 +13,12 @@ import {
 describe('earthFlyTo', () => {
   it('exposes the three test destinations', () => {
     expect(EARTH_FLY_DESTINATIONS.map((item) => item.label)).toEqual(['巴黎', '拉萨', '里约热内卢']);
-    expect(EARTH_FLY_DESTINATIONS.map((item) => item.blurb)).toEqual([
-      '浪漫之都，漫步塞纳河畔，邂逅古典建筑与文艺风情。',
-      '雪域高原，置身圣洁雪山，感受藏地的宁静与辽阔。',
-      '阳光海岸，群山环抱，感受南美热烈奔放的气息。',
-    ]);
+    expect(EARTH_FLY_DESTINATIONS.map((item) => item.blurb).join('|')).toContain('塞纳河');
+    expect(EARTH_FLY_DESTINATIONS.map((item) => item.blurb).join('|')).toContain('青藏高原');
+    expect(EARTH_FLY_DESTINATIONS.map((item) => item.blurb).join('|')).toContain('大西洋');
+    expect(EARTH_FLY_DESTINATIONS.some((item) => /浪漫之都|圣洁雪山|热烈奔放/.test(item.blurb))).toBe(
+      false,
+    );
   });
 
   it('eases in and out so the middle moves faster than the ends', () => {

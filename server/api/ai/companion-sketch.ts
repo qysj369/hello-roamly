@@ -43,7 +43,7 @@ export async function handleCompanionSketchApi(
       return;
     }
 
-    const messages = buildCompanionSketchMessages(city.label);
+    const messages = buildCompanionSketchMessages(city.label, city.blurb);
     const raw = await completer({
       messages: [
         { role: 'system', content: messages.system },
