@@ -5,6 +5,7 @@ import {
 } from '../../controllers/aiPlanContinueController';
 import type { ServerEnv } from '../../lib/deepseekServer';
 import { readJsonBody, sendJson } from '../../lib/http';
+import { DeepSeekUnconfiguredError } from '@/services/ai/runMapPlanGeneration';
 
 /** POST /api/ai/continue-chat — 穷游方案连续追问 */
 export async function handleContinuePlanChatApi(
@@ -27,6 +28,10 @@ export async function handleContinuePlanChatApi(
     const result = await continueMapPlanChat(body, env);
     sendJson(res, 200, result);
   } catch (error) {
+    if (error instanceof DeepSeekUnconfiguredError) {
+      sendJson(res, 503, { error: error.message, code: error.code });
+      return;
+    }
     const message = error instanceof Error ? error.message : '追问失败';
     sendJson(res, 500, { error: message, code: 'continue_failed' });
   }

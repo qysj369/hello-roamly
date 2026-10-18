@@ -36,7 +36,7 @@ export default function StructuredGuideAuthorMeta({
           </Link>
         </span>
         {aiAssisted && (
-          <span className="rounded-full bg-violet-100 px-2.5 py-0.5 text-[11px] font-medium text-violet-800">
+          <span className="rounded-full bg-emerald-50 px-2.5 py-0.5 text-[11px] font-medium text-[#2c6b58]">
             {SLIME_TRAIL_AI_ATTRIBUTION}
           </span>
         )}

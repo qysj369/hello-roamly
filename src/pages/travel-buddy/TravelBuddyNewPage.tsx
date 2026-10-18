@@ -10,6 +10,7 @@ import { usePageSeo } from '@/hooks/browser/usePageSeo';
 import { TRAVEL_BUDDY_BRAND } from '@/lib/config/travelBuddy';
 import { paths } from '@/router/paths';
 import type { TravelBuddyNewPageState } from '@/types/router-state';
+import '@/styles/holo-inner.css';
 
 export default function TravelBuddyNewPage() {
   const navigate = useNavigate();
@@ -24,12 +25,12 @@ export default function TravelBuddyNewPage() {
   });
 
   return (
-    <MotionPage className="flex flex-col gap-4">
+    <MotionPage className="holo-buddies flex flex-col gap-4">
       <MotionBlock>
         <button
           type="button"
           onClick={() => navigate(-1)}
-          className="inline-flex items-center gap-1 text-sm font-medium text-brand-600 hover:text-brand-700"
+          className="holo-buddies__back inline-flex items-center gap-1 text-sm font-medium"
         >
           <ArrowLeft className="h-4 w-4" aria-hidden />
           返回
@@ -37,9 +38,9 @@ export default function TravelBuddyNewPage() {
       </MotionBlock>
 
       <MotionBlock>
-        <header className="rounded-2xl border border-slate-200 bg-white p-5 shadow-sm">
-          <h1 className="text-lg font-bold text-slate-900">{TRAVEL_BUDDY_BRAND.publishTitle}</h1>
-          <p className="mt-1 text-sm text-slate-600">{TRAVEL_BUDDY_BRAND.tagline}</p>
+        <header className="holo-buddies__panel rounded-xl border border-[#b7cdc4] bg-[#fffef6] p-5 shadow-none">
+          <h1 className="holo-buddies__title text-lg font-bold">{TRAVEL_BUDDY_BRAND.publishTitle}</h1>
+          <p className="holo-buddies__subtitle mt-1 text-sm">{TRAVEL_BUDDY_BRAND.tagline}</p>
         </header>
       </MotionBlock>
 

@@ -22,7 +22,7 @@ export const TRAVEL_PLAN_CREATORS: TravelPlanCreator[] = [
   },
   {
     id: 'creator-budget',
-    nickname: '穷游记事本',
+    nickname: '漫行记事本',
     avatarUrl: `${AVATAR_BASE}?seed=budget-note&backgroundColor=ffdfbf,b6e3f4`,
   },
 ];

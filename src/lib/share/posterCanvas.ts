@@ -102,6 +102,8 @@ export async function drawCoverImage(
 export function canvasToPngBlob(canvas: HTMLCanvasElement): Promise<Blob> {
   return new Promise((resolve, reject) => {
     canvas.toBlob((blob) => {
+      canvas.width = 0;
+      canvas.height = 0;
       if (!blob) {
         reject(new Error('海报导出失败'));
         return;

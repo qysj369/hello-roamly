@@ -25,7 +25,7 @@ export default function DiscoverFeedSentinel({
       <div ref={sentinelRef as Ref<HTMLDivElement>} className="h-px w-full" aria-hidden />
       {isLoadingMore && (
         <p className="flex items-center justify-center gap-2 text-sm text-slate-500">
-          <Loader2 className="h-4 w-4 animate-spin text-violet-600" aria-hidden />
+          <Loader2 className="h-4 w-4 animate-spin text-[#2c6b58]" aria-hidden />
           加载更多内容…
         </p>
       )}

@@ -1,4 +1,5 @@
 import { BRAND_NAME, BRAND_NAME_EN, BRAND_SPIRIT_SLOGAN } from '@/lib/config/brand';
+import { useI18n } from '@/i18n/useI18n';
 
 type SnailBrandLogoProps = {
   size?: number;
@@ -7,12 +8,18 @@ type SnailBrandLogoProps = {
   className?: string;
 };
 
-/** 全局蜗牛品牌标：螺旋线壳 + 蜗牛旅行 HelloRoamly + slogan */
+/** 全局蜗牛品牌标：螺旋线壳 + 蜗牛旅行 HelloRoamly + slogan（跟随 i18n） */
 export default function SnailBrandLogo({
   size = 32,
   variant = 'full',
   className = '',
 }: SnailBrandLogoProps) {
+  const { locale, messages: t } = useI18n();
+  const isEn = locale === 'en';
+  const primaryName = isEn ? t.brand.logo : BRAND_NAME;
+  const secondaryName = isEn ? null : BRAND_NAME_EN;
+  const slogan = isEn ? t.brand.slogan : BRAND_SPIRIT_SLOGAN;
+
   return (
     <div className={`snail-brand-logo ${className}`.trim()}>
       <svg
@@ -23,14 +30,12 @@ export default function SnailBrandLogo({
         aria-hidden
         className="snail-brand-logo__icon"
       >
-        {/* 螺旋壳 */}
         <path
           d="M18 28.5c-5.2 0-9.4-3.8-9.4-9.2 0-6.2 4.6-10.8 10.4-10.8 4.6 0 8.2 3 8.2 7.2 0 3.4-2.4 5.8-5.6 5.8-2.6 0-4.4-1.8-4.4-4.2 0-2.2 1.6-3.6 3.6-3.6"
           stroke="var(--theme-accent)"
           strokeWidth="1.55"
           strokeLinecap="round"
         />
-        {/* 触角 */}
         <path
           d="M24.2 12.2V8.8M27.4 13.4l1.8-1.8"
           stroke="var(--theme-accent)"
@@ -43,14 +48,12 @@ export default function SnailBrandLogo({
 
       <div className="snail-brand-logo__text">
         <p className="snail-brand-logo__title">
-          <span className="snail-brand-logo__zh">{BRAND_NAME}</span>
-          {variant === 'full' ? (
-            <span className="snail-brand-logo__en">{BRAND_NAME_EN}</span>
+          <span className="snail-brand-logo__zh">{primaryName}</span>
+          {variant === 'full' && secondaryName ? (
+            <span className="snail-brand-logo__en">{secondaryName}</span>
           ) : null}
         </p>
-        {variant === 'full' ? (
-          <p className="snail-brand-logo__slogan">{BRAND_SPIRIT_SLOGAN}</p>
-        ) : null}
+        {variant === 'full' ? <p className="snail-brand-logo__slogan">{slogan}</p> : null}
       </div>
     </div>
   );

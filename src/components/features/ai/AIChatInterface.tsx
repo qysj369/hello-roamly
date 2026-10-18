@@ -184,13 +184,22 @@ export default function AIChatInterface({
             role="status"
             aria-label="正在生成旅行计划"
           >
-            <div className="flex max-w-[18rem] flex-col items-center gap-1 rounded-2xl border border-brand-200 bg-white px-4 py-3 text-center shadow-sm">
+            <div className="flex w-[18rem] max-w-[85vw] flex-col items-center gap-2 rounded-2xl border border-brand-200 bg-white px-4 py-3 text-center shadow-sm">
               <div className="flex items-center gap-2 text-sm font-medium text-brand-800">
                 <Loader2 className="h-4 w-4 animate-spin shrink-0" aria-hidden />
                 {planProgress.message ?? '生成行程中…'}
               </div>
+              <div
+                className="h-1.5 w-full overflow-hidden rounded-full bg-brand-100"
+                aria-hidden
+              >
+                <div
+                  className="h-full rounded-full bg-brand-600 transition-[width] duration-700 ease-out"
+                  style={{ width: `${planProgress.progressPercent}%` }}
+                />
+              </div>
               <p className="text-[11px] text-slate-500">
-                {ctrl.travelParams.params.days} 天行程预计约 {planProgress.estimateSeconds} 秒
+                {ctrl.travelParams.params.days} 天行程通常约 {planProgress.estimateSeconds} 秒
               </p>
             </div>
           </div>

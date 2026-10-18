@@ -17,7 +17,15 @@ import { generateCompleteMapPlanStream } from '../lib/mapPlanStreamPipeline';
 import {
   isServerDeepSeekStreamConfigured,
 } from '../lib/deepseekStreamServer';
-import type { ServerEnv } from '../lib/deepseekServer';
+import { createServerDeepSeekCompleter, type ServerEnv } from '../lib/deepseekServer';
+import { scrubPlanDisplayMarkup } from '@/lib/home/scrubPlanDisplayMarkup';
+import {
+  auditSnailPlanOutput,
+  resolveSnailPlanAuditLock,
+} from '@/lib/home/snailPlanOutputAudit';
+import { generateMapPlanFromModel } from '@/services/ai/runMapPlanGeneration';
+import { buildSnailAuditRepairPrompt } from '@/services/ai/prompts/mapPlanGeneration';
+import { applySnailPlanAuditRepairs } from '@/lib/home/snailPlanAuditRepair';
 import { serverReverseGeocode } from '../lib/reverseGeocodeServer';
 import { endSse, initSseResponse, writeSseEvent } from '../lib/sse';
 
@@ -89,7 +97,7 @@ export async function streamMapPlan(
   }, 12_000);
 
   try {
-    const content = await generateCompleteMapPlanStream({
+    let content = await generateCompleteMapPlanStream({
       env,
       locationName,
       query: planQuery,
@@ -118,7 +126,57 @@ export async function streamMapPlan(
       return;
     }
 
-    const finalized = finalizeMapPlanContent(content, locationName, originName, effectiveSearchQuery);
+    const auditLock = resolveSnailPlanAuditLock(locationName, planQuery, originName);
+    let finalized = scrubPlanDisplayMarkup(
+      applySnailPlanAuditRepairs(
+        scrubPlanDisplayMarkup(
+          finalizeMapPlanContent(content, locationName, originName, effectiveSearchQuery),
+        ),
+        auditLock,
+      ),
+    );
+    const firstAudit = auditSnailPlanOutput(finalized, auditLock);
+    if (!firstAudit.ok) {
+      console.error('[snail-plan-audit]', JSON.stringify(firstAudit.issues));
+      writeSseEvent(res, 'status', { message: '攻略未通过校验，正在重新生成…' });
+      const completer = createServerDeepSeekCompleter(env);
+      if (completer) {
+        try {
+          const regenerated = await generateMapPlanFromModel(
+            {
+              lng: body.lng,
+              lat: body.lat,
+              query: planQuery,
+              locationName,
+              originName,
+            },
+            completer,
+            planQuery,
+            locationName,
+            buildSnailAuditRepairPrompt(firstAudit.issues),
+          );
+          if (regenerated.trim()) {
+            finalized = scrubPlanDisplayMarkup(
+              applySnailPlanAuditRepairs(
+                scrubPlanDisplayMarkup(
+                  finalizeMapPlanContent(regenerated, locationName, originName, effectiveSearchQuery),
+                ),
+                auditLock,
+              ),
+            );
+            if (!res.writableEnded) {
+              writeSseEvent(res, 'sync', { text: finalized });
+            }
+          }
+        } catch (retryError) {
+          const detail = retryError instanceof Error ? retryError.message : '未知错误';
+          console.error('[snail-plan-retry]', detail);
+          writeSseEvent(res, 'status', {
+            message: '重新生成未完成，先保留本次攻略',
+          });
+        }
+      }
+    }
 
     if (!isMapPlanDeliverable(finalized)) {
       writeSseEvent(res, 'error', {

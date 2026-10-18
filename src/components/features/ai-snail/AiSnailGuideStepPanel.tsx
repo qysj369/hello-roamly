@@ -40,14 +40,7 @@ function OptionButton({
       type="button"
       disabled={disabled}
       onClick={onClick}
-      className={cn(
-        'rounded-xl border px-3 py-2 text-sm font-medium transition',
-        'focus:outline-none focus-visible:ring-2 focus-visible:ring-emerald-500 focus-visible:ring-offset-2',
-        'disabled:cursor-not-allowed disabled:opacity-50',
-        selected
-          ? 'border-emerald-500 bg-emerald-50 text-emerald-800'
-          : 'border-slate-200 bg-white text-slate-700 hover:border-emerald-300 hover:bg-emerald-50/50',
-      )}
+      className={cn('holo-ai-snail__option', selected && 'is-selected')}
     >
       {children}
     </button>
@@ -86,9 +79,9 @@ export default function AiSnailGuideStepPanel({
 
   if (step === 'generating') {
     return (
-      <div className="flex items-center justify-center gap-2 border-t border-slate-200/80 bg-white px-4 py-5 text-sm text-slate-600">
-        <Loader2 className="h-4 w-4 animate-spin text-emerald-600" aria-hidden />
-        AI蜗牛正在生成结构化穷游攻略…
+      <div className="holo-ai-snail__footer flex items-center justify-center gap-2 px-4 py-5 text-sm">
+        <Loader2 className="h-4 w-4 animate-spin" aria-hidden />
+        AI蜗牛正在生成结构化漫行攻略…
       </div>
     );
   }
@@ -99,12 +92,8 @@ export default function AiSnailGuideStepPanel({
 
   if (hasDraft && onOpenEditor) {
     return (
-      <div className="border-t border-slate-200/80 bg-white px-4 py-4">
-        <button
-          type="button"
-          onClick={onOpenEditor}
-          className="w-full rounded-xl bg-gradient-to-r from-emerald-600 to-teal-600 py-3 text-sm font-bold text-white shadow-sm transition hover:brightness-105"
-        >
+      <div className="holo-ai-snail__footer px-4 py-4">
+        <button type="button" onClick={onOpenEditor} className="holo-ai-snail__primary-btn w-full">
           打开攻略发布编辑器
         </button>
       </div>
@@ -112,7 +101,7 @@ export default function AiSnailGuideStepPanel({
   }
 
   return (
-    <div className="border-t border-slate-200/80 bg-white px-4 py-4">
+    <div className="holo-ai-snail__footer px-4 py-4">
       {step === 'destination' && (
         <form onSubmit={handleDestinationSubmit} className="flex flex-col gap-3 sm:flex-row">
           <input
@@ -121,12 +110,12 @@ export default function AiSnailGuideStepPanel({
             onChange={(event) => setDestinationDraft(event.target.value)}
             placeholder="例如：济南、大理、厦门"
             aria-label="目的地"
-            className="min-w-0 flex-1 rounded-xl border border-slate-200 px-4 py-3 text-sm focus:border-emerald-400 focus:outline-none focus:ring-2 focus:ring-emerald-500/30"
+            className="holo-ai-snail__input min-w-0 flex-1"
           />
           <button
             type="submit"
             disabled={!destinationDraft.trim()}
-            className="rounded-xl bg-gradient-to-r from-emerald-600 to-teal-600 px-5 py-3 text-sm font-bold text-white shadow-sm transition hover:brightness-105 disabled:opacity-50"
+            className="holo-ai-snail__primary-btn disabled:opacity-50"
           >
             下一步
           </button>
@@ -151,12 +140,12 @@ export default function AiSnailGuideStepPanel({
               onChange={(event) => setCustomDays(event.target.value)}
               placeholder="自定义天数"
               aria-label="自定义天数"
-              className="min-w-0 flex-1 rounded-xl border border-slate-200 px-4 py-2.5 text-sm focus:border-emerald-400 focus:outline-none focus:ring-2 focus:ring-emerald-500/30"
+              className="holo-ai-snail__input min-w-0 flex-1"
             />
             <button
               type="submit"
               disabled={!customDays}
-              className="rounded-xl border border-emerald-200 bg-emerald-50 px-4 py-2.5 text-sm font-semibold text-emerald-800 disabled:opacity-50"
+              className="holo-ai-snail__secondary-btn disabled:opacity-50"
             >
               确定
             </button>
@@ -192,7 +181,7 @@ export default function AiSnailGuideStepPanel({
             type="button"
             disabled={preferences.length === 0 || isGenerating}
             onClick={() => onGenerate(preferences)}
-            className="w-full rounded-xl bg-gradient-to-r from-emerald-600 via-teal-600 to-cyan-700 py-3.5 text-sm font-bold text-white shadow-[0_6px_20px_rgba(16,185,129,0.35)] transition hover:brightness-105 disabled:opacity-50"
+            className="holo-ai-snail__primary-btn w-full disabled:opacity-50"
           >
             开始生成攻略
           </button>

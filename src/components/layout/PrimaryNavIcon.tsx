@@ -1,4 +1,4 @@
-import { BookOpen, Compass, MessageCircle, Search, User, Users } from 'lucide-react';
+import { Compass, Sparkles, User } from 'lucide-react';
 import { paths } from '@/router/paths';
 
 type PrimaryNavIconProps = {
@@ -11,17 +11,8 @@ export default function PrimaryNavIcon({ to, className = 'h-5 w-5' }: PrimaryNav
   if (to === paths.home) {
     return <Compass className={className} aria-hidden />;
   }
-  if (to === paths.discover) {
-    return <Search className={className} aria-hidden />;
-  }
-  if (to === paths.guides) {
-    return <BookOpen className={className} aria-hidden />;
-  }
-  if (to === paths.travelBuddies) {
-    return <Users className={className} aria-hidden />;
-  }
-  if (to === paths.messages) {
-    return <MessageCircle className={className} aria-hidden />;
+  if (to === paths.ai) {
+    return <Sparkles className={className} aria-hidden />;
   }
   return <User className={className} aria-hidden />;
 }

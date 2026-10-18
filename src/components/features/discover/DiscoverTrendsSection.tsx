@@ -38,8 +38,8 @@ function TrendChip({ label, count, rank, active, icon: Icon, onClick }: TrendChi
       className={cn(
         'inline-flex shrink-0 items-center gap-1.5 rounded-full border px-4 py-2.5 text-sm font-medium transition sm:px-3 sm:py-1.5 sm:text-xs',
         active
-          ? 'border-violet-600 bg-violet-600 text-white shadow-md scale-[1.02]'
-          : 'border-slate-200 bg-white text-slate-700 hover:border-violet-200 hover:bg-violet-50/50 active:scale-95',
+          ? 'border-[#2c6b58] bg-[#2c6b58] text-white shadow-sm scale-[1.02]'
+          : 'border-slate-200 bg-white text-slate-700 hover:border-[#b7cdc4] hover:bg-emerald-50/60 active:scale-95',
       )}
       aria-pressed={active}
     >
@@ -115,7 +115,7 @@ export default function DiscoverTrendsSection({
       {tags.length > 0 && (
         <div>
           <p className="mb-2 flex items-center gap-1 text-xs font-medium text-slate-600">
-            <Hash className="h-3.5 w-3.5 text-violet-500" aria-hidden />
+            <Hash className="h-3.5 w-3.5 text-[#54786c]" aria-hidden />
             热门标签
           </p>
           <div className="flex gap-2 overflow-x-auto pb-0.5 [-ms-overflow-style:none] [scrollbar-width:none] [&::-webkit-scrollbar]:hidden">

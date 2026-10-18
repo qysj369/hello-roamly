@@ -1,6 +1,7 @@
 import { ArrowLeft } from 'lucide-react';
 import { useMemo, useState } from 'react';
 import { Link, useLocation, useNavigate } from 'react-router-dom';
+import BrandValueWhisper from '@/components/brand/BrandValueWhisper';
 import SlimeTrailPublisher from '@/components/features/guides/slime-trail/SlimeTrailPublisher';
 import PublishTravelBuddyCta from '@/components/features/travelBuddy/PublishTravelBuddyCta';
 import MotionPage, { MotionBlock } from '@/components/motion/MotionPage';
@@ -12,6 +13,7 @@ import {
   aiSnailGuideToEditorDraft,
   createEmptyGuidePublishDraft,
 } from '@/utils/guidePublishDraft';
+import '@/styles/brand-whisper.css';
 
 export default function PublishGuidePage() {
   const navigate = useNavigate();
@@ -32,7 +34,7 @@ export default function PublishGuidePage() {
       return {
         ...draft,
         destination: routeState.destination,
-        title: routeState.destination ? `${routeState.destination} 穷游攻略` : draft.title,
+        title: routeState.destination ? `${routeState.destination} 漫行攻略` : draft.title,
         days: String(routeState.days ?? days),
       };
     }
@@ -45,7 +47,7 @@ export default function PublishGuidePage() {
   });
 
   return (
-    <MotionPage className="flex flex-col gap-4">
+    <MotionPage className="holo-guide-publish flex flex-col gap-4">
       <MotionBlock>
         <div className="flex flex-wrap items-center justify-between gap-2">
           <button
@@ -99,6 +101,10 @@ export default function PublishGuidePage() {
           <PublishTravelBuddyCta />
         </MotionBlock>
       )}
+
+      <MotionBlock>
+        <BrandValueWhisper />
+      </MotionBlock>
     </MotionPage>
   );
 }

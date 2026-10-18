@@ -5,13 +5,14 @@ import {
   detectFollowUpIntent,
 } from '@/lib/plan/detectFollowUpIntent';
 import { validatePlanBudget } from '@/lib/plan/planBudgetValidator';
+import { scrubPlanDisplayMarkup } from '@/lib/home/scrubPlanDisplayMarkup';
 import { sanitizePlanContentForDisplay } from '@/lib/plan/sanitizePlanContent';
 import {
   buildMapPlanContinueSystemPrompt,
-  buildMapPlanContinueMockContent,
   buildMapPlanFollowUpUserPrompt,
 } from '@/services/ai/prompts/mapPlanGeneration';
 import type { AiSnailGuideCompleter } from '@/services/ai/runAiSnailGuideGeneration';
+import { DeepSeekUnconfiguredError } from '@/services/ai/runMapPlanGeneration';
 
 export type MapPlanContinueParams = {
   planId: string;
@@ -53,27 +54,20 @@ export function buildMapPlanContinueMessages(
 }
 
 export function finalizeMapPlanContinueReply(raw: string): string {
-  return attachBudgetFootnote(sanitizePlanContentForDisplay(raw.trim()));
+  return attachBudgetFootnote(scrubPlanDisplayMarkup(sanitizePlanContentForDisplay(raw.trim())));
 }
 
 export async function runMapPlanContinue(
   params: MapPlanContinueParams,
   completer: AiSnailGuideCompleter | null,
-  options: { forceMock?: boolean } = {},
 ): Promise<MapPlanContinueResult> {
   const trimmed = params.message.trim();
   if (!trimmed) {
     throw new Error('追问内容不能为空');
   }
 
-  const locationName = params.locationName.trim() || '目的地';
-
-  if (options.forceMock || !completer) {
-    return {
-      reply: finalizeMapPlanContinueReply(
-        buildMapPlanContinueMockContent(trimmed, locationName),
-      ),
-    };
+  if (!completer) {
+    throw new DeepSeekUnconfiguredError();
   }
 
   const reply = await completer({

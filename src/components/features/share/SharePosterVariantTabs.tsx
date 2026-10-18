@@ -5,12 +5,14 @@ export type SharePosterVariantTabsProps = {
   variants: SharePosterVariant[];
   activeVariantId: SharePosterVariant['id'];
   onSelect: (id: SharePosterVariant['id']) => void;
+  tone?: 'default' | 'brand';
 };
 
 export default function SharePosterVariantTabs({
   variants,
   activeVariantId,
   onSelect,
+  tone = 'default',
 }: SharePosterVariantTabsProps) {
   if (variants.length <= 1) {
     return null;
@@ -36,7 +38,11 @@ export default function SharePosterVariantTabs({
               selected
                 ? variant.id === 'xhs'
                   ? 'bg-[#FF2442] text-white shadow-sm'
-                  : 'bg-violet-600 text-white shadow-sm'
+                  : variant.id === 'douyin'
+                    ? 'bg-[#FE2C55] text-white shadow-sm'
+                    : tone === 'brand'
+                      ? 'bg-[var(--color-main)] text-white shadow-sm'
+                      : 'bg-violet-600 text-white shadow-sm'
                 : 'text-slate-600 hover:bg-white',
             )}
           >

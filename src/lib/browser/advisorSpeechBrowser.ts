@@ -99,8 +99,13 @@ export function advisorVoiceDialogNetworkHint(): string {
 export function formatMicrophoneStartError(error: unknown): string {
 
   const detail = error instanceof Error ? error.message : '';
+  const name = error instanceof DOMException ? error.name : '';
 
-  if (/permission|denied|not allowed|permissions policy/i.test(detail)) {
+  if (
+    name === 'NotAllowedError' ||
+    name === 'SecurityError' ||
+    /permission|denied|not allowed|permissions policy/i.test(`${name} ${detail}`)
+  ) {
 
     if (isEmbeddedMicBlockedContext()) {
       return embeddedMicBlockedHint();

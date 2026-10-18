@@ -1,4 +1,4 @@
-import { assertAiServiceReady, getAiProvider } from '@/lib/config/ai';
+import { getAiProvider } from '@/lib/config/ai';
 import { isProductionAppMode } from '@/lib/config/appMode';
 import { AiChatStreamError, streamChatFromApi } from '@/services/ai/api/streamChatFromApi';
 import { mockStreamChatReply } from '@/services/ai/mockStreamChatReply';
@@ -65,7 +65,6 @@ export async function streamChatReply({
   }
 
   if (isProductionAppMode()) {
-    assertAiServiceReady();
     throw new AiChatStreamError(
       '上线模式需要配置服务端 DeepSeek Key（DEEPSEEK_API_KEY）',
       'deepseek_unconfigured',

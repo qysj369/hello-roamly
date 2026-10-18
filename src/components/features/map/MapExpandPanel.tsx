@@ -36,7 +36,7 @@ function MapPlanningLayer({ className, planning, showHint = true }: MapPlanningL
         <div className="pointer-events-none absolute left-3 top-3 z-20">
           <span className="inline-flex items-center gap-1 rounded-lg border border-brand-200/80 bg-white/95 px-2.5 py-1 text-[11px] font-medium text-brand-800 shadow-sm backdrop-blur-sm">
             <Sparkles className="h-3.5 w-3.5" aria-hidden />
-            点击地图，AI 规划穷游方案
+            点击地图，AI 规划漫行方案
           </span>
         </div>
       )}

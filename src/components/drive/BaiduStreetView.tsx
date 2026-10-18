@@ -9,6 +9,56 @@ import { getBaiduMapAk } from '@/lib/map/baidu';
 import { loadBaiduPanorama } from '@/lib/map/baiduPanoramaLoader';
 import { gcj02ToBd09 } from '@/lib/map/coordinates';
 
+/** 移动端左右滑动微调朝向（不改驾驶循环底层） */
+function useStreetSwipeLook(
+  containerRef: React.RefObject<HTMLElement | null>,
+  engine: DualPanoramaEngine | null,
+  enabled: boolean,
+) {
+  const startXRef = useRef<number | null>(null);
+  const lastHeadingRef = useRef(0);
+
+  useEffect(() => {
+    const container = containerRef.current;
+    if (!enabled || !engine || !container) {
+      return undefined;
+    }
+
+    const onStart = (event: TouchEvent) => {
+      if (event.touches.length !== 1) return;
+      startXRef.current = event.touches[0].clientX;
+      lastHeadingRef.current = engine.getPovHeading();
+    };
+
+    const onMove = (event: TouchEvent) => {
+      if (startXRef.current == null || event.touches.length !== 1) return;
+      const deltaX = event.touches[0].clientX - startXRef.current;
+      const pano = engine.getActive();
+      if (!pano?.setPov) return;
+      const nextHeading = lastHeadingRef.current - deltaX * 0.28;
+      pano.setPov({ heading: nextHeading, pitch: 0 });
+      event.preventDefault();
+    };
+
+    const onEnd = () => {
+      startXRef.current = null;
+      lastHeadingRef.current = engine.getPovHeading();
+    };
+
+    container.addEventListener('touchstart', onStart, { passive: true });
+    container.addEventListener('touchmove', onMove, { passive: false });
+    container.addEventListener('touchend', onEnd, { passive: true });
+    container.addEventListener('touchcancel', onEnd, { passive: true });
+
+    return () => {
+      container.removeEventListener('touchstart', onStart);
+      container.removeEventListener('touchmove', onMove);
+      container.removeEventListener('touchend', onEnd);
+      container.removeEventListener('touchcancel', onEnd);
+    };
+  }, [containerRef, enabled, engine]);
+}
+
 type BaiduStreetViewProps = {
   lng: number;
   lat: number;
@@ -244,10 +294,16 @@ export default function BaiduStreetView({
     onLiveSpeed,
   });
 
+  useStreetSwipeLook(streetRef, engine, status === 'ready');
+
   return (
     <div ref={streetRef} className="holo-drive__street" aria-label={`${cityLabel} 街景`}>
       {status === 'loading' ? (
-        <div className="holo-drive__street-overlay">{loadingLabel}</div>
+        <div className="holo-drive__street-overlay holo-drive__street-overlay--loading">
+          <span className="holo-drive__loading-spinner" aria-hidden />
+          <strong>{loadingLabel}</strong>
+          <p>左右滑动可微调街景朝向</p>
+        </div>
       ) : null}
       {status === 'unavailable' ? (
         <div className="holo-drive__street-overlay holo-drive__street-overlay--muted">

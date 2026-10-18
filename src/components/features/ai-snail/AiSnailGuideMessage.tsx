@@ -24,10 +24,8 @@ function AiSnailGuideMessage({ message }: AiSnailGuideMessageProps) {
     >
       <span
         className={cn(
-          'mt-0.5 flex h-8 w-8 shrink-0 items-center justify-center rounded-full text-sm ring-2 ring-white',
-          isUser
-            ? 'bg-slate-700 text-white shadow-sm'
-            : 'bg-gradient-to-br from-emerald-500 to-teal-600 text-white shadow-md shadow-emerald-500/25',
+          'holo-ai-snail__avatar mt-0.5 flex h-8 w-8 shrink-0 items-center justify-center rounded-full text-sm',
+          isUser ? 'is-user' : 'is-bot',
         )}
         aria-hidden
       >
@@ -35,23 +33,11 @@ function AiSnailGuideMessage({ message }: AiSnailGuideMessageProps) {
       </span>
 
       <div className={cn('flex min-w-0 max-w-[min(100%,28rem)] flex-col', isUser && 'items-end')}>
-        <span
-          className={cn(
-            'mb-1 px-1 text-[10px] font-semibold uppercase tracking-wider',
-            isUser ? 'text-slate-400' : 'text-emerald-700',
-          )}
-        >
+        <span className={cn('holo-ai-snail__bubble-label mb-1 px-1 text-[10px] font-semibold', isUser && 'is-user')}>
           {isUser ? '你' : AI_SNAIL_ASSISTANT_NAME}
         </span>
 
-        <div
-          className={cn(
-            'w-full rounded-2xl px-3.5 py-2.5 shadow-sm',
-            isUser
-              ? 'rounded-tr-md bg-gradient-to-br from-emerald-600 to-teal-700 text-white'
-              : 'rounded-tl-md border border-slate-200/90 bg-white text-slate-800 ring-1 ring-slate-100 border-l-[3px] border-l-emerald-400',
-          )}
-        >
+        <div className={cn('holo-ai-snail__bubble w-full px-3.5 py-2.5', isUser ? 'is-user' : 'is-bot')}>
           {isUser ? (
             <p className="whitespace-pre-wrap text-sm leading-relaxed">{message.content}</p>
           ) : (

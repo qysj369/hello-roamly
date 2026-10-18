@@ -16,13 +16,7 @@ export function detectSnailFlightQuality(): SnailFlightQuality {
     return 'low';
   }
   const effective = nav.connection?.effectiveType;
-  if (effective === '2g' || effective === 'slow-2g' || effective === '3g') {
-    return 'low';
-  }
-  if (typeof nav.deviceMemory === 'number' && nav.deviceMemory <= 4) {
-    return 'low';
-  }
-  if (typeof navigator.hardwareConcurrency === 'number' && navigator.hardwareConcurrency <= 4) {
+  if (effective === '2g' || effective === 'slow-2g') {
     return 'low';
   }
   const coarse = window.matchMedia('(pointer: coarse)').matches;
@@ -33,9 +27,9 @@ export function detectSnailFlightQuality(): SnailFlightQuality {
 }
 
 export function snailFlightImageryMaxLevel(quality: SnailFlightQuality): number {
-  return quality === 'low' ? 14 : 17;
+  return quality === 'low' ? 16 : 18;
 }
 
 export function snailFlightResolutionScale(quality: SnailFlightQuality): number {
-  return quality === 'low' ? 0.62 : 1;
+  return quality === 'low' ? 0.85 : 1;
 }

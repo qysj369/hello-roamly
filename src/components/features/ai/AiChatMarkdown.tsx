@@ -9,6 +9,8 @@ import { cn } from '@/utils/cn';
 type AiChatMarkdownProps = {
   content: string;
   className?: string;
+  /** 攻略结果柔和排版：浅灰正文、弱化序号与粗分割线 */
+  soft?: boolean;
   /** 点击「示例提问」时填入下方输入框 */
   onUseExamplePrompt?: (text: string) => void;
 };
@@ -37,19 +39,53 @@ function isExampleTextBlock(className?: string): boolean {
   );
 }
 
-function createMarkdownComponents(onUseExamplePrompt?: (text: string) => void): Components {
+function createMarkdownComponents(
+  onUseExamplePrompt?: (text: string) => void,
+  soft = false,
+): Components {
   return {
-    p: ({ children }) => <p className="my-2 leading-relaxed first:mt-0 last:mb-0">{children}</p>,
+    p: ({ children }) => (
+      <p
+        className={cn(
+          'first:mt-0 last:mb-0',
+          soft ? 'my-3 leading-7 text-slate-600' : 'my-2 leading-relaxed',
+        )}
+      >
+        {children}
+      </p>
+    ),
     ul: ({ children }) => (
-      <ul className="my-2 list-disc space-y-1 pl-4 marker:text-brand-500">{children}</ul>
+      <ul
+        className={cn(
+          soft
+            ? 'my-3 list-none space-y-2.5 pl-0 text-slate-600'
+            : 'my-2 list-disc space-y-1 pl-4 marker:text-brand-500',
+        )}
+      >
+        {children}
+      </ul>
     ),
     ol: ({ children }) => (
-      <ol className="my-2 list-decimal space-y-1 pl-4 marker:font-medium marker:text-brand-600">
+      <ol
+        className={cn(
+          soft
+            ? 'my-3 list-none space-y-2.5 pl-0 text-slate-600'
+            : 'my-2 list-decimal space-y-1 pl-4 marker:font-medium marker:text-brand-600',
+        )}
+      >
         {children}
       </ol>
     ),
-    li: ({ children }) => <li className="leading-relaxed">{children}</li>,
-    strong: ({ children }) => <strong className="font-semibold text-slate-900">{children}</strong>,
+    li: ({ children }) => (
+      <li className={cn('leading-relaxed', soft && 'leading-7 before:mr-1.5 before:content-["▫️"]')}>
+        {children}
+      </li>
+    ),
+    strong: ({ children }) => (
+      <strong className={cn('font-semibold', soft ? 'text-slate-800' : 'text-slate-900')}>
+        {children}
+      </strong>
+    ),
     em: ({ children }) => <em className="text-slate-700">{children}</em>,
     a: ({ href, children }) => (
       <a
@@ -62,20 +98,53 @@ function createMarkdownComponents(onUseExamplePrompt?: (text: string) => void): 
       </a>
     ),
     blockquote: ({ children }) => (
-      <blockquote className="my-2 border-l-2 border-violet-300 bg-violet-50/60 py-1 pl-3 text-slate-700">
+      <blockquote
+        className={cn(
+          'my-2 py-1 pl-3 text-slate-700',
+          soft
+            ? 'border-l-2 border-emerald-200/80 bg-emerald-50/40'
+            : 'border-l-2 border-violet-300 bg-violet-50/60',
+        )}
+      >
         {children}
       </blockquote>
     ),
     h1: ({ children }) => (
-      <h3 className="mt-3 mb-1.5 text-base font-bold text-slate-900">{children}</h3>
+      <h3
+        className={cn(
+          'font-bold text-slate-900',
+          soft ? 'mt-4 mb-2 text-base' : 'mt-3 mb-1.5 text-base',
+        )}
+      >
+        {children}
+      </h3>
     ),
     h2: ({ children }) => (
-      <h4 className="mt-2.5 mb-1 text-sm font-bold text-slate-900">{children}</h4>
+      <h4
+        className={cn(
+          'font-bold text-slate-900',
+          soft ? 'mt-3.5 mb-1.5 text-sm' : 'mt-2.5 mb-1 text-sm',
+        )}
+      >
+        {children}
+      </h4>
     ),
     h3: ({ children }) => (
-      <h5 className="mt-2 mb-1 text-sm font-semibold text-slate-800">{children}</h5>
+      <h5
+        className={cn(
+          'font-semibold text-slate-800',
+          soft ? 'mt-3 mb-1.5 text-sm' : 'mt-2 mb-1 text-sm',
+        )}
+      >
+        {children}
+      </h5>
     ),
-    hr: () => <hr className="my-3 border-slate-200" />,
+    hr: () =>
+      soft ? (
+        <div className="my-4 h-px bg-gradient-to-r from-transparent via-emerald-100 to-transparent" />
+      ) : (
+        <hr className="my-3 border-slate-200" />
+      ),
     table: ({ children }) => (
       <div className="my-2">
         <p className="mb-1 text-[10px] font-medium text-slate-400">点击表格行可展开详情</p>
@@ -166,14 +235,21 @@ function createMarkdownComponents(onUseExamplePrompt?: (text: string) => void): 
 export default function AiChatMarkdown({
   content,
   className,
+  soft = false,
   onUseExamplePrompt,
 }: AiChatMarkdownProps) {
   return (
-    <div className={cn('ai-chat-markdown text-sm text-slate-800', className)}>
+    <div
+      className={cn(
+        'ai-chat-markdown text-sm',
+        soft ? 'text-slate-600' : 'text-slate-800',
+        className,
+      )}
+    >
       <ReactMarkdown
         remarkPlugins={[remarkGfm]}
         rehypePlugins={[rehypeHighlight]}
-        components={createMarkdownComponents(onUseExamplePrompt)}
+        components={createMarkdownComponents(onUseExamplePrompt, soft)}
       >
         {content}
       </ReactMarkdown>

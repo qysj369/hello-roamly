@@ -1,3 +1,4 @@
+import { useI18n } from '@/i18n/useI18n';
 import { cn } from '@/utils/cn';
 
 /**
@@ -16,6 +17,7 @@ import { cn } from '@/utils/cn';
  * ```
  */
 export default function SkipToMainLink() {
+  const { locale } = useI18n();
   return (
     <a
       href="#main-content"
@@ -25,7 +27,7 @@ export default function SkipToMainLink() {
         'shadow-lg focus:outline-none focus-visible:ring-2 focus-visible:ring-brand-500 focus-visible:ring-offset-2',
       )}
     >
-      跳到主内容
+      {locale === 'en' ? 'Skip to main content' : '跳到主内容'}
     </a>
   );
 }

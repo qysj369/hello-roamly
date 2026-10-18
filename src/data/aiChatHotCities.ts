@@ -108,5 +108,5 @@ export const AI_CHAT_ALL_CITIES: AiChatHotCity[] = [
 
 export function buildHotCityPlanPrompt(cityName: string, params: AiTravelParams): string {
   const trimmed = cityName.trim();
-  return `帮我规划${trimmed}${params.days}天的穷游行程，预算${params.budgetMin}–${params.budgetMax}元，含交通、住宿和花费清单`;
+  return `帮我规划${trimmed}${params.days}天的漫行行程，预算${params.budgetMin}–${params.budgetMax}元，含交通、住宿和花费清单`;
 }

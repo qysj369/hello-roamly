@@ -30,7 +30,7 @@ export function buildTravelPlanPromptFromParams(
     .join('、');
   const paceLabel = TRAVEL_PACE_OPTIONS.find((o) => o.id === params.pace)?.label ?? '适中';
 
-  return `请为${dest}规划${params.days}天穷游行程，预算约¥${params.budgetMin}–${params.budgetMax}，节奏${paceLabel}，偏好${interestLabels || '美食与文化'}。`;
+  return `请为${dest}规划${params.days}天漫行行程，预算约¥${params.budgetMin}–${params.budgetMax}，节奏${paceLabel}，偏好${interestLabels || '美食与文化'}。`;
 }
 
 /** 根据 TravelOptions 拼出计划生成 prompt */
@@ -46,7 +46,7 @@ export function buildTravelPlanPromptFromOptions(options: TravelOptions): string
   const paceLabel =
     TRAVEL_PACE_OPTIONS.find((o) => o.id === options.pace)?.label ?? '适中';
 
-  return `请为${dest}规划${days}天穷游行程，预算约¥${budget.min}–${budget.max}，节奏${paceLabel}，偏好${interestLabels}。`;
+  return `请为${dest}规划${days}天漫行行程，预算约¥${budget.min}–${budget.max}，节奏${paceLabel}，偏好${interestLabels}。`;
 }
 
 function parseBudgetFromInput(value: string): TravelOptionsBudget {
@@ -67,7 +67,7 @@ export function buildHomePlannerTravelRequest(
   const budgetRange = parseBudgetFromInput(budget);
 
   return {
-    prompt: `帮我规划${dest}${days}天、预算约${budgetRange.max}元的穷游行程`,
+    prompt: `帮我规划${dest}${days}天、预算约${budgetRange.max}元的漫行行程`,
     options: {
       destination: destination.trim() || undefined,
       days,

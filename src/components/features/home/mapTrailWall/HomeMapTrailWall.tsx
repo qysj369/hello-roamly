@@ -504,7 +504,7 @@ export default function HomeMapTrailWall({
               aria-live="polite"
             >
               <div className="w-[min(calc(100%-2rem),24rem)] max-h-[min(70vh,28rem)] rounded-2xl border border-emerald-400/30 bg-slate-900/90 px-5 py-4 text-left shadow-xl">
-                <p className="text-center text-sm font-medium text-white">AI 正在为你定制穷游方案</p>
+                <p className="text-center text-sm font-medium text-white">AI 正在为你定制漫行方案</p>
                 <p className="mt-2 text-center text-xs text-emerald-200/90">{planLoadingMessage}</p>
                 {planning.streamPreview ? (
                   <div

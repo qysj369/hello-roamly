@@ -56,14 +56,14 @@ export default function TravelBuddyMatch({ context, className }: TravelBuddyMatc
   return (
     <section
       className={cn(
-        'rounded-2xl border border-violet-200/80 bg-gradient-to-br from-violet-50 via-white to-cyan-50 p-5 shadow-sm sm:p-6',
+        'rounded-2xl border border-[#b7cdc4] bg-gradient-to-br from-emerald-50 via-[#fffef6] to-[#f9f7eb] p-5 shadow-sm sm:p-6',
         className,
       )}
       aria-labelledby="travel-buddy-match-title"
     >
       <div className="flex flex-wrap items-start justify-between gap-3">
         <div>
-          <p className="inline-flex items-center gap-1.5 font-mono text-[10px] uppercase tracking-wider text-violet-700">
+          <p className="inline-flex items-center gap-1.5 font-mono text-[10px] uppercase tracking-wider text-[#2c6b58]">
             <Users className="h-3.5 w-3.5" aria-hidden />
             Buddy Match
           </p>
@@ -74,8 +74,8 @@ export default function TravelBuddyMatch({ context, className }: TravelBuddyMatc
           <p className="mt-1 text-[10px] text-slate-400">{describeMatchAlgorithm()}</p>
         </div>
         {hasContext && (
-          <div className="rounded-xl border border-violet-200/60 bg-white/80 px-3 py-2 text-right text-xs">
-            <p className="font-medium text-violet-800">{context?.planTitle ?? '当前行程'}</p>
+          <div className="rounded-xl border border-[#b7cdc4] bg-white/80 px-3 py-2 text-right text-xs">
+            <p className="font-medium text-[#2c6b58]">{context?.planTitle ?? '当前行程'}</p>
             <p className="mt-0.5 text-slate-600">{describeMatchQuery(context!)}</p>
             {countryHint && <p className="mt-0.5 text-slate-400">区域：{countryHint}</p>}
           </div>
@@ -98,7 +98,7 @@ export default function TravelBuddyMatch({ context, className }: TravelBuddyMatc
 
       {!hasContext && (
         <p className="mt-4 flex items-center gap-1.5 text-xs text-slate-500">
-          <Sparkles className="h-3.5 w-3.5 text-violet-500" aria-hidden />
+          <Sparkles className="h-3.5 w-3.5 text-[#54786c]" aria-hidden />
           从旅行计划详情点击「寻找旅伴」可带入目的地与预算，获得更精准推荐
         </p>
       )}

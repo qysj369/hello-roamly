@@ -8,7 +8,7 @@ export const SNAIL_COMMUNITY = {
   memberTerm: '蜗友',
   defaultAuthorName: '蜗牛旅人',
   glossaryTitle: '蜗牛黑话手册',
-  glossarySubtitle: '懂黑话，才像自己人 — 穷游路上的蜗牛暗号',
+  glossarySubtitle: '懂黑话，才像自己人 — 漫行路上的蜗牛暗号',
   creedTitle: '蜗牛公约',
 } as const;
 
@@ -34,7 +34,7 @@ export const SNAIL_SLANG_GLOSSARY: readonly SnailSlangEntry[] = [
   {
     id: 'slime-trail',
     term: '黏液轨迹',
-    meaning: '蜗友发布的结构化穷游攻略，含花费清单、行程流水账与蜗牛启示。',
+    meaning: '蜗友发布的结构化漫行攻略，含花费清单、行程流水账与蜗牛启示。',
     example: '「我刚留下一条西安三天的黏液轨迹。」',
     category: 'guide',
   },
@@ -71,7 +71,7 @@ export const SNAIL_SLANG_GLOSSARY: readonly SnailSlangEntry[] = [
   },
   {
     id: 'hard-shell',
-    term: '硬壳穷游',
+    term: '硬壳漫行',
     meaning: '极限压低花费的玩法：青旅、公交、免费景点为主。',
     category: 'budget',
   },
@@ -184,12 +184,13 @@ export const SNAIL_RANKS: readonly SnailRank[] = [
   },
 ] as const;
 
-/** 蜗牛公约 — 社区行为准则 */
+/** 蜗牛公约 — 社区行为准则（UGC / 游记） */
 export const SNAIL_COMMUNITY_CREED: readonly string[] = [
   '每一分花费都有出处 — 不编造、不夸大、不隐瞒。',
-  '慢爬优于打卡 — 行程可以紧，但不要骗自己「很轻松」。',
+  '慢爬优于赶场 — 行程预留闲逛空档，拒绝一日多景点流水账。',
   '避坑要具体 — 蜗牛启示写清地点、金额与替代方案。',
   '尊重在地 — 不鼓吹逃票、占小便宜或伤害环境的行为。',
+  '只分享真实短途松弛出行 — 过滤商家广告软文与特惠/下单推销。',
   'AI 草稿必核验 — 经 AI蜗牛 生成的内容，发布前由作者负责。',
 ] as const;
 
@@ -221,7 +222,7 @@ export const SNAIL_GLOBAL_COPY = {
 /** 各页面社区化文案（提示词5 延伸） */
 export const SNAIL_UI_COPY = {
   guidesLibraryTitle: '黏液轨迹库',
-  guidesLibrarySubtitle: '蜗友留下的结构化穷游攻略，支持关键词实时筛选。',
+  guidesLibrarySubtitle: '蜗友留下的结构化漫行攻略，支持关键词实时筛选。',
   guidesSearchPlaceholder: "城市、蜗壳或关键词，如：'西安 三天 1500'",
   guidesListTitle: '全部蜗牛轨迹',
   guidesListEmpty: SNAIL_GLOBAL_COPY.emptyState,
@@ -229,8 +230,8 @@ export const SNAIL_UI_COPY = {
   guideDetailGlossaryHint: '看不懂板块名？查蜗牛黑话手册',
   publishChecklist: '留轨迹清单',
   aiWelcome:
-    '你好，我是 AI蜗牛 🐌\n\n我会按**宪法三卡**帮你起草黏液轨迹——花费清单、行程流水账、蜗牛启示，每一分花费都有出处。\n\n**第一步：你想去哪里？**\n请告诉我目的地（城市或区域）。',
-  inviteTagline: '邀请蜗友加入，一起慢爬看世界',
+    '你好，我是 AI蜗牛 🐌\n\n我会按**宪法三卡**帮你起草黏液轨迹——花费清单、行程流水账、蜗牛启示。蜗牛旅行是纯免费小众漫行工具：无推销、本地视角、松弛慢游。\n\n**第一步：你想去哪里？**\n请告诉我目的地（城市或区域）。',
+  inviteTagline: '邀请蜗友一起慢爬看世界',
   insightRegretsPlaceholder: '写下避坑雷达：最后悔的事、需要避开的坑…',
   insightTreasurePlaceholder: '写下宝藏点：最推荐的去处、点单 secret…',
   costTotalHint: '蜗壳总计',

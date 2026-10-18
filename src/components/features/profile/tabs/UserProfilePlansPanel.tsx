@@ -34,7 +34,7 @@ function UserProfilePlansPanel({
       ) : null}
 
       {isOwnProfile && plans.length > 0 && (
-        <p className="text-xs text-slate-500">以下为 AI 生成的穷游计划，含你本地新生成的方案</p>
+        <p className="text-xs text-slate-500">以下为 AI 生成的漫行计划，含你本地新生成的方案</p>
       )}
 
       {plans.length === 0 && isOwnProfile && !savedPlansLoading && !hasSavedPlans && (

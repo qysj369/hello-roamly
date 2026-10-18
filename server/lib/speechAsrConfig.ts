@@ -110,21 +110,22 @@ export function getSpeechAsrStatus(): SpeechAsrStatus {
 
   const cloudReady = provider !== 'local-whisper';
 
-  const voiceDialogReady = hasIflytekKeys() || provider === 'local-whisper';
+  const iflytekReady = hasIflytekKeys();
 
-
+  /** 有讯飞 Key 走流式；否则走本机 Whisper 录音（需点「说完了」） */
+  const voiceDialogReady = iflytekReady || provider === 'local-whisper';
 
   let hint = '语音对话：Microsoft Edge 大声说话，停顿约 2 秒自动发送';
 
-  if (hasIflytekKeys()) {
+  if (iflytekReady) {
 
     hint = '语音对话：讯飞流式识别，大声说话停顿约 2 秒自动发送';
 
   } else if (provider === 'local-whisper') {
 
-    hint = '语音对话：Edge 打开本站，点绿色波形大声说话，说完点「说完了」';
+    hint = '语音对话：点麦克风后大声说话，说完点「说完了」再规划';
 
-  } else if (!hasIflytekKeys()) {
+  } else if (!iflytekReady) {
 
     hint =
 
@@ -146,7 +147,8 @@ export function getSpeechAsrStatus(): SpeechAsrStatus {
 
     voiceDialogReady,
 
-    voiceDialogMode: voiceDialogReady ? 'iflytek-stream' : 'unavailable',
+    /** 仅真实有讯飞凭证时才宣称流式；避免前端空连 /speech-stream 再落到卡死的 Edge 听写 */
+    voiceDialogMode: iflytekReady ? 'iflytek-stream' : 'unavailable',
 
     streamPath: SPEECH_STREAM_PATH,
 

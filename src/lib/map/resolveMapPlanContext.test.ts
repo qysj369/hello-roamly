@@ -39,4 +39,18 @@ describe('resolveMapPlanContext', () => {
     expect(ctx.query).toContain('青州');
     expect(ctx.query).toContain('潍坊');
   });
+
+  it('does not turn Qingdao theme words into a 4-stop tour', () => {
+    const ctx = resolveMapPlanContext(
+      '去青岛玩3天，同行情侣，人均预算约1500元，自然山水',
+      '青岛→海景→民俗',
+      {
+        searchQuery: '青岛3天海景民俗自然山水',
+        originName: '济南市历下区中林路绿城百合花园',
+      },
+    );
+    expect(ctx.locationName).toBe('青岛');
+    expect(ctx.multiStops).toEqual([]);
+    expect(ctx.query).not.toContain('第4天');
+  });
 });

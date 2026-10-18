@@ -13,6 +13,7 @@ type BuildAdvisorHandoffParams = {
   destination?: string;
   days?: number;
   budget?: string;
+  searchNonce?: number;
 };
 
 /** 首页 / 方案页 → /ai 的统一跳转上下文 */
@@ -26,6 +27,7 @@ export function buildAdvisorHandoffState(
     initialPrompt: prompt,
     aiDream: prompt,
     source: params.source,
+    searchNonce: params.searchNonce,
     linkedPlanSessionId: params.planSessionId ?? undefined,
     planExcerpt: params.planContent ? buildPlanExcerpt(params.planContent) : undefined,
     location:
@@ -50,7 +52,8 @@ export function handoffStateToChatContext(state: AiChatPageState): AiChatContext
     destination: state.aiPlan?.destination,
     days: state.aiPlan?.days,
     budget: state.aiPlan?.budget,
-    sessionId: state.sessionId,
+    sessionId: state.searchNonce ? undefined : state.sessionId,
+    searchNonce: state.searchNonce,
     source: state.source,
     linkedPlanSessionId: state.linkedPlanSessionId,
     planExcerpt: state.planExcerpt,

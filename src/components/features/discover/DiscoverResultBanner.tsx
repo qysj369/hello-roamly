@@ -40,23 +40,23 @@ export default function DiscoverResultBanner({
   return (
     <div
       className={cn(
-        'flex flex-wrap items-center justify-between gap-3 rounded-2xl border border-violet-200 bg-gradient-to-r from-violet-50 to-fuchsia-50 px-4 py-3 shadow-sm',
+        'flex flex-wrap items-center justify-between gap-3 rounded-2xl border border-[#b7cdc4] bg-gradient-to-r from-emerald-50 to-[#fffef6] px-4 py-3 shadow-sm',
         className,
       )}
     >
       <div className="min-w-0">
-        <p className="flex items-center gap-1.5 text-sm font-semibold text-violet-900">
-          <Sparkles className="h-4 w-4 shrink-0 text-violet-600" aria-hidden />
+        <p className="flex items-center gap-1.5 text-sm font-semibold text-[#2c6b58]">
+          <Sparkles className="h-4 w-4 shrink-0 text-[#2c6b58]" aria-hidden />
           {total > 0 ? `找到 ${total} 条相关内容` : '这组筛选暂无内容'}
         </p>
-        <p className="mt-0.5 truncate text-xs text-violet-700/80">{label}</p>
+        <p className="mt-0.5 truncate text-xs text-[#54786c]">{label}</p>
       </div>
       <div className="flex shrink-0 flex-wrap gap-2">
         {total > 0 ? (
           <button
             type="button"
             onClick={onJumpToFeed}
-            className="inline-flex items-center gap-1 rounded-full bg-violet-600 px-4 py-2 text-sm font-semibold text-white shadow-sm hover:bg-violet-700"
+            className="inline-flex items-center gap-1 rounded-full bg-[#2c6b58] px-4 py-2 text-sm font-semibold text-white shadow-sm hover:bg-[#245a4a]"
           >
             查看内容
             <ChevronDown className="h-4 w-4" aria-hidden />
@@ -65,7 +65,7 @@ export default function DiscoverResultBanner({
           <button
             type="button"
             onClick={onRelax}
-            className="rounded-full bg-violet-600 px-4 py-2 text-sm font-semibold text-white shadow-sm hover:bg-violet-700"
+            className="rounded-full bg-[#2c6b58] px-4 py-2 text-sm font-semibold text-white shadow-sm hover:bg-[#245a4a]"
           >
             放宽筛选
           </button>

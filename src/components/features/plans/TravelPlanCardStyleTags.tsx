@@ -11,15 +11,15 @@ type TravelPlanCardStyleTagsProps = {
 
 const TONE_CLASS: Record<NonNullable<TravelPlanStyleTag['tone']>, string> = {
   brand:
-    'border-brand-200/80 bg-brand-50/80 text-brand-800 hover:border-brand-300 hover:bg-brand-100/90 hover:shadow-[0_0_12px_rgba(59,130,246,0.15)]',
+    'border-[#b7cdc4] bg-emerald-50/80 text-[#2c6b58] hover:border-[#2c6b58] hover:bg-emerald-50',
   violet:
-    'border-violet-200/80 bg-violet-50/80 text-violet-800 hover:border-violet-300 hover:bg-violet-100/90 hover:shadow-[0_0_12px_rgba(139,92,246,0.15)]',
+    'border-[#b7cdc4] bg-emerald-50/80 text-[#2c6b58] hover:border-[#2c6b58] hover:bg-emerald-50',
   amber:
-    'border-amber-200/80 bg-amber-50/80 text-amber-900 hover:border-amber-300 hover:bg-amber-100/90 hover:shadow-[0_0_12px_rgba(245,158,11,0.15)]',
+    'border-[#b7cdc4] bg-[#fffef6] text-[#54786c] hover:border-[#2c6b58] hover:bg-emerald-50',
   emerald:
-    'border-emerald-200/80 bg-emerald-50/80 text-emerald-800 hover:border-emerald-300 hover:bg-emerald-100/90 hover:shadow-[0_0_12px_rgba(16,185,129,0.15)]',
-  rose: 'border-rose-200/80 bg-rose-50/80 text-rose-800 hover:border-rose-300 hover:bg-rose-100/90 hover:shadow-[0_0_12px_rgba(244,63,94,0.12)]',
-  cyan: 'border-cyan-200/80 bg-cyan-50/80 text-cyan-800 hover:border-cyan-300 hover:bg-cyan-100/90 hover:shadow-[0_0_12px_rgba(6,182,212,0.15)]',
+    'border-[#b7cdc4] bg-emerald-50/80 text-[#2c6b58] hover:border-[#2c6b58] hover:bg-emerald-50',
+  rose: 'border-[#b7cdc4] bg-[#fffef6] text-[#54786c] hover:border-[#2c6b58] hover:bg-emerald-50',
+  cyan: 'border-[#b7cdc4] bg-[#fffef6] text-[#54786c] hover:border-[#2c6b58] hover:bg-emerald-50',
 };
 
 function getToneClass(tone: TravelPlanStyleTag['tone']): string {

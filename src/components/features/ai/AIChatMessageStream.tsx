@@ -108,7 +108,7 @@ export default function AIChatMessageStream({
                 🐌
               </p>
               <p className="mt-3 text-sm font-medium text-slate-800">想问什么，直接在下面输入</p>
-              <p className="mt-1 text-xs text-slate-500">例如：济南 3 天 1500 · 银川 周末穷游</p>
+              <p className="mt-1 text-xs text-slate-500">例如：济南 3 天 1500 · 银川 周末漫行</p>
             </>
           )}
         </div>

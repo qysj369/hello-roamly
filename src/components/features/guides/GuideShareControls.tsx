@@ -78,8 +78,8 @@ export default function GuideShareControls({
           className={cn(
             buttonBase,
             isPrimary
-              ? 'border border-slate-200 bg-white text-slate-700 hover:bg-slate-50'
-              : 'text-slate-600 hover:bg-slate-100',
+              ? 'border border-[#b7cdc4] bg-[#fffef6] text-[#2c6b58] hover:bg-emerald-50 shadow-none'
+              : 'text-[#54786c] hover:bg-emerald-50',
           )}
           aria-label="分享攻略"
         >
@@ -97,8 +97,8 @@ export default function GuideShareControls({
             className={cn(
               buttonBase,
               isPrimary
-                ? 'bg-emerald-600 text-white hover:bg-emerald-700'
-                : 'text-emerald-700 hover:bg-emerald-50',
+                ? 'border border-[#b7cdc4] bg-[#2c6b58] text-[#f9f7eb] hover:brightness-105 shadow-none'
+                : 'text-[#2c6b58] hover:bg-emerald-50',
             )}
             aria-label="生成微信分享海报"
           >

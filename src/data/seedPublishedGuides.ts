@@ -48,7 +48,7 @@ function buildSeedRecord(
 }
 
 const XIAN_DRAFT: GuidePublishEditorDraft = {
-  title: '西安三天硬壳穷游：城墙骑行 + 兵马俑错峰',
+  title: '西安三天硬壳漫行：城墙骑行 + 兵马俑错峰',
   destination: '西安',
   days: '3',
   budgetLabel: '人均 ¥1000–2000',

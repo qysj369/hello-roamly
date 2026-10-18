@@ -49,7 +49,7 @@ export default function SiteChatMessageList({
                 className={cn(
                   'rounded-2xl px-3 py-2 text-sm leading-relaxed shadow-sm',
                   isSelf
-                    ? 'rounded-br-md bg-violet-600 text-white'
+                    ? 'rounded-br-md bg-[#2c6b58] text-white'
                     : 'rounded-bl-md border border-slate-200/80 bg-white text-slate-800',
                 )}
               >

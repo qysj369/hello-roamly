@@ -11,9 +11,10 @@ import type { SnailFlightRoute } from '@/lib/snail-flight/routes';
 
 type SnailFlightLandingPanelProps = {
   route: SnailFlightRoute;
+  onReady?: () => void;
 };
 
-export default function SnailFlightLandingPanel({ route }: SnailFlightLandingPanelProps) {
+export default function SnailFlightLandingPanel({ route, onReady }: SnailFlightLandingPanelProps) {
   const [plan, setPlan] = useState<string | null>(null);
   const [loading, setLoading] = useState(false);
   const [failed, setFailed] = useState(false);
@@ -65,15 +66,19 @@ export default function SnailFlightLandingPanel({ route }: SnailFlightLandingPan
     };
   }, [generate]);
 
+  useEffect(() => {
+    onReady?.();
+  }, [onReady]);
+
   return (
     <aside
-      className="snail-flight-landing earth-fly-card"
+      className="snail-flight-landing is-in"
       aria-label={`${route.dest.label}结伴旅行攻略`}
       aria-busy={loading}
     >
       <h2>{route.dest.label} · 好友结伴</h2>
       {plan ? (
-        <p className="earth-fly-card__plan">{plan}</p>
+        <p className="snail-flight-landing__plan">{plan}</p>
       ) : (
         <>
           <p>{failed ? COMPANION_SKETCH_FAIL_HINT : COMPANION_SKETCH_LOADING}</p>

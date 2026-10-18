@@ -37,7 +37,7 @@ export default function DiscoverSortToggle({ value, onChange, className }: Disco
             className={cn(
               'inline-flex min-h-10 items-center gap-1.5 rounded-md px-3 py-2 text-sm font-medium transition sm:min-h-0 sm:px-2.5 sm:py-1 sm:text-xs',
               active
-                ? 'bg-white text-violet-700 shadow-sm'
+                ? 'bg-white text-[#2c6b58] shadow-sm'
                 : 'text-slate-600 hover:text-slate-900',
             )}
             aria-pressed={active}

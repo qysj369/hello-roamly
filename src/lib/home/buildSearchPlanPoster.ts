@@ -4,18 +4,19 @@ import { findHoloHomeCityKit } from '@/data/holoHotCityKit';
 import { CITY_SHARE_PHOTO_FRAMES } from '@/lib/home/citySharePhotoLibrary';
 import { getSearchPlanNoteCoverUrl } from '@/lib/home/searchPlanNoteSlides';
 import { buildSearchPlanDouyinScenes, buildSearchPlanXhsScenes } from '@/lib/home/searchPlanAssetPack';
-import { renderFragmentPoster } from '@/lib/share/renderFragmentPoster';
+import { renderItinerarySummaryPoster } from '@/lib/share/renderItinerarySummaryPoster';
 import { renderXhsImageSlide } from '@/lib/share/renderXhsImageSlide';
 import { isLikelyMobileShareDevice } from '@/lib/share/openSocialApp';
 import { searchPlanCatchyTitle, searchPlanLiteHeader, searchPlanPublicHashtags } from '@/lib/home/searchPlanShareCopy';
 import { searchShareContentId } from '@/lib/home/homeShareLanding';
+import { encodeCompactSharePlan, SHARE_PLAN_QUERY_KEY } from '@/lib/home/shareLandingPlan';
 import { hashtagsFromTags, mapShareInputToXhs } from '@/lib/share/mapToXhsPoster';
 import { renderSharePoster } from '@/lib/share/renderSharePoster';
 import { buildShareUrl } from '@/lib/share/shareUrl';
 import { xhsInputToCopyText } from '@/lib/share/xhsNoteCopy';
 import type { SharePosterInput } from '@/lib/share/posterTypes';
 import type { XhsNoteCopyText, XhsPosterInput } from '@/lib/share/xhsPosterTypes';
-import { paths, savedUserPlanDetailPath } from '@/router/paths';
+import { paths } from '@/router/paths';
 import type { SearchStructuredPlan } from '@/types/domain/searchStructuredPlan';
 
 export type SearchPlanShareHint = {
@@ -31,21 +32,23 @@ function normalizeShareHint(hint?: string | SearchPlanShareHint | null): SearchP
 }
 
 export function searchPlanPosterShareUrl(
-  savedSessionId: string | null,
-  hint?: string | SearchPlanShareHint | null,
+  _savedSessionId: string | null,
+  hint?: string | SearchPlanShareHint | SearchStructuredPlan | null,
+  plan?: SearchStructuredPlan | null,
 ): string {
-  if (savedSessionId) {
-    return buildShareUrl(savedUserPlanDetailPath(savedSessionId), {
-      contentKind: 'saved_user_plan',
-      contentId: savedSessionId,
-    });
-  }
-  const { targetCity, days, peopleType } = normalizeShareHint(hint);
+  const sourcePlan = plan ?? (hint && typeof hint === 'object' && 'baseInfo' in hint ? hint : null);
+  const fromHint = normalizeShareHint(typeof hint === 'string' ? hint : sourcePlan ? null : hint);
+  const targetCity = sourcePlan?.baseInfo.targetCity ?? fromHint.targetCity;
+  const days = sourcePlan?.baseInfo.days ?? fromHint.days;
+  const peopleType = sourcePlan?.baseInfo.peopleType ?? fromHint.peopleType;
   const query = new URLSearchParams();
   const city = targetCity?.trim();
   if (city) query.set('city', city);
   if (days && days > 0) query.set('days', String(Math.round(days)));
   if (peopleType?.trim()) query.set('party', peopleType.trim());
+  if (sourcePlan) {
+    query.set(SHARE_PLAN_QUERY_KEY, encodeCompactSharePlan(sourcePlan));
+  }
   const path = query.toString() ? `${paths.home}?${query.toString()}` : paths.home;
   return buildShareUrl(path, {
     contentKind: 'travel_plan',
@@ -179,20 +182,16 @@ export async function buildSearchPlanPosterBlob(
 
 export async function buildSearchPlanWechatSquarePosterBlob(
   plan: SearchStructuredPlan,
-  compact = isLikelyMobileShareDevice(),
+  _compact = isLikelyMobileShareDevice(),
 ): Promise<Blob> {
-  const fragment = getSearchPlanFragmentPoster(plan);
-  const size = searchPlanExportPosterSize('wechat', compact);
-  return renderFragmentPoster({ ...fragment, ...size });
+  return renderItinerarySummaryPoster(plan, 'wechat', searchPlanPosterShareUrl(null, plan.baseInfo, plan));
 }
 
 export async function buildSearchPlanDouyinStaticPosterBlob(
   plan: SearchStructuredPlan,
-  compact = isLikelyMobileShareDevice(),
+  _compact = isLikelyMobileShareDevice(),
 ): Promise<Blob> {
-  const fragment = getSearchPlanFragmentPoster(plan);
-  const size = searchPlanExportPosterSize('douyin', compact);
-  return renderFragmentPoster({ ...fragment, ...size });
+  return renderItinerarySummaryPoster(plan, 'douyin', searchPlanPosterShareUrl(null, plan.baseInfo, plan));
 }
 
 export async function buildSearchPlanDouyinPosterBlob(

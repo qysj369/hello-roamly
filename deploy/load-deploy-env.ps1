@@ -1,4 +1,4 @@
-# 从 .env 文件加载部署变量到当前 PowerShell 进程（不打印密钥）
+﻿# Load deploy env vars into current PowerShell process (do not print secrets)
 param(
   [string]$Root = (Split-Path -Parent (Split-Path -Parent $MyInvocation.MyCommand.Path))
 )
@@ -44,7 +44,7 @@ if (-not $env:VITE_SITE_URL) {
   $env:VITE_SITE_URL = 'https://helloroamly.com'
 }
 
-# 推广上线构建默认（覆盖 .env.local 中的 development 演示配置）
+# Production defaults for deploy builds
 $env:VITE_APP_MODE = 'production'
 $env:VITE_MAP_DEV_DEMO = '0'
 $env:VITE_HOME_LAYOUT = 'launch'

@@ -24,7 +24,7 @@ const BASE_QUICK_PROMPTS: AiChatQuickPrompt[] = [
   {
     id: 'food-route',
     label: '美食路线',
-    text: '推荐一条不踩雷的美食路线，适合穷游',
+    text: '推荐一条不踩雷的美食路线，适合漫行',
   },
   {
     id: 'pitfalls',
@@ -37,7 +37,7 @@ function buildMapTrailStarterPrompts(): AiChatQuickPrompt[] {
   return HOME_MAP_TRAIL_SEARCH_EXAMPLES.map((text, index) => ({
     id: `map-trail-${index}`,
     label: extractPrimaryLocation(text) ?? text.split(/\s+/)[0] ?? text.slice(0, 4),
-    text: `帮我规划${text}的穷游行程，含交通、住宿和花费清单`,
+    text: `帮我规划${text}的漫行行程，含交通、住宿和花费清单`,
   }));
 }
 
@@ -58,14 +58,14 @@ export function buildAiChatQuickPrompts(
     contextual.push({
       id: 'plan-destination',
       label: `${destination} ${params.days}天`,
-      text: `帮我规划${destination}${params.days}天的穷游行程，预算${params.budgetMin}–${params.budgetMax}元，节奏${paceLabel}${interestLabels ? `，偏好${interestLabels}` : ''}`,
+      text: `帮我规划${destination}${params.days}天的漫行行程，预算${params.budgetMin}–${params.budgetMax}元，节奏${paceLabel}${interestLabels ? `，偏好${interestLabels}` : ''}`,
     });
   } else {
     contextual.push(...buildMapTrailStarterPrompts());
     contextual.push({
       id: 'plan-generic',
-      label: `${params.days}天穷游`,
-      text: `帮我规划${params.days}天穷游行程，预算${params.budgetMin}–${params.budgetMax}元，节奏${paceLabel}`,
+      label: `${params.days}天漫行`,
+      text: `帮我规划${params.days}天漫行行程，预算${params.budgetMin}–${params.budgetMax}元，节奏${paceLabel}`,
     });
   }
 
@@ -75,7 +75,7 @@ export function buildAiChatQuickPrompts(
       label: '本地必吃',
       text: destination
         ? `${destination}有哪些本地人常去、性价比高的美食？`
-        : '推荐几个适合穷游的网红美食城市',
+        : '推荐几个适合漫行的网红美食城市',
     });
   }
 

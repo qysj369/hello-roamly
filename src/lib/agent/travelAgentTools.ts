@@ -85,13 +85,23 @@ export async function executeTravelAgentTool(
       sessionId: nextSessionId,
       openShare: true,
       message: nextSessionId
-        ? '分享已打开。点微信、抖音或小红书：下载海报并复制文案。网页发不进 App，粘贴或扫码即可。'
-        : '分享已打开。点微信、抖音或小红书下载海报并复制文案。扫码需要先能保存行程，这次可先粘贴给朋友。',
+        ? '分享已打开。点微信、抖音或小红书：复制文案并保存带美图的素材。网页发不进 App，粘贴或扫码即可。'
+        : '分享已打开。点微信、抖音或小红书复制文案并保存配图。扫码需要先能保存行程，这次可先粘贴给朋友。',
     };
   }
 
-  const nextSessionId = await ensureSharedSearchPlan(plan, sessionId);
-  const shareUrl = searchPlanPosterShareUrl(nextSessionId, plan.baseInfo);
+  let nextSessionId = sessionId ?? undefined;
+  try {
+    nextSessionId = await Promise.race([
+      ensureSharedSearchPlan(plan, sessionId),
+      new Promise<string>((_, reject) => {
+        window.setTimeout(() => reject(new Error('poster-save-timeout')), 4000);
+      }),
+    ]);
+  } catch {
+    nextSessionId = sessionId ?? undefined;
+  }
+  const shareUrl = searchPlanPosterShareUrl(nextSessionId, plan.baseInfo, plan);
 
   if (tool === 'copy_link') {
     const copied = (await copyTextToClipboard(shareUrl)) === 'copied';

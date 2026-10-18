@@ -40,7 +40,7 @@ export function sessionToHistoryEntry(session: UserAiSessionRecord): PlanHistory
 export function sessionToLegacyPlanRecord(session: UserAiSessionRecord): UserPlanRecord {
   const title =
     session.title?.trim() ||
-    (session.location.name ? `${session.location.name}穷游方案` : '我的穷游方案');
+    (session.location.name ? `${session.location.name}漫行方案` : '我的漫行方案');
 
   return {
     id: session.id,
@@ -64,7 +64,7 @@ export function sessionToLegacyPlanRecord(session: UserAiSessionRecord): UserPla
 export function sessionToDiscoverItem(session: UserAiSessionRecord): DiscoverSavedPlanItem {
   const title =
     session.title?.trim() ||
-    (session.location.name ? `${session.location.name}穷游方案` : '我的穷游方案');
+    (session.location.name ? `${session.location.name}漫行方案` : '我的漫行方案');
 
   return {
     kind: 'savedPlan',

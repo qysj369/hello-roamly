@@ -6,6 +6,7 @@ import {
 } from '@/lib/plan/planConversation';
 import { buildPlanHistorySummary } from '@/lib/plan/planHistoryStorage';
 import { sanitizeLocationLabelForDisplay } from '@/lib/map/resolveAmapPlaceName';
+import { scrubPlanDisplayMarkup } from '@/lib/home/scrubPlanDisplayMarkup';
 import { sanitizePlanContentForDisplay } from '@/lib/plan/sanitizePlanContent';
 import {
   persistUserAiSessionCreate,
@@ -60,6 +61,8 @@ type GlobalMapPlanningState = {
   finishPlanStream: (params: OpenPlanResultParams) => void;
   restoreFromHistory: (entry: PlanHistoryEntry) => void;
   closeResult: () => void;
+  /** 新搜索：清空上一轮方案正文与会话，避免旧测试内容污染 */
+  resetLivePlanSession: () => void;
   setConversationTurns: (
     turns:
       | PlanConversationTurn[]
@@ -122,7 +125,7 @@ function commitPlanResult(
   const sessionId = options.sessionId ?? createPlanSessionId();
   const now = new Date().toISOString();
   const displayLocation = sanitizeLocationLabelForDisplay(params.locationName);
-  const sanitizedContent = sanitizePlanContentForDisplay(params.content);
+  const sanitizedContent = scrubPlanDisplayMarkup(sanitizePlanContentForDisplay(params.content));
   const state = get();
   const userTurns = state.conversationTurns.filter((turn) => turn.role === 'user');
   const turns: PlanConversationTurn[] = [
@@ -298,6 +301,24 @@ export const useGlobalMapPlanningStore = create<GlobalMapPlanningState>((set, ge
     });
   },
 
+  resetLivePlanSession: () => {
+    set({
+      resultOpen: false,
+      planStreaming: false,
+      planStreamStatus: null,
+      resultLocation: null,
+      resultContent: null,
+      planSessionId: null,
+      initialQuery: null,
+      conversationTurns: [],
+      followUpLoading: false,
+      followUpError: null,
+      saveLoading: false,
+      saveError: null,
+      saveSuccess: false,
+    });
+  },
+
   setConversationTurns: (turns) => {
     set((state) => ({
       conversationTurns: typeof turns === 'function' ? turns(state.conversationTurns) : turns,
@@ -325,7 +346,7 @@ export const useGlobalMapPlanningStore = create<GlobalMapPlanningState>((set, ge
   },
 
   finishFollowUpStream: (content) => {
-    const sanitized = sanitizePlanContentForDisplay(content);
+    const sanitized = scrubPlanDisplayMarkup(sanitizePlanContentForDisplay(content));
     set((state) => {
       const turns = state.conversationTurns.map((turn, index, all) =>
         index === all.length - 1 && turn.role === 'assistant'

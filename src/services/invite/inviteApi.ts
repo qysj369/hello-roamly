@@ -1,5 +1,6 @@
 import { http } from '@/lib/api/http';
 import { getUserFacingErrorMessage } from '@/lib/errors/userFacingMessage';
+import { CITY_INSPIRATION_PACK_REWARD_ID } from '@/lib/invite/cityInspirationPack';
 import {
   DEFAULT_DEMO_REFERRALS,
   DEFAULT_INVITE_REWARDS,
@@ -33,9 +34,18 @@ function buildDemoInviteSummary(userId: string): InviteSummary {
   const inviteCode = getDemoInviteCodeForUser(userId);
   const referrals = [...listDemoReferrals(userId), ...DEFAULT_DEMO_REFERRALS];
   const grantedExtra = listDemoGrantedRewards(userId);
-  const rewards = [...DEFAULT_INVITE_REWARDS, ...grantedExtra];
-
   const invitedCount = referrals.length;
+  const seededRewards = DEFAULT_INVITE_REWARDS.map((reward) => {
+    if (reward.id === CITY_INSPIRATION_PACK_REWARD_ID && invitedCount >= 1) {
+      return {
+        ...reward,
+        status: 'granted' as const,
+        earnedAt: reward.earnedAt ?? new Date(Date.now() - 4 * 86_400_000).toISOString(),
+      };
+    }
+    return reward;
+  });
+  const rewards = [...seededRewards, ...grantedExtra];
   const activeCount = referrals.filter((row) => row.status !== 'registered').length;
   const pendingRewardCount = rewards.filter((row) => row.status === 'pending').length;
   const totalPointsEarned = rewards

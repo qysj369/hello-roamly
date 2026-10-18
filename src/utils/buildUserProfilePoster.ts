@@ -57,7 +57,7 @@ function profileSharePosterInput(user: User, isOwnProfile: boolean) {
     }),
     coverImageUrl: getProfilePosterCoverUrl(user),
     qrCaption: '长按识别二维码查看主页',
-    qrFooter: '微信扫码 · 穷游动态与 AI 行程',
+    qrFooter: '微信扫码 · 漫行动态与 AI 行程',
   };
 }
 
@@ -67,7 +67,7 @@ export function getUserProfileXhsPosterInput(user: User, isOwnProfile: boolean):
 
   return {
     ...mapShareInputToXhs(input, {
-      hashtags: hashtagsFromTags(interestLabels, ['旅行博主', '穷游', '个人主页']),
+      hashtags: hashtagsFromTags(interestLabels, ['旅行博主', '漫行', '个人主页']),
       authorLabel: `@${user.username}`,
       titlePrefix: '✨ ',
     }),
@@ -76,7 +76,7 @@ export function getUserProfileXhsPosterInput(user: User, isOwnProfile: boolean):
       title: `${user.username}的旅行主页`,
       lines: [
         `👥 ${formatProfileStatCount(user.followersCount)} 粉丝 · ${formatProfileStatCount(user.travelMoments.length)} 条动态`,
-        user.bio?.trim() || '一起来穷游世界',
+        user.bio?.trim() || '一起来漫行世界',
         '扫码关注 TA 的最新行程与瞬间 →',
       ],
     },

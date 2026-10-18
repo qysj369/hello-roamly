@@ -41,7 +41,7 @@ function PlanMapMarker({
         type="button"
         className={cn(
           'flex h-7 w-7 items-center justify-center rounded-full border-2 border-white text-xs font-bold text-white shadow-md',
-          selected && 'bg-violet-600 ring-2 ring-violet-400',
+          selected && 'bg-[#2c6b58] ring-2 ring-[#b7cdc4]',
           !selected && point.geocoded && 'bg-emerald-600 hover:bg-emerald-700',
           !selected && !point.geocoded && 'bg-brand-600 hover:bg-brand-700',
         )}

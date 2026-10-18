@@ -8,12 +8,14 @@ import { useUserMapOrigin } from '@/hooks/map/useUserMapOrigin';
 import { aiChatPageSeo } from '@/lib/seo';
 import { historyItemsToAdvisorMessages } from '@/lib/ai/advisorSessionSync';
 import { handoffStateToChatContext } from '@/lib/ai/buildAdvisorHandoff';
+import { formatPlanDemandForDisplay } from '@/lib/home/launchHomeMapQiongYouPlan';
 import { parseTravelSearchIntent } from '@/lib/map/planQueryBuilder';
 import type { AiChatMessage } from '@/types/domain/aiChat';
 import type { AiChatPageState } from '@/types/router-state';
 import { getAiProviderDisplay, getAiProviderDisplayLabel } from '@/lib/config/ai';
 import { CAPSULE_FONT_URL } from '@/lib/config/capsuleDesignTokens';
 import { clearCapsuleAiSession, isCapsuleAiSession } from '@/lib/capsule/capsuleAiSession';
+import TravelAgentHost from '@/components/agent/TravelAgentHost';
 import { paths } from '@/router/paths';
 import { fetchUserAiSessionById } from '@/services/user/api/userAiSessions';
 import { extractDaysFromPrompt, extractDestinationFromPrompt } from '@/utils/extractTravelIntent';
@@ -28,7 +30,12 @@ export default function AiChatPage() {
   const routeState = location.state as AiChatPageState | null;
 
   const sessionIdFromUrl = searchParams.get('session')?.trim() || undefined;
-  const restoreSessionId = sessionIdFromUrl ?? routeState?.sessionId;
+  const isFreshHomeSearch =
+    routeState?.source === 'home_map' && Boolean(routeState.searchNonce);
+  /** 首页新搜索绝不恢复上一轮会话，避免测试对话污染 */
+  const restoreSessionId = isFreshHomeSearch
+    ? undefined
+    : sessionIdFromUrl ?? routeState?.sessionId;
 
   const [restoredMessages, setRestoredMessages] = useState<AiChatMessage[] | undefined>();
   const [restoredInitialQuery, setRestoredInitialQuery] = useState<string | undefined>();
@@ -165,14 +172,23 @@ export default function AiChatPage() {
       return `已带入地图方案。${bits.join(' · ')} · 直接在下方追问即可。`;
     }
     if (context.destination || context.dream) {
+      const dreamShort = formatPlanDemandForDisplay(context.dream);
       const bits = [
-        context.dream && `想法：${context.dream}`,
+        dreamShort && `想法：${dreamShort}`,
         context.destination &&
           `${context.destination}${context.days ? ` · ${context.days}天` : ''}${context.budget ? ` · ¥${context.budget}` : ''}`,
       ].filter(Boolean);
-      return isCapsuleMode
-        ? `已锁定${bits.length ? ` · ${bits.join(' · ')}` : ''}。说说偏好，我来构建路线。`
-        : `你好，我是旅行顾问。${bits.join(' · ')} · 说说偏好或直接让我出行程。`;
+      if (isCapsuleMode) {
+        return `已锁定${bits.length ? ` · ${bits.join(' · ')}` : ''}。说说偏好，我来构建路线。`;
+      }
+      if (mergedState?.source === 'home_map') {
+        const summary =
+          context.destination != null
+            ? `${context.destination}${context.days ? ` · ${context.days}天` : ''}${context.budget ? ` · ¥${context.budget}` : ''}`
+            : dreamShort || '你的漫行需求';
+        return `已收到：${summary}。正在生成漫行攻略，请稍候…`;
+      }
+      return `你好，我是旅行顾问。${bits.join(' · ')} · 说说偏好或直接让我出行程。`;
     }
     if (context.origin?.name) {
       return `已从首页读取出发地：${context.origin.name}。直接说想去哪，我会按从你家出发来算交通。`;
@@ -195,9 +211,16 @@ export default function AiChatPage() {
   ]);
 
   const aiProvider = getAiProviderDisplay();
+  const useButlerPage =
+    !isCapsuleMode && !restoreSessionId && routeState?.source !== 'capsule_one';
+
+  if (useButlerPage) {
+    return <TravelAgentHost layout="page" />;
+  }
 
   const chatBody = (
     <AIChatInterface
+      key={routeState?.searchNonce ?? restoreSessionId ?? 'ai-live'}
       className={isCapsuleMode ? 'capsule-ai-interface' : undefined}
       variant={isCapsuleMode ? 'capsule' : 'default'}
       context={context}
@@ -206,10 +229,10 @@ export default function AiChatPage() {
       hideAutoPromptBubble={isCapsuleMode && Boolean(autoPrompt)}
       paramsOpen={isCapsuleMode ? paramsOpen : undefined}
       onParamsOpenChange={isCapsuleMode ? setParamsOpen : undefined}
-      initialMessages={restoredMessages}
+      initialMessages={isFreshHomeSearch ? undefined : restoredMessages}
       restoredSessionId={restoreSessionId}
-      restoredInitialQuery={restoredInitialQuery}
-      isSessionRestoring={restoreLoading}
+      restoredInitialQuery={isFreshHomeSearch ? undefined : restoredInitialQuery}
+      isSessionRestoring={isFreshHomeSearch ? false : restoreLoading}
     />
   );
 

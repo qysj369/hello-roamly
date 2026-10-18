@@ -165,7 +165,7 @@ export function useAISnailGuideWizard(options: UseAISnailGuideWizardOptions = {}
         createMessage('user', formatPreferences(selectedPreferences)),
         createMessage(
           'assistant',
-          '信息已收齐，正在生成结构化穷游攻略…\n文字会边生成边出现，请稍候。',
+          '信息已收齐，正在生成结构化漫行攻略…\n文字会边生成边出现，请稍候。',
         ),
       );
 

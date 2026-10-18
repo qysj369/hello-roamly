@@ -12,6 +12,8 @@ export type AiChatPageState = {
   };
   /** 恢复已有顾问会话 */
   sessionId?: string;
+  /** 首页每次新搜索的一次性标记，禁止复用上一轮对话 */
+  searchNonce?: number;
   /** 从地图方案带入的关联会话 */
   linkedPlanSessionId?: string;
   planExcerpt?: string;

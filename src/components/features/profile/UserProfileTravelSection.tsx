@@ -38,7 +38,7 @@ export default function UserProfileTravelSection({
             {user.travelPersonality.traits.map((trait) => (
               <span
                 key={trait}
-                className="rounded-lg bg-violet-50 px-2 py-0.5 text-xs font-medium text-violet-700"
+                className="rounded-lg bg-emerald-50 px-2 py-0.5 text-xs font-medium text-[#2c6b58]"
               >
                 {trait}
               </span>

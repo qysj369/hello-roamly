@@ -109,9 +109,26 @@ function messageFromApiError(error: ApiError, context: UserErrorContext, fallbac
   return copy.errors.defaultMessage;
 }
 
+function localizeAiProviderMessage(message: string): string | null {
+  if (/insufficient\s*balance/i.test(message) || /余额不足|账户欠费/.test(message)) {
+    return 'AI 账户余额不足：请为服务器上的 DeepSeek 账号充值后重试';
+  }
+  if (/rate_limited|生成过于频繁|请求过于频繁/i.test(message)) {
+    return message.trim().length <= 120 ? message.trim() : '请求过于频繁，请稍后再试';
+  }
+  if (/deepseek_unconfigured|未配置.*DeepSeek|DEEPSEEK_API_KEY/i.test(message)) {
+    return '服务端尚未配置 DeepSeek（DEEPSEEK_API_KEY），无法生成攻略';
+  }
+  return null;
+}
+
 function messageFromDeepSeek(error: DeepSeekApiError): string {
   if (error.status === 429) {
     return copy.errors.rateLimit;
+  }
+  const balanceOrConfig = localizeAiProviderMessage(error.message);
+  if (balanceOrConfig) {
+    return balanceOrConfig;
   }
   if (error.message.includes('API Key') || error.message.includes('未授权')) {
     return import.meta.env.DEV
@@ -171,7 +188,8 @@ export function resolveUserFacingError(
   }
 
   const raw = getErrorMessage(error, fallback);
-  const message = isUserFriendlyMessage(raw) ? raw : fallback;
+  const localized = localizeAiProviderMessage(raw);
+  const message = localized ?? (isUserFriendlyMessage(raw) ? raw : fallback);
 
   return {
     title,

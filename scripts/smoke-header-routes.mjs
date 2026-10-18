@@ -8,11 +8,8 @@ const BASE = process.argv[2] ?? 'https://helloroamly.com';
 
 const NAV = [
   { label: '首页', path: '/' },
-  { label: '发现', path: '/discover' },
-  { label: '查看攻略', path: '/guides' },
-  { label: '旅游搭子', path: '/travel-buddies' },
-  { label: '消息', path: '/messages' },
-  { label: '蜗居', path: '/profile' },
+  { label: '管家', path: '/ai' },
+  { label: '我的', path: '/profile' },
 ];
 
 async function assertNoCrash(page) {

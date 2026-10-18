@@ -12,6 +12,11 @@ import { getCapsuleCityById, type CapsuleCityPoint } from '@/data/capsuleHotRout
 
 type CapsuleOneCanvasProps = {
   onCitySelect: (city: CapsuleCityPoint) => void;
+  /** 画布清屏色。不进入 EarthGlobe 内核 */
+  backdrop?: string;
+  autoRotate?: boolean;
+  /** 降低 DPR / 关闭抗锯齿，避免首页叠加层把显存顶满 */
+  lowMemory?: boolean;
 };
 
 function useCapsuleMobileLayout() {
@@ -30,8 +35,15 @@ function useCapsuleMobileLayout() {
   return isMobile;
 }
 
+const DEFAULT_BACKDROP = '#eaf0f3';
+
 /** 基础地球：拖拽旋转/缩放。不做云层与高级光影 */
-export default function CapsuleOneCanvas({ onCitySelect }: CapsuleOneCanvasProps) {
+export default function CapsuleOneCanvas({
+  onCitySelect,
+  backdrop = DEFAULT_BACKDROP,
+  autoRotate = false,
+  lowMemory = false,
+}: CapsuleOneCanvasProps) {
   const { roaming, interruptRoamOnOrbitStart } = useEarthRoam();
   const { flying, pendingIdRef, flightRef, cancelFly, markFlightEnded } = useEarthFlyTo();
   const controlsRef = useRef<OrbitControlsImpl | null>(null);
@@ -64,15 +76,15 @@ export default function CapsuleOneCanvas({ onCitySelect }: CapsuleOneCanvasProps
         near: 0.1,
         far: 400,
       }}
-      dpr={isMobile ? [1, 1.25] : [1, 1.5]}
+      dpr={isMobile || lowMemory ? [1, 1.15] : [1, 1.5]}
       gl={{
-        antialias: !isMobile,
+        antialias: !isMobile && !lowMemory,
         alpha: false,
         powerPreference: 'high-performance',
       }}
       onCreated={({ gl, scene, camera }) => {
-        scene.background = new THREE.Color('#eaf0f3');
-        gl.setClearColor('#eaf0f3', 1);
+        scene.background = new THREE.Color(backdrop);
+        gl.setClearColor(backdrop, 1);
         gl.toneMapping = THREE.ACESFilmicToneMapping;
         gl.toneMappingExposure = 1.38;
         if (import.meta.env.DEV) {
@@ -88,7 +100,12 @@ export default function CapsuleOneCanvas({ onCitySelect }: CapsuleOneCanvasProps
       <hemisphereLight args={['#f4f8fc', '#8aa0ae', 0.88]} />
 
       <group position={[0, earthLift, 0]}>
-        <EarthGlobe onCitySelect={onCitySelect} variant="daylight" interactionMode="display" />
+        <EarthGlobe
+          onCitySelect={onCitySelect}
+          variant="daylight"
+          interactionMode="display"
+          autoRotate={autoRotate}
+        />
       </group>
 
       <EarthRoamControls

@@ -42,7 +42,7 @@ export function formatSavedUserPlanMeta(record: UserPlanRecord): string {
 export function getSavedUserPlanSummary(record: UserPlanRecord): string {
   const assistant = record.content.fullHistory.find((item) => item.role === 'assistant');
   if (!assistant?.content.trim()) {
-    return `${record.content.locationName} 穷游方案，含花费与行程建议。`;
+    return `${record.content.locationName} 漫行方案，含花费与行程建议。`;
   }
   const plain = assistant.content
     .replace(/^#+\s*/gm, '')
@@ -50,12 +50,12 @@ export function getSavedUserPlanSummary(record: UserPlanRecord): string {
     .replace(/\[([^\]]+)\]\([^)]+\)/g, '$1')
     .replace(/\n+/g, ' ')
     .trim();
-  return plain.slice(0, 160) || `${record.content.locationName} 穷游方案`;
+  return plain.slice(0, 160) || `${record.content.locationName} 漫行方案`;
 }
 
 export function getSavedUserPlanRoundsLabel(record: UserPlanRecord): string {
   const rounds = record.content.fullHistory.filter((item) => item.role === 'assistant').length;
-  return rounds > 1 ? `${rounds} 版对话方案` : 'AI 穷游方案';
+  return rounds > 1 ? `${rounds} 版对话方案` : 'AI 漫行方案';
 }
 
 export { sessionToDiscoverItem, sessionToLegacyPlanRecord } from '@/lib/plan/sessionAdapters';

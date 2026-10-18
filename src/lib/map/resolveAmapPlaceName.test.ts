@@ -1,5 +1,10 @@
 import { describe, expect, it } from 'vitest';
-import { isCoordinateLikeLocationName, resolveAmapPlaceName } from '@/lib/map/resolveAmapPlaceName';
+import {
+  compactGeocodeLabelForDisplay,
+  isCoordinateLikeLocationName,
+  resolveAmapPlaceName,
+  sanitizeLocationLabelForDisplay,
+} from '@/lib/map/resolveAmapPlaceName';
 
 describe('resolveAmapPlaceName', () => {
   it('prefers nearby POI over city-level address', () => {
@@ -35,5 +40,10 @@ describe('resolveAmapPlaceName', () => {
   it('detects coordinate-like labels', () => {
     expect(isCoordinateLikeLocationName('36.7247, 117.0902')).toBe(true);
     expect(isCoordinateLikeLocationName('华山风景区')).toBe(false);
+  });
+
+  it('uses destination when route label has arrow', () => {
+    expect(compactGeocodeLabelForDisplay('济南市历下区中林路 → 杭州')).toBe('杭州');
+    expect(sanitizeLocationLabelForDisplay('济南市历下区 → 杭州市')).toBe('杭州');
   });
 });

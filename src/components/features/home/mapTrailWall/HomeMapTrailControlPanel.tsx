@@ -102,7 +102,7 @@ export default function HomeMapTrailControlPanel({
       ? '正在生成方案…'
       : usingExample
         ? `将使用示例：${exampleQuery}`
-        : '一键生成穷游方案';
+        : '一键生成漫行方案';
 
   return (
     <aside

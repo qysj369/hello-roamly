@@ -43,9 +43,9 @@ export default function PlanSaveDialog({
 
       <div className="fixed inset-0 flex items-center justify-center p-4">
         <DialogPanel className="w-full max-w-md rounded-2xl border border-slate-200 bg-white p-6 shadow-xl">
-          <DialogTitle className="text-base font-semibold text-slate-900">保存穷游方案</DialogTitle>
+          <DialogTitle className="text-base font-semibold text-slate-900">保存漫行方案</DialogTitle>
           <Description className="mt-2 text-sm leading-relaxed text-slate-600">
-            将当前完整穷游方案（简介、行程、蜗牛提示与避坑指南）保存到你的方案库。
+            将当前完整漫行方案（简介与行程）保存到你的方案库。
           </Description>
 
           <div className="mt-4 space-y-3 text-sm text-slate-700">

@@ -67,8 +67,13 @@ function isCaptureInputDevice(label: string): boolean {
 }
 
 function isPreferredBuiltinMic(label: string): boolean {
-  return /realtek|麦克风阵列|mic array|high definition audio/i.test(label) &&
-    !/philips|spa3609|立体声混音|stereo mix/i.test(label);
+  if (/philips|spa3609|立体声混音|stereo mix|线路输入|line\s*in/i.test(label)) {
+    return false;
+  }
+  return (
+    /麦克风阵列|mic array/i.test(label) ||
+    (/realtek/i.test(label) && /麦克风|microphone/i.test(label))
+  );
 }
 
 function isLikelyUsbHeadsetMic(label: string): boolean {
@@ -313,37 +318,41 @@ export async function requestVoiceDialogMicrophoneStream(
 
   const { deviceId = null } = options;
 
-  const attempts: MediaStreamConstraints[] = [
-    { audio: true },
-    {
-      audio: {
-        autoGainControl: true,
-        echoCancellation: false,
-        noiseSuppression: false,
-      },
-    },
-  ];
-
-  if (deviceId) {
-    attempts.unshift(
-      {
-        audio: {
-          deviceId: { ideal: deviceId },
-          autoGainControl: true,
-          echoCancellation: false,
-          noiseSuppression: false,
+  // 指定设备时绝不回退到 { audio: true }，否则会落到系统默认的静音 Philips
+  const attempts: MediaStreamConstraints[] = deviceId
+    ? [
+        {
+          audio: {
+            deviceId: { exact: deviceId },
+            autoGainControl: true,
+            echoCancellation: false,
+            noiseSuppression: false,
+          },
         },
-      },
-      {
-        audio: {
-          deviceId: { exact: deviceId },
-          autoGainControl: true,
-          echoCancellation: false,
-          noiseSuppression: false,
+        {
+          audio: {
+            deviceId: { ideal: deviceId },
+            autoGainControl: true,
+            echoCancellation: false,
+            noiseSuppression: false,
+          },
         },
-      },
-    );
-  }
+        {
+          audio: {
+            deviceId: { exact: deviceId },
+          },
+        },
+      ]
+    : [
+        {
+          audio: {
+            autoGainControl: true,
+            echoCancellation: false,
+            noiseSuppression: false,
+          },
+        },
+        { audio: true },
+      ];
 
   let lastError: unknown;
   for (const constraints of attempts) {
@@ -455,7 +464,7 @@ export function formatProbeFailureHint(
   }
 
   if (probes.every((item) => item.peak < 0.01)) {
-    return '所有麦克风几乎无信号：Win+I → 系统 → 声音 → 输入，选「麦克风阵列 Realtek」并调高音量，不要用 Philips';
+    return '所有麦克风几乎无信号：Win+I → 声音 → 输入，不要用 Philips SPA3609；选「麦克风 Realtek」并插入前面板麦克风（或可用的 USB 耳机麦），确认「测试麦克风」条会跳动';
   }
 
   return `所有麦克风几乎无信号（${best.label} 约 ${Math.round(best.peak * 100)}%）：请先让 Windows 录音机录到声音`;

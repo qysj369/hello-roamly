@@ -10,6 +10,7 @@ import { paths } from '@/router/paths';
 import type { TravelBuddyPost } from '@/types/domain/travelBuddy';
 import { openTravelBuddyInterestChat } from '@/utils/travelBuddyChat';
 import { SNAIL_GLOBAL_COPY } from '@/lib/config/snailCommunity';
+import '@/styles/holo-inner.css';
 
 export default function TravelBuddiesPage() {
   const navigate = useNavigate();
@@ -31,17 +32,14 @@ export default function TravelBuddiesPage() {
   const items = data?.items ?? [];
 
   return (
-    <MotionPage className="flex flex-col gap-4">
+    <MotionPage className="holo-buddies flex flex-col gap-4">
       <MotionBlock>
-        <header className="flex items-start justify-between gap-3">
+        <header className="holo-buddies__header flex items-start justify-between gap-3">
           <div>
-            <h1 className="text-xl font-bold text-slate-900">{TRAVEL_BUDDY_BRAND.feedTitle}</h1>
-            <p className="mt-1 text-sm text-slate-600">{TRAVEL_BUDDY_BRAND.feedSubtitle}</p>
+            <h1 className="holo-buddies__title">{TRAVEL_BUDDY_BRAND.feedTitle}</h1>
+            <p className="holo-buddies__subtitle">{TRAVEL_BUDDY_BRAND.feedSubtitle}</p>
           </div>
-          <Link
-            to={paths.travelBuddyNew}
-            className="inline-flex shrink-0 items-center gap-1 rounded-xl bg-emerald-600 px-3 py-2 text-sm font-semibold text-white hover:bg-emerald-700"
-          >
+          <Link to={paths.travelBuddyNew} className="holo-buddies__cta inline-flex shrink-0 items-center gap-1">
             <Plus className="h-4 w-4" aria-hidden />
             发布
           </Link>

@@ -25,7 +25,7 @@ export default function TravelBuddyCard({ post, onInterest, className }: TravelB
   return (
     <article
       className={cn(
-        'flex flex-col rounded-2xl border border-slate-200/90 bg-white p-4 shadow-sm',
+        'flex flex-col rounded-xl border border-[#b7cdc4] bg-[#fffef6] p-4 shadow-none',
         className,
       )}
     >
@@ -42,7 +42,7 @@ export default function TravelBuddyCard({ post, onInterest, className }: TravelB
             出发 {formatTravelBuddyStartDate(post.startDate)}
           </p>
         </div>
-        <span className="shrink-0 rounded-lg bg-violet-50 px-2.5 py-1 text-xs font-semibold text-violet-700">
+        <span className="shrink-0 rounded-lg bg-emerald-50 px-2.5 py-1 text-xs font-semibold text-[#2c6b58]">
           {formatTravelBuddyBudgetLabel(post.budgetRange)}
         </span>
       </div>
@@ -93,7 +93,7 @@ export default function TravelBuddyCard({ post, onInterest, className }: TravelB
       <button
         type="button"
         onClick={() => onInterest(post)}
-        className="mt-3 inline-flex w-full items-center justify-center gap-1.5 rounded-xl bg-emerald-600 px-4 py-2.5 text-sm font-semibold text-white hover:bg-emerald-700"
+        className="mt-3 inline-flex w-full items-center justify-center gap-1.5 rounded-xl bg-[#2c6b58] px-4 py-2.5 text-sm font-semibold text-[#f9f7eb] hover:brightness-105"
       >
         <MapPin className="h-4 w-4" aria-hidden />
         感兴趣

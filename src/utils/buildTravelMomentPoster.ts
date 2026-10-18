@@ -59,7 +59,7 @@ function momentSharePosterInput(params: {
       }),
       coverImageUrl: getMomentPosterCoverUrl(moment),
       qrCaption: '长按识别二维码查看瞬间',
-      qrFooter: '微信扫码 · 穷游动态与 AI 行程',
+      qrFooter: '微信扫码 · 漫行动态与 AI 行程',
     },
     title,
     authorName,
@@ -80,7 +80,7 @@ export function getTravelMomentXhsPosterInput(params: {
 
   return {
     ...mapShareInputToXhs(input, {
-      hashtags: hashtagsFromTags(tags, ['旅行瞬间', '穷游日记', location ?? ''].filter(Boolean)),
+      hashtags: hashtagsFromTags(tags, ['旅行瞬间', '漫行日记', location ?? ''].filter(Boolean)),
       authorLabel: `@${authorName}`,
       locationLabel: location,
       titlePrefix: '📸 ',

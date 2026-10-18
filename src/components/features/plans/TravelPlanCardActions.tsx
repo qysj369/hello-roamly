@@ -142,7 +142,7 @@ export default function TravelPlanCardActions({ plan, className }: TravelPlanCar
       {chinaShare && (
         <button
           type="button"
-          className={cn(actionButtonClass, 'text-violet-700 hover:bg-violet-50')}
+          className={cn(actionButtonClass, 'text-[#2c6b58] hover:bg-emerald-50')}
           aria-label="微信分享海报"
           onClick={handlePoster}
         >

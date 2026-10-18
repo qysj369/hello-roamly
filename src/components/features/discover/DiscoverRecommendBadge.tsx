@@ -43,7 +43,7 @@ export default function DiscoverRecommendBadge({
   const badge = (
     <span
       className={cn(
-        'inline-flex max-w-full items-center gap-1 rounded-full bg-violet-600/95 px-2 py-0.5 text-[10px] font-semibold text-white shadow-sm',
+        'inline-flex max-w-full items-center gap-1 rounded-full bg-[#2c6b58]/95 px-2 py-0.5 text-[10px] font-semibold text-white shadow-sm',
         interactive && 'cursor-pointer ring-2 ring-transparent hover:ring-white/40',
         className,
       )}
@@ -77,14 +77,14 @@ export default function DiscoverRecommendBadge({
       {open && (
         <div
           role="tooltip"
-          className="absolute right-0 top-full z-20 mt-1 w-52 rounded-xl border border-slate-200 bg-white p-2.5 text-left shadow-lg"
+          className="absolute right-0 top-full z-20 mt-1 w-52 rounded-xl border border-slate-200 bg-white p-2.5 text-left shadow-sm"
           onClick={(event) => {
             event.preventDefault();
             event.stopPropagation();
           }}
         >
           {showScore && (
-            <p className="text-[10px] font-semibold text-violet-700">匹配度 {score}</p>
+            <p className="text-[10px] font-semibold text-[#2c6b58]">匹配度 {score}</p>
           )}
           {reasons.length > 0 ? (
             <ul className="mt-1 space-y-1">

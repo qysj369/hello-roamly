@@ -24,8 +24,8 @@ export default function InviteCodeCard({ summary, className, compact = false }: 
 
   async function handleShare() {
     const payload = {
-      title: 'Hello Roamly 穷游邀请',
-      text: `用我的邀请码 ${summary.inviteCode} 一起规划穷游行程`,
+      title: 'Hello Roamly 漫行邀请',
+      text: `用我的邀请码 ${summary.inviteCode} 一起规划漫行行程`,
       url: summary.inviteLink,
     };
     try {

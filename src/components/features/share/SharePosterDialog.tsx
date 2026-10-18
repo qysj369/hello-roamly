@@ -21,6 +21,8 @@ export type SharePosterDialogProps = {
   posterVariants?: SharePosterVariant[];
   shareTrackContext?: ShareTrackingContext;
   onSystemShare?: () => Promise<'shared' | 'copied' | 'cancelled' | 'failed' | void>;
+  className?: string;
+  previewExpanded?: boolean;
 };
 
 /** 分享海报弹窗：容器组件，逻辑见 useSharePosterDialog */
@@ -36,6 +38,8 @@ export default function SharePosterDialog({
   posterVariants,
   shareTrackContext,
   onSystemShare,
+  className,
+  previewExpanded = false,
 }: SharePosterDialogProps) {
   const poster = useSharePosterDialog({
     open,
@@ -48,7 +52,13 @@ export default function SharePosterDialog({
   });
 
   return (
-    <Dialog open={open} onClose={onClose} title={title} description={description} className="max-w-lg">
+    <Dialog
+      open={open}
+      onClose={onClose}
+      title={title}
+      description={description}
+      className={className ?? 'max-w-lg'}
+    >
       <div className="space-y-4">
         <SharePosterVariantTabs
           variants={poster.variants}
@@ -56,7 +66,7 @@ export default function SharePosterDialog({
           onSelect={poster.setActiveVariantId}
         />
 
-        <SharePosterHintBar hint={poster.hint} isXhs={poster.isXhs} />
+        <SharePosterHintBar hint={poster.hint} isXhs={poster.isXhs} isDouyin={poster.isDouyin} />
 
         <SharePosterPreview
           posterAlt={posterAlt}
@@ -67,21 +77,24 @@ export default function SharePosterDialog({
           slideIndex={poster.slideIndex}
           slideCount={poster.slideCount}
           isXhs={poster.isXhs}
+          isDouyin={poster.isDouyin}
           isMultiSlide={poster.isMultiSlide}
           onRetry={() => void poster.runGenerate()}
           onPrevSlide={poster.goPrevSlide}
           onNextSlide={poster.goNextSlide}
           onGoToSlide={poster.goToSlide}
+          expanded={previewExpanded}
         />
 
-        {poster.copyFeedback && (
-          <p className="text-center text-xs text-emerald-700" role="status">
-            {poster.copyFeedback}
+        {(poster.assistHint || poster.copyFeedback) && (
+          <p className="text-center text-sm font-semibold text-emerald-800" role="status">
+            {poster.assistHint || poster.copyFeedback}
           </p>
         )}
 
         <SharePosterActionBar
           isXhs={poster.isXhs}
+          isDouyin={poster.isDouyin}
           isMultiSlide={poster.isMultiSlide}
           slideIndex={poster.slideIndex}
           slideCount={poster.slideCount}
@@ -94,6 +107,9 @@ export default function SharePosterDialog({
           onCopyXhsText={() => void poster.handleCopyXhsText()}
           onCopyLink={() => void poster.handleCopyLink()}
           onSystemShare={() => void poster.handleSystemShare()}
+          onShareImage={() => void poster.handleShareImage()}
+          shareImageLabel={poster.shareImageLabel}
+          showDownload={poster.showDownload}
         />
       </div>
     </Dialog>

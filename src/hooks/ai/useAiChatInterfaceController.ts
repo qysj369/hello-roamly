@@ -7,6 +7,12 @@ import { useAiChatPlanGeneration } from '@/hooks/ai/useAiChatPlanGeneration';
 import { useAiChatScrollSync } from '@/hooks/ai/useAiChatScrollSync';
 import { useAiTravelParams } from '@/hooks/ai/useAiTravelParams';
 import type { AiProviderDisplay } from '@/lib/config/ai';
+import {
+  friendlyHomeMapPlanError,
+  launchHomeMapQiongYouPlan,
+  stripHoloPlanHandoffMeta,
+} from '@/lib/home/launchHomeMapQiongYouPlan';
+import { parseTravelSearchIntent } from '@/lib/map/planQueryBuilder';
 import type { AiChatContext, AiChatMessage } from '@/types/domain/aiChat';
 import { travelPlanDetailPath } from '@/router/paths';
 import {
@@ -45,6 +51,7 @@ export function useAiChatInterfaceController({
   const [internalParamsOpen, setInternalParamsOpen] = useState(false);
   const paramsOpen = controlledParamsOpen ?? internalParamsOpen;
   const setParamsOpen = onParamsOpenChange ?? setInternalParamsOpen;
+  const [homeMapPlanError, setHomeMapPlanError] = useState<string | null>(null);
 
   const advisorSession = useAdvisorSession({
     context,
@@ -80,7 +87,7 @@ export function useAiChatInterfaceController({
   const [shareFallbackText, setShareFallbackText] = useState('');
 
   const saveDefaultTitle = useMemo(
-    () => plan.lastPlan?.title?.trim() || travelParamsState.chatContext.destination?.trim() || '我的穷游方案',
+    () => plan.lastPlan?.title?.trim() || travelParamsState.chatContext.destination?.trim() || '我的漫行方案',
     [plan.lastPlan?.title, travelParamsState.chatContext.destination],
   );
 
@@ -96,13 +103,52 @@ export function useAiChatInterfaceController({
     defaultTitle: saveDefaultTitle,
   });
 
+  const runHomeMapQiongYouPlan = useCallback(
+    async (prompt: string) => {
+      setHomeMapPlanError(null);
+      plan.clearError();
+      const fullPrompt = prompt.trim();
+      const cleanPrompt = stripHoloPlanHandoffMeta(fullPrompt) || fullPrompt;
+      const destinationHint =
+        context?.destination?.trim() ||
+        parseTravelSearchIntent(cleanPrompt).destinationHint ||
+        null;
+      /** 须保留 handoff 内【用户已确认】等段，供 clarify lock / 漂移防护解析 */
+      const result = await launchHomeMapQiongYouPlan({
+        query: fullPrompt,
+        originName: context?.origin?.name,
+        destinationHint,
+      });
+      if (!result.ok) {
+        setHomeMapPlanError(result.error);
+        return false;
+      }
+      return true;
+    },
+    [context?.destination, context?.origin?.name, plan],
+  );
+
   useEffect(() => {
     const prompt = autoPrompt?.trim();
     if (!prompt || autoSentRef.current) {
       return undefined;
     }
-    autoSentRef.current = true;
+
+    /** 首页搜索 / 城市·灵感 CTA：旧版地图穷游四区块（非顾问行程卡片） */
+    const fromHomePlanHandoff =
+      context?.source === 'home_map' &&
+      Boolean(context.destination?.trim() || context.dream?.trim());
+
+    // 勿在排定时就把 autoSent 置 true：依赖项抖动会清掉定时器，导致永远不生成
     const timer = window.setTimeout(() => {
+      if (autoSentRef.current) return;
+      autoSentRef.current = true;
+      if (fromHomePlanHandoff) {
+        void runHomeMapQiongYouPlan(prompt).catch((error) => {
+          setHomeMapPlanError(friendlyHomeMapPlanError(error));
+        });
+        return;
+      }
       chat
         .sendMessage(prompt, hideAutoPromptBubble ? { hideUserBubble: true } : undefined)
         .catch(() => undefined);
@@ -110,18 +156,42 @@ export function useAiChatInterfaceController({
     return () => {
       window.clearTimeout(timer);
     };
-  }, [autoPrompt, chat.sendMessage, hideAutoPromptBubble]);
+  }, [
+    autoPrompt,
+    chat.sendMessage,
+    context?.destination,
+    context?.dream,
+    context?.source,
+    hideAutoPromptBubble,
+    runHomeMapQiongYouPlan,
+  ]);
 
   const handleReset = useCallback(() => {
     chat.resetChat();
     travelParamsState.resetParams();
+    setHomeMapPlanError(null);
     plan.clearError();
     advisorSession.resetSession();
   }, [advisorSession, chat, plan, travelParamsState]);
 
   const handleGeneratePlan = useCallback(() => {
+    const prompt =
+      autoPrompt?.trim() ||
+      context?.dream?.trim() ||
+      context?.destination?.trim() ||
+      '';
+    if (context?.source === 'home_map' && prompt) {
+      void runHomeMapQiongYouPlan(prompt).catch((error) => {
+        setHomeMapPlanError(friendlyHomeMapPlanError(error));
+      });
+      return;
+    }
+    if (!prompt) {
+      setHomeMapPlanError('请先输入目的地与出行信息，再生成漫行攻略');
+      return;
+    }
     plan.generateFromContext().catch(() => undefined);
-  }, [plan]);
+  }, [autoPrompt, context?.destination, context?.dream, context?.source, plan, runHomeMapQiongYouPlan]);
 
   const confirmPlanDialog = useCallback(() => {
     if (plan.lastPlan) {
@@ -181,6 +251,34 @@ export function useAiChatInterfaceController({
     [hasUserTurn, plan.lastPlan],
   );
 
+  const planForUi = useMemo(
+    () => ({
+      ...plan,
+      error: homeMapPlanError ?? plan.error,
+      clearError: () => {
+        setHomeMapPlanError(null);
+        plan.clearError();
+      },
+      retry: async () => {
+        if (context?.source === 'home_map') {
+          const prompt =
+            autoPrompt?.trim() ||
+            context.destination?.trim() ||
+            context.dream?.trim() ||
+            '';
+          if (!prompt) {
+            setHomeMapPlanError('请先输入目的地与出行信息，再生成漫行攻略');
+            return null;
+          }
+          const ok = await runHomeMapQiongYouPlan(prompt);
+          return ok ? true : null;
+        }
+        return plan.retry();
+      },
+    }),
+    [autoPrompt, context?.destination, context?.dream, context?.source, homeMapPlanError, plan, runHomeMapQiongYouPlan],
+  );
+
   return {
     context,
     paramsOpen,
@@ -188,7 +286,7 @@ export function useAiChatInterfaceController({
     travelParams: travelParamsState,
     chat,
     scroll,
-    plan,
+    plan: planForUi,
     isBusy,
     aiBlocked,
     handleReset,

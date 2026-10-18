@@ -23,7 +23,7 @@ export function buildTravelPlanFromGuide(guide: Guide): EnrichedTravelPlan {
 
   return {
     id: `plan-${guide.id}`,
-    title: `AI · ${guide.city}${guide.days}穷游方案`,
+    title: `AI · ${guide.city}${guide.days}漫行方案`,
     summary,
     dailyPlans,
     totalCost: estimateTotalCostFromGuide(guide),

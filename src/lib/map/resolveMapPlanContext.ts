@@ -1,7 +1,9 @@
 import {
   buildMultiStopSearchPlanQuery,
   parseTravelSearchIntent,
+  resolveRealPlanCity,
 } from '@/lib/map/planQueryBuilder';
+import { isTravelThemeStop } from '@/lib/map/segmentTravelPlaces';
 import { filterOriginFromMultiStops } from '@/lib/map/planRouteLabel';
 import {
   extractMultiStopDestinations,
@@ -30,13 +32,13 @@ function resolveMultiStopsFromInputs(
 ): string[] {
   const candidates = [searchQuery.trim(), rawQuery.trim()].filter(Boolean);
   for (const text of candidates) {
-    const fromSearch = extractMultiStopDestinations(text);
+    const fromSearch = dropThemeStops(extractMultiStopDestinations(text));
     if (fromSearch.length >= 2) {
       return filterOriginFromMultiStops(fromSearch, originName);
     }
   }
 
-  const clientStops = getMultiStopNames(fallbackLocationName);
+  const clientStops = dropThemeStops(getMultiStopNames(fallbackLocationName));
   if (
     clientStops.length >= 2 &&
     !isLikelyAdminGeocodeLabel(fallbackLocationName) &&
@@ -46,6 +48,10 @@ function resolveMultiStopsFromInputs(
   }
 
   return [];
+}
+
+function dropThemeStops(stops: string[]): string[] {
+  return stops.filter((stop) => !isTravelThemeStop(stop));
 }
 
 function buildMultiStopContext(
@@ -100,7 +106,8 @@ export function resolveMapPlanContext(
   }
 
   return {
-    locationName: fallbackLocationName.trim() || '所选地点',
+    locationName:
+      resolveRealPlanCity(fallbackLocationName) || fallbackLocationName.trim() || '所选地点',
     query: trimmedQuery,
     multiStops: [],
   };
@@ -136,7 +143,7 @@ export async function resolveMapPlanContextAsync(
   const candidateText = effectiveSearchQuery || trimmedQuery;
   const resolved = await resolveTravelPlacesFromText(candidateText, geocode);
   const multiStops = filterOriginFromMultiStops(
-    resolved.map((place) => place.name),
+    dropThemeStops(resolved.map((place) => place.name)),
     options?.originName,
   );
 

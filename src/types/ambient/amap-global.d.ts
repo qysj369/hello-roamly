@@ -43,6 +43,8 @@ declare global {
       maxZoom?: number,
     ): void;
     setZoomAndCenter(zoom: number, center: [number, number]): void;
+    panTo?(lnglat: [number, number]): void;
+    setZoom?(zoom: number): void;
     clearInfoWindow(): void;
     getZoom(): number;
     setFeatures(features: ('bg' | 'road' | 'point' | 'building')[]): void;
@@ -55,6 +57,7 @@ declare global {
     setPosition(position: [number, number]): void;
     setMap(map: AMapMapInstance | null): void;
     setContent(content: string | HTMLElement): void;
+    setAnimation?(animation: 'AMAP_ANIMATION_NONE' | 'AMAP_ANIMATION_BOUNCE' | string): void;
     on(event: 'click', handler: () => void): void;
     getExtData<T>(): T;
   }

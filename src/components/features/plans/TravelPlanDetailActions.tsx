@@ -45,7 +45,7 @@ function PanelActionButton({
         variant === 'secondary' &&
           'border-slate-200 bg-white text-slate-900 hover:border-slate-300 hover:bg-slate-50',
         variant === 'accent' &&
-          'border-violet-200 bg-gradient-to-br from-violet-50 to-fuchsia-50 text-slate-900 hover:from-violet-100 hover:to-fuchsia-100',
+          'border-[#b7cdc4] bg-[#fffef6] from-emerald-50 to-[#fffef6] text-slate-900 hover:bg-emerald-50',
         isSuccess && variant === 'primary' && 'border-emerald-300 bg-emerald-600 hover:bg-emerald-700',
         isSuccess && variant === 'secondary' && 'border-emerald-200 bg-emerald-50',
         isError && variant === 'primary' && 'border-red-300 bg-red-600 hover:bg-red-700',
@@ -65,7 +65,7 @@ function PanelActionButton({
           className={cn(
             'h-4 w-4 shrink-0',
             variant === 'primary' ? 'text-white/90' : 'text-slate-600',
-            variant === 'accent' && 'text-violet-600',
+            variant === 'accent' && 'text-[#2c6b58]',
           )}
           aria-hidden
         />
@@ -112,7 +112,7 @@ function ToolbarActionButton({
         'focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-1 focus-visible:outline-brand-500',
         tone === 'brand' && 'border-brand-200 bg-brand-50 text-brand-800 hover:bg-brand-100',
         tone === 'slate' && 'border-slate-200 bg-white text-slate-700 hover:bg-slate-50',
-        tone === 'violet' && 'border-violet-200 bg-violet-50 text-violet-800 hover:bg-violet-100',
+        tone === 'violet' && 'border-[#b7cdc4] bg-emerald-50 text-[#2c6b58] hover:bg-emerald-50',
         isSuccess && 'border-emerald-200 bg-emerald-50 text-emerald-800',
         isError && 'border-red-200 bg-red-50 text-red-700',
       )}

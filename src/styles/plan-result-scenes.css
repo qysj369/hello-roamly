@@ -1,0 +1,29 @@
+@keyframes plan-scene-fade {
+  from {
+    opacity: 0;
+    transform: translateY(6px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+.plan-result-scene-img {
+  animation: plan-scene-fade 480ms ease-out both;
+}
+
+.plan-result-scene-placeholder {
+  display: grid;
+  place-items: center;
+  width: 100%;
+  aspect-ratio: 4 / 3;
+  max-height: 220px;
+  overflow: hidden;
+  border-radius: 16px;
+  background: color-mix(in srgb, var(--theme-sand) 32%, var(--theme-surface));
+  color: var(--theme-muted);
+  font-size: 12px;
+  letter-spacing: 0.04em;
+  animation: plan-scene-fade 480ms ease-out both;
+}

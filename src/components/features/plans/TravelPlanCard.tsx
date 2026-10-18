@@ -87,7 +87,7 @@ const TravelPlanCardCover = memo(function TravelPlanCardCover({ plan }: { plan: 
   const showImage = Boolean(coverUrl) && !imageFailed;
 
   return (
-    <div className="relative aspect-[16/10] w-full overflow-hidden bg-gradient-to-br from-brand-100 via-slate-100 to-violet-100">
+    <div className="relative aspect-[16/10] w-full overflow-hidden bg-gradient-to-br from-emerald-50 via-[#f9f7eb] to-[#fffef6]">
       {showImage ? (
         <OptimizedImage
           src={coverUrl!}
@@ -141,7 +141,7 @@ const TravelPlanCardCreator = memo(function TravelPlanCardCreator({ plan }: { pl
         />
       ) : (
         <span
-          className="flex h-9 w-9 shrink-0 items-center justify-center rounded-full bg-gradient-to-br from-brand-100 to-violet-100 text-sm font-bold text-brand-700 ring-2 ring-white"
+          className="flex h-9 w-9 shrink-0 items-center justify-center rounded-full bg-gradient-to-br from-emerald-50 to-[#f9f7eb] text-sm font-bold text-brand-700 ring-2 ring-white"
           aria-hidden
         >
           {getCreatorInitial(creator.nickname)}
@@ -209,7 +209,7 @@ function TravelPlanCard({
         <TravelPlanCardHeading plan={plan} />
 
         <div className="flex items-center justify-between gap-2">
-          <span className="inline-flex items-center gap-1 rounded-full bg-violet-100 px-2 py-0.5 font-mono text-[10px] font-medium text-violet-700">
+          <span className="inline-flex items-center gap-1 rounded-full bg-emerald-50 px-2 py-0.5 font-mono text-[10px] font-medium text-[#2c6b58]">
             <Bot className="h-3 w-3" aria-hidden />
             AI Generated
           </span>

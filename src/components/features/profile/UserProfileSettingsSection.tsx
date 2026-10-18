@@ -53,13 +53,13 @@ export default function UserProfileSettingsSection({
 
       <Link
         to={paths.messages}
-        className="mt-4 flex items-center justify-between gap-3 rounded-xl border border-violet-200/80 bg-violet-50/50 px-4 py-3 text-sm font-semibold text-violet-800 hover:bg-violet-50"
+        className="mt-4 flex items-center justify-between gap-3 rounded-xl border border-[#b7cdc4] bg-emerald-50/50 px-4 py-3 text-sm font-semibold text-[#2c6b58] hover:bg-emerald-50"
       >
         <span className="inline-flex items-center gap-2">
           <MessageCircle className="h-4 w-4" aria-hidden />
           站内消息
         </span>
-        <span className="text-xs font-normal text-violet-600">查看会话 →</span>
+        <span className="text-xs font-normal text-[#2c6b58]">查看会话 →</span>
       </Link>
 
       <div className="mt-4 grid gap-4 sm:grid-cols-2">
@@ -85,7 +85,7 @@ export default function UserProfileSettingsSection({
 
         <div className="rounded-xl border border-slate-200/80 bg-slate-50/80 p-4">
           <h3 className="flex items-center gap-1.5 text-sm font-semibold text-slate-900">
-            <Bell className="h-4 w-4 text-violet-600" aria-hidden />
+            <Bell className="h-4 w-4 text-[#2c6b58]" aria-hidden />
             通知
           </h3>
           <dl className="mt-2 divide-y divide-slate-200/80">

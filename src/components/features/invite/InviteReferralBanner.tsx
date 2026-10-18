@@ -16,7 +16,7 @@ export default function InviteReferralBanner() {
     <div className="mb-3 flex items-start gap-2 rounded-xl border border-amber-200 bg-amber-50/95 px-3 py-2.5 text-sm text-amber-950 shadow-sm">
       <Gift className="mt-0.5 h-4 w-4 shrink-0 text-amber-600" aria-hidden />
       <div className="min-w-0 flex-1">
-        <p className="font-semibold">好友邀请你加入穷游</p>
+        <p className="font-semibold">好友邀请你加入漫行</p>
         <p className="mt-0.5 text-xs text-amber-900/90">
           邀请码 <span className="font-mono font-bold">{pendingCode}</span>
           ，登录注册后可领取新人奖励。

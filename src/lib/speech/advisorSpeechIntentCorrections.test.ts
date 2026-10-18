@@ -7,7 +7,8 @@ describe('correctAdvisorSpeechIntent', () => {
   });
 
   it('normalizes budget phrasing', () => {
-    expect(correctAdvisorSpeechIntent('一千五穷游规划')).toBe('1500穷游规划');
+    expect(correctAdvisorSpeechIntent('一千五穷游规划')).toBe('1500漫行规划');
+    expect(correctAdvisorSpeechIntent('一千五漫行规划')).toBe('1500漫行规划');
   });
 
   it('merges multi-stop destinations', () => {

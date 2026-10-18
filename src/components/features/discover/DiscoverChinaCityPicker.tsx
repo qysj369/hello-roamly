@@ -80,7 +80,7 @@ export default function DiscoverChinaCityPicker({
             value={query}
             onChange={(event) => setQuery(event.target.value)}
             placeholder="搜索中国城市…"
-            className="block w-full rounded-lg border border-slate-200 bg-white py-2 pl-9 pr-3 text-sm focus:border-violet-400 focus:outline-none focus:ring-2 focus:ring-violet-200"
+            className="block w-full rounded-lg border border-slate-200 bg-white py-2 pl-9 pr-3 text-sm focus:border-[#2c6b58] focus:outline-none focus:ring-2 focus:ring-[#b7cdc4]/60"
           />
         </label>
       ) : null}
@@ -92,8 +92,8 @@ export default function DiscoverChinaCityPicker({
           className={cn(
             'rounded-full border px-3 py-1.5 text-xs font-medium transition',
             !activeDestination
-              ? 'border-violet-600 bg-violet-600 text-white'
-              : 'border-slate-200 bg-white text-slate-600 hover:border-violet-200',
+              ? 'border-[#2c6b58] bg-[#2c6b58] text-white'
+              : 'border-slate-200 bg-white text-slate-600 hover:border-[#b7cdc4]',
           )}
           aria-pressed={!activeDestination}
         >
@@ -107,8 +107,8 @@ export default function DiscoverChinaCityPicker({
             className={cn(
               'rounded-full border px-3 py-1.5 text-xs font-medium transition',
               activeDestination === city
-                ? 'border-violet-600 bg-violet-600 text-white'
-                : 'border-slate-200 bg-white text-slate-600 hover:border-violet-200 hover:bg-violet-50/40',
+                ? 'border-[#2c6b58] bg-[#2c6b58] text-white'
+                : 'border-slate-200 bg-white text-slate-600 hover:border-[#b7cdc4] hover:bg-emerald-50/50',
             )}
             aria-pressed={activeDestination === city}
           >
@@ -121,7 +121,7 @@ export default function DiscoverChinaCityPicker({
         <button
           type="button"
           onClick={() => setExpanded((open) => !open)}
-          className="inline-flex items-center gap-1 text-xs font-semibold text-violet-700 hover:text-violet-900"
+          className="inline-flex items-center gap-1 text-xs font-semibold text-[#2c6b58] hover:text-[#2c6b58]"
           aria-expanded={expanded}
         >
           {expanded ? (

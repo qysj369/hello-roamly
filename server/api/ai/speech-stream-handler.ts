@@ -29,11 +29,13 @@ export function handleSpeechStreamConnection(clientWs: WebSocket): void {
   }
 
   let session: IflytekIatStreamSession | null = null;
+  let ending = false;
 
   const ensureSession = () => {
     if (session) {
       return;
     }
+    ending = false;
     session = new IflytekIatStreamSession({
       onReady: () => {
         sendJson(clientWs, { type: 'ready' });
@@ -44,9 +46,11 @@ export function handleSpeechStreamConnection(clientWs: WebSocket): void {
       onFinal: (text) => {
         const cleaned = correctAdvisorSpeechIntent(extractAdvisorSpeechText(text));
         sendJson(clientWs, { type: 'final', text: cleaned });
+        ending = false;
       },
       onError: (message) => {
         sendJson(clientWs, { type: 'error', message });
+        ending = false;
       },
     });
     session.start();
@@ -81,14 +85,30 @@ export function handleSpeechStreamConnection(clientWs: WebSocket): void {
     }
 
     if (message.type === 'stop') {
-      session?.end();
-      session?.dispose();
-      session = null;
+      // 只发 end 帧等待讯飞 final；勿立刻 dispose，否则会丢断句结果
+      if (!session) {
+        return;
+      }
+      if (ending) {
+        return;
+      }
+      ending = true;
+      session.end();
+      setTimeout(() => {
+        if (ending) {
+          ending = false;
+          sendJson(clientWs, {
+            type: 'error',
+            message: '没听清，请靠近麦克风再说一次，说完点「说完了」',
+          });
+        }
+      }, 4500);
     }
   });
 
   clientWs.on('close', () => {
     session?.dispose();
     session = null;
+    ending = false;
   });
 }

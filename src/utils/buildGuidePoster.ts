@@ -11,7 +11,7 @@ import { getGuideShareSummary } from '@/utils/shareGuide';
 
 function guideSharePosterInput(guide: Guide) {
   return {
-    badge: '穷游攻略',
+    badge: '漫行攻略',
     title: guide.title,
     subtitle: `${guide.city} · ${guide.days} · ${guide.budget}`,
     summary: getGuideShareSummary(guide),
@@ -21,7 +21,7 @@ function guideSharePosterInput(guide: Guide) {
     }),
     coverImageUrl: getGuideCoverUrl(guide, 560),
     qrCaption: '长按识别二维码查看攻略',
-    qrFooter: '微信扫码 · 穷游攻略与 AI 行程',
+    qrFooter: '微信扫码 · 漫行攻略与 AI 行程',
   };
 }
 
@@ -30,7 +30,7 @@ export function getGuideXhsPosterInput(guide: Guide): XhsPosterInput {
   const cover = getGuideCoverUrl(guide, 720);
   return {
     ...mapShareInputToXhs(base, {
-      hashtags: hashtagsFromTags(guide.tags, [guide.city, '穷游攻略', '旅行干货']),
+      hashtags: hashtagsFromTags(guide.tags, [guide.city, '漫行攻略', '旅行干货']),
       locationLabel: guide.city,
       titlePrefix: '✨ ',
     }),

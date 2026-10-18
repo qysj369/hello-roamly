@@ -15,7 +15,7 @@ function passThrough(message?: string): ModerationResult {
 }
 
 function buildDemoResult(input: ModerateContentInput): ModerationResult {
-  const preflight = runLocalPreflight(input.text);
+  const preflight = runLocalPreflight(input.text, input.scene);
   if (preflight && preflight.decision === 'reject') {
     return preflight;
   }
@@ -36,7 +36,7 @@ export async function checkContentModeration(input: ModerateContentInput): Promi
     return passThrough();
   }
 
-  const preflight = runLocalPreflight(input.text);
+  const preflight = runLocalPreflight(input.text, input.scene);
   if (preflight?.decision === 'reject') {
     return preflight;
   }

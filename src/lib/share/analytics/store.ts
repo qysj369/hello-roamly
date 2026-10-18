@@ -133,8 +133,9 @@ export function formatShareAction(action: ShareAction): string {
 
 export function formatShareChannel(channel: ShareChannel): string {
   const labels: Record<ShareChannel, string> = {
-    wechat: '微信',
+    wechat: '微信朋友圈',
     xhs: '小红书',
+    douyin: '抖音',
     link: '链接',
     native: '系统',
     unknown: '未知',

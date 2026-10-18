@@ -203,7 +203,7 @@ export function editorDraftToListMeta(
     title: draft.title.trim(),
     budget: total > 0 ? `约 ¥${total}` : draft.budgetLabel.trim(),
     days: `${days} 天`,
-    tags: tags.length > 0 ? tags : ['穷游'],
+    tags: tags.length > 0 ? tags : ['漫行'],
     updatedAt: new Date().toISOString(),
     kind: 'structured',
   };

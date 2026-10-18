@@ -2,7 +2,7 @@
 export const MAP_PLAN_MAX_TOKENS = 4096;
 
 /** 第一阶段：简介 + 门到门行程流水账 */
-export const MAP_PLAN_PHASE1_MAX_TOKENS = 2200;
+export const MAP_PLAN_PHASE1_MAX_TOKENS = 2800;
 
 /**
  * 单城超过该天数才逐天生成（防超长截断）。
@@ -20,7 +20,7 @@ export const MAP_PLAN_DAY_MAX_TOKENS = 1100;
 export const MAP_PLAN_PHASE2_MAX_TOKENS = 800;
 
 /** 短途单城：一次流式输出四段（简介+行程+蜗牛+避坑） */
-export const MAP_PLAN_SINGLE_STREAM_MAX_TOKENS = 2800;
+export const MAP_PLAN_SINGLE_STREAM_MAX_TOKENS = 3600;
 
 /** 续写单段上限 */
 export const MAP_PLAN_INSIGHTS_CONTINUE_MAX_TOKENS = 1000;

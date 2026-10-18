@@ -1,5 +1,6 @@
 import { DEMO_CURRENT_USER_ID } from '@/data/demoUsers';
 import { trackShareOutcome } from '@/lib/share/analytics/trackShareEvent';
+import { withBrandShareTitle } from '@/lib/config/brandMindshare';
 import { buildShareUrl } from '@/lib/share/shareUrl';
 import { profilePathForUser, travelMomentSharePath } from '@/router/paths';
 import type { TravelMoment } from '@/types/domain/user/userSocial';
@@ -47,7 +48,7 @@ export async function shareTravelMoment(params: {
   const tracking = { contentKind: 'travel_moment' as const, contentId: moment.id };
   const url = buildShareUrl(getTravelMomentSharePath(moment, authorId, { isOwnProfile }), tracking);
   const text = getTravelMomentShareSummary(moment, authorName);
-  const title = moment.title?.trim() || `${authorName} 的旅行瞬间`;
+  const title = withBrandShareTitle(moment.title?.trim() || `${authorName} 的旅行瞬间`);
 
   try {
     if (navigator.share) {
@@ -55,7 +56,7 @@ export async function shareTravelMoment(params: {
       trackShareOutcome(tracking, 'shared', { channel: 'native', shareUrl: url });
       return 'shared';
     }
-    await navigator.clipboard.writeText(`${text}\n${url}`);
+    await navigator.clipboard.writeText(`${title}\n${text}\n${url}`);
     trackShareOutcome(tracking, 'copied', { channel: 'link', shareUrl: url });
     return 'copied';
   } catch (error) {
@@ -63,7 +64,7 @@ export async function shareTravelMoment(params: {
       return 'cancelled';
     }
     try {
-      await navigator.clipboard.writeText(`${text}\n${url}`);
+      await navigator.clipboard.writeText(`${title}\n${text}\n${url}`);
       trackShareOutcome(tracking, 'copied', { channel: 'link', shareUrl: url });
       return 'copied';
     } catch {

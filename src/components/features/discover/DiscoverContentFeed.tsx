@@ -27,11 +27,11 @@ function FeedSectionTitle({
   return (
     <div className="flex items-center justify-between gap-2">
       <h2 className="flex items-center gap-1.5 text-sm font-semibold text-slate-900">
-        <Icon className="h-4 w-4 text-violet-600" aria-hidden />
+        <Icon className="h-4 w-4 text-[#2c6b58]" aria-hidden />
         {title}
       </h2>
       {href && (
-        <Link to={href} className="text-xs font-medium text-violet-700 hover:underline">
+        <Link to={href} className="text-xs font-medium text-[#2c6b58] hover:underline">
           查看全部
         </Link>
       )}
@@ -79,7 +79,7 @@ export default function DiscoverContentFeed({ items, className }: DiscoverConten
             subtitle={
               showMixed
                 ? `共 ${guides.length} 条，点击查看详情`
-                : '穷游路线与省钱贴士'
+                : '漫行路线与省钱贴士'
             }
           />
         </section>
@@ -119,7 +119,7 @@ export default function DiscoverContentFeed({ items, className }: DiscoverConten
 
       {guides.length === 1 && guides[0] && (
         <p className="text-center text-xs text-slate-400">
-          <Link to={guideDetailPath(guides[0].id)} className="text-violet-700 hover:underline">
+          <Link to={guideDetailPath(guides[0].id)} className="text-[#2c6b58] hover:underline">
             打开攻略详情
           </Link>
         </p>

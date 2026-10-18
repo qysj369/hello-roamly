@@ -15,7 +15,7 @@ export const holoFeatureCities: readonly HoloFeatureCity[] = [
   {
     id: 'jinan',
     label: '济南',
-    tag: '泉城·平价穷游',
+    tag: '泉城·平价漫行',
     lat: 36.65,
     lng: 117.12,
     hot: true,
@@ -97,6 +97,9 @@ export const holoFeatureCities: readonly HoloFeatureCity[] = [
 
 /** 草图首页快捷城市：成都 / 杭州 / 大理 / 阳朔 */
 export const holoShortcutCityIds = ['chengdu', 'hangzhou', 'dali', 'yangshuo'] as const;
+
+/** 沉浸式漫游热门城：济南 / 大理 / 成都 / 杭州 / 阳朔 */
+export const holoImmerseCityIds = ['jinan', 'dali', 'chengdu', 'hangzhou', 'yangshuo'] as const;
 
 /** 热门目的地横向标签：成都 / 杭州 / 西安 / 大理 / 阳朔 */
 export const holoHotTagCityIds = ['chengdu', 'hangzhou', 'xian', 'dali', 'yangshuo'] as const;

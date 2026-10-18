@@ -110,7 +110,7 @@ export default function DiscoverPage() {
   const contextDestination = routeState?.destination?.trim() || routeState?.aiDream?.trim();
 
   return (
-    <MotionPage className="flex flex-col gap-5 pb-8">
+    <MotionPage className="holo-discover flex flex-col gap-5 pb-8">
       {contextDestination ? (
         <MotionBlock>
           <CapsuleContextBanner

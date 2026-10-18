@@ -28,7 +28,7 @@ function planSharePosterInput(plan: TravelPlan) {
       }),
       coverImageUrl: getPlanCoverUrl(plan),
       qrCaption: '长按识别二维码查看行程',
-      qrFooter: '微信扫码 · 穷游攻略与 AI 行程',
+      qrFooter: '微信扫码 · 漫行攻略与 AI 行程',
     },
     destination,
   };
@@ -41,7 +41,7 @@ export function getTravelPlanXhsPosterInput(plan: TravelPlan): XhsPosterInput {
 
   return {
     ...mapShareInputToXhs(input, {
-      hashtags: hashtagsFromTags([], [destination, 'AI行程', '穷游', '旅行计划']),
+      hashtags: hashtagsFromTags([], [destination, 'AI行程', '漫行', '旅行计划']),
       locationLabel: destination,
       titlePrefix: '🗺️ ',
     }),

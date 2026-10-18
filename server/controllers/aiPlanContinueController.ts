@@ -44,6 +44,5 @@ export async function continueMapPlanChat(body: ContinuePlanChatRequest, env: Se
       lat: typeof body.lat === 'number' ? body.lat : undefined,
     },
     completer,
-    { forceMock: !completer },
   );
 }

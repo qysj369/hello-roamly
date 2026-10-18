@@ -169,7 +169,7 @@ export function parseAiSnailGuideFromAiResponse(
   const title =
     typeof record.title === 'string' && record.title.trim()
       ? record.title.trim()
-      : `${meta.destination} ${meta.days} 天穷游攻略`;
+      : `${meta.destination} ${meta.days} 天漫行攻略`;
 
   const costBreakdown = parseCostBreakdown(record.costBreakdown ?? record.costs);
   const dailyJournal = parseDailyJournal(record.dailyJournal ?? record.dailyPlans);

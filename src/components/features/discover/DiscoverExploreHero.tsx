@@ -11,7 +11,7 @@ import { cn } from '@/utils/cn';
 
 const TEASERS = [
   '有人刚分享了隐藏玩法',
-  '穷游也能很精彩',
+  '漫行也能很精彩',
   '下一站在哪里？点一下就知道',
   '慢下来，发现不一样的风景',
 ];
@@ -75,7 +75,7 @@ export default function DiscoverExploreHero({
     return (
       <section
         className={cn(
-          'flex items-center gap-3 rounded-xl border border-violet-200/80 bg-gradient-to-r from-violet-600 to-fuchsia-600 px-3 py-2.5 text-white shadow-md',
+          'flex items-center gap-3 rounded-xl border border-[#b7cdc4] bg-gradient-to-r from-[#2c6b58] to-[#54786c] px-3 py-2.5 text-white shadow-sm',
           className,
         )}
         aria-label="今日盲盒"
@@ -99,7 +99,7 @@ export default function DiscoverExploreHero({
         <button
           type="button"
           onClick={handleSurprise}
-          className="inline-flex shrink-0 items-center gap-1 rounded-full bg-white px-3 py-1.5 text-xs font-bold text-violet-700 hover:bg-violet-50"
+          className="inline-flex shrink-0 items-center gap-1 rounded-full bg-white px-3 py-1.5 text-xs font-bold text-[#2c6b58] hover:bg-emerald-50"
         >
           <Compass className={cn('h-3.5 w-3.5', isAnimating && 'animate-spin')} aria-hidden />
           换一个
@@ -111,7 +111,7 @@ export default function DiscoverExploreHero({
   return (
     <section
       className={cn(
-        'relative overflow-hidden rounded-2xl border border-violet-200/80 bg-gradient-to-br from-violet-600 via-fuchsia-600 to-orange-500 p-4 text-white shadow-lg sm:p-5',
+        'relative overflow-hidden rounded-2xl border border-[#b7cdc4] bg-gradient-to-br from-[#2c6b58] via-[#3d7f6a] to-[#54786c] p-4 text-white shadow-sm sm:p-5',
         className,
       )}
       aria-labelledby="discover-explore-title"
@@ -123,7 +123,7 @@ export default function DiscoverExploreHero({
         <Link
           to={previewHref}
           className={cn(
-            'group relative aspect-[4/3] w-full shrink-0 overflow-hidden rounded-xl border border-white/20 shadow-md transition sm:aspect-[3/4] sm:w-36',
+            'group relative aspect-[4/3] w-full shrink-0 overflow-hidden rounded-xl border border-white/20 shadow-sm transition sm:aspect-[3/4] sm:w-36',
             isAnimating && 'ring-2 ring-white/60',
           )}
           aria-label={`阅读：${currentPreview.title}`}
@@ -136,7 +136,7 @@ export default function DiscoverExploreHero({
             className="transition duration-500 group-hover:scale-110"
           />
           <div className="absolute inset-0 bg-gradient-to-t from-black/70 via-black/10 to-transparent" />
-          <span className="absolute left-2 top-2 rounded-full bg-white/90 px-2 py-0.5 text-[10px] font-semibold text-violet-800">
+          <span className="absolute left-2 top-2 rounded-full bg-white/90 px-2 py-0.5 text-[10px] font-semibold text-[#2c6b58]">
             {currentPreview.badge}
           </span>
           <span className="absolute inset-x-0 bottom-0 p-2 text-left text-xs font-semibold leading-snug">
@@ -162,7 +162,7 @@ export default function DiscoverExploreHero({
             <button
               type="button"
               onClick={handleSurprise}
-              className="inline-flex min-h-11 items-center gap-2 rounded-full bg-white px-5 py-2.5 text-sm font-bold text-violet-700 shadow-md transition hover:scale-[1.02] hover:bg-violet-50 active:scale-[0.98] sm:min-h-0 sm:px-4 sm:py-2 sm:text-xs"
+              className="inline-flex min-h-11 items-center gap-2 rounded-full bg-white px-5 py-2.5 text-sm font-bold text-[#2c6b58] shadow-sm transition hover:scale-[1.02] hover:bg-emerald-50 active:scale-[0.98] sm:min-h-0 sm:px-4 sm:py-2 sm:text-xs"
             >
               <Compass className={cn('h-4 w-4', isAnimating && 'animate-spin')} aria-hidden />
               随机换一座城

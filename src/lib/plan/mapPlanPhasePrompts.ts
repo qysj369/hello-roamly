@@ -16,10 +16,13 @@ import {
   buildTransportModeStandards,
 } from '@/lib/map/travelTransportModes';
 import {
+  buildLodgingContinuityConstraint,
+  buildSameCityAccuracyConstraint,
   buildStrictDayCountConstraint,
   resolveEffectivePlanDays,
 } from '@/lib/plan/planDayConstraint';
 import { PLAN_SECTION_MARKERS } from '@/lib/plan/parsePlanSections';
+import { AI_SLOW_TRAVEL_PROMPT_CONSTRAINTS } from '@/lib/config/productPositioning';
 
 /** 自驾模式输出标准 */
 export function buildSelfDriveStandards(): string {
@@ -54,25 +57,32 @@ function buildSelfDriveLegHint(params: {
   return `第${dayNumber}天自驾转场：${fromLabel}→${stopName}，写自驾路线、耗时、过路费与停车，再写${stopName}玩法。`;
 }
 
-const STYLE = `文风：幽默口语、信息真实可用，偶尔 🐌，禁止坐标与机器开场白。`;
+const STYLE = `文风：幽默口语、信息真实可用，偶尔 🐌，禁止坐标与机器开场白；禁止特惠/抢购/预订/下单等电商词。`;
 
-/** 专业旅行顾问输出标准（对标面面俱到） */
+/** 专业旅行顾问输出标准（松弛漫行向） */
 export function buildProfessionalAdvisorStandards(): string {
   return [
-    '【专业顾问标准】每一程须无缝衔接，像真人顾问一样面面俱到：',
+    '【专业顾问标准】每一程须无缝衔接，像本地朋友给路线参考：',
     '1. 交通：家门口→出发站→大交通→抵达站→住宿/景点，每段写地铁/公交/出租车三方案 + 🐌落地最佳，禁止跳段。',
-    '2. 住宿：推荐具体区域/商圈（近地铁/近景点），含大致价位与取舍理由。',
-    '3. 餐饮：早/午/晚各至少1个具体选择（店名或街区），含人均参考价。',
-    '4. 门票：主流景点票价、预约/闭馆提示、学生/联票优惠。',
+    '2. 住宿：推荐具体区域/商圈（近地铁/近老街），含大致价位与取舍理由；用「路线参考」语气，勿推销房源下单。多日单城固定主住宿片区，次日必须从该片区出发。',
+    '3. 餐饮：早/午/晚各至少1个具体选择（店名或街区/门店），含人均参考价。',
+    '4. 门票：主流景点票价、预约/闭馆提示、学生/联票信息（用「建议提前查验」代替「抢购/预订」话术）。',
     '5. 花费：分项可加总，与简介表一致；注明大交通/市内/餐饮/门票/住宿。',
-    '6. 备选：雨天/误车/排队时的Plan B（替代交通或室内方案）。',
-    '7. 中国复杂行程：跨省市须写清具体车站/车次类型/换乘站，禁止模糊「坐车去」。',
+    '6. 节奏：每天预留闲逛/喝茶/散步空档；拒绝一日多景点赶场流水账；优先近郊轻体验与老街古巷。',
+    '7. 备选：雨天/误车/排队时的Plan B（替代交通或室内方案）。',
+    '8. 中国复杂行程：跨省市须写清具体车站/车次类型/换乘站，禁止模糊「坐车去」。',
+    `9. ${buildLodgingContinuityConstraint()}`,
+    `10. ${buildSameCityAccuracyConstraint()}`,
   ].join('\n');
 }
 
-/** 第一阶段：只生成简介 + 行程，为蜗牛提示/避坑预留 token */
+/** 第一阶段：只生成简介 + 行程，为蜗牛提示/避坑预留 token
+ * 产品底线：基础 AI 漫行攻略永久免费（见 productPositioning）。
+ */
 export function buildMapPlanPhase1SystemPrompt(): string {
-  return `你是 hello-roamly 专业穷游规划师。${STYLE}
+  return `你是 hello-roamly 专业漫行规划师。${STYLE}
+
+${AI_SLOW_TRAVEL_PROMPT_CONSTRAINTS}
 
 ${buildProfessionalAdvisorStandards()}
 
@@ -81,15 +91,18 @@ ${PLAN_SECTION_MARKERS.intro}
 ${PLAN_SECTION_MARKERS.itinerary}
 
 规则：
-- 【方案简介】2–3 句 + GFM 花费表（交通/餐饮/门票/住宿/总计，¥整数）。
+- 【方案简介】2–3 句自然段落（预算感+必吃必逛），可用一行极简花费清单；禁止生硬大表。
 - 【行程流水账】门到门写法：跨城须写「家门口→出发站」「大交通」「抵达站→住宿/首站」；每段市内衔接：${buildDoorToDoorSegmentRules(true)} 大城市公交须写到具体站名、换车站与第二路车号。
+- 每天至少留 1 段松弛空档（闲逛/喝茶/散步）；优先老街古巷与近郊轻体验。
 - 若用户需求含多个站点（如「曲阜→微山湖→台儿庄」），须按天分配：第1天在第1站、第2天转第2站……每段转场写全门到门，禁止只规划其中一个地方。
 - 目的地名称必须与用户需求一致，不得替换为其他城市。
 - ${buildItinerarySegmentOutputTemplate()}`;
 }
 
 export function buildMapPlanPhase2SystemPrompt(): string {
-  return `你是 hello-roamly 专业穷游规划师。${STYLE}
+  return `你是 hello-roamly 专业漫行规划师。${STYLE}
+
+${AI_SLOW_TRAVEL_PROMPT_CONSTRAINTS}
 
 本回合**只输出两个区块**（不要重复简介与行程）：
 ${PLAN_SECTION_MARKERS.snailTips}
@@ -97,7 +110,7 @@ ${PLAN_SECTION_MARKERS.pitfalls}
 
 规则：
 - 【蜗牛提示】2–4 句，覆盖交通/美食/省钱，每句具体（店名/街区），以句号结尾。
-- 【避坑指南】2–4 句，覆盖常见踩坑+金额+替代，**必须写完整**。`;
+- 【避坑指南】2–4 句，覆盖常见踩坑+金额+替代，**必须写完整**；禁止电商推销话术。`;
 }
 
 export function buildMapPlanPhase1UserPrompt(
@@ -136,12 +149,15 @@ export function buildMapPlanPhase1UserPrompt(
   const selfDriveLine = intent.selfDrive ? `\n${buildSelfDriveStandards()}` : '';
   const requestedDays = resolveEffectivePlanDays(trimmed, locationName);
   const dayLock = requestedDays ? `\n${buildStrictDayCountConstraint(requestedDays)}` : '';
+  const lodgingLock = `\n${buildLodgingContinuityConstraint()}`;
+  const accuracyLock = `\n${buildSameCityAccuracyConstraint()}`;
 
   return `地点：${locationName}
 需求：${trimmed}${originLine}
-${multiStopStructure ? `${multiStopStructure}\n` : ''}${destLock}${dayLock}${transportLine}${themeLine ? `\n${themeLine}` : ''}${selfDriveLine}${coordinateLine}
+${multiStopStructure ? `${multiStopStructure}\n` : ''}${destLock}${dayLock}${lodgingLock}${accuracyLock}${transportLine}${themeLine ? `\n${themeLine}` : ''}${selfDriveLine}${coordinateLine}
 
-本回合只输出【方案简介】与【行程流水账】，不要写蜗牛提示与避坑指南。`;
+本回合只输出【方案简介】与【行程流水账】，不要写蜗牛提示与避坑指南。
+自检：每天独立「### 第N天」；「今晚住宿片区」连续；同城禁止伪大交通；次日从昨晚同一片区出发。`;
 }
 
 /** 多地联游：仅生成【方案简介】+ 花费表 */
@@ -150,7 +166,7 @@ export function buildMapPlanIntroSystemPrompt(): string {
 
 ${buildProfessionalAdvisorStandards()}
 
-本回合**只输出** ${PLAN_SECTION_MARKERS.intro}（2–3句 + GFM 花费表：交通/餐饮/门票/住宿/总计，¥整数）。
+本回合**只输出** ${PLAN_SECTION_MARKERS.intro}（2–3句自然段 + 可选一行极简花费清单：交通/餐饮/门票/住宿/总计）。
 不要写行程流水账、蜗牛提示、避坑指南。`;
 }
 
@@ -175,7 +191,7 @@ export function buildMapPlanIntroUserPrompt(
 需求：${trimmed}${originLine}
 ${multiStopStructure ? `${multiStopStructure}\n` : ''}${buildStrictDestinationConstraint(locationName)}${dayLock}${transportLine}${themeLine ? `\n${themeLine}` : ''}${selfDriveLine}
 
-只输出【方案简介】与花费表，行程由后续逐天生成。`;
+只输出【方案简介】与花费要点，行程由后续逐天生成。`;
 }
 
 /** 多地联游：单日行程（追加到【行程流水账】） */
@@ -224,7 +240,9 @@ export function buildMapPlanDayUserPrompt(params: {
 需求：${query.trim()}
 ${transportLine ? `\n${transportLine}` : ''}${themeLine ? `\n${themeLine}` : ''}
 ${legHint ? `\n${legHint}\n` : ''}
-只写第${dayNumber}天「${stopName}」的完整一日（含转场/抵达/玩法/餐饮/住宿建议/分项花费），与前后天无缝衔接。`;
+只写第${dayNumber}天「${stopName}」的完整一日（含转场/抵达/玩法/餐饮/住宿建议/分项花费），与前后天无缝衔接。
+${!isFirstDay ? '上午必须从上一晚住宿片区写起；若换区须先写住宿→新片区三方案 + 🐌落地最佳。' : '写明当晚住宿片区，供后续天数连续居住。'}
+${buildLodgingContinuityConstraint()}`;
 }
 
 export function buildMapPlanPhase2UserPrompt(

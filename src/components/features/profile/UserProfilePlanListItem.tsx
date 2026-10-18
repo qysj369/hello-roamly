@@ -34,7 +34,7 @@ function UserProfilePlanListItem({ plan, className }: UserProfilePlanListItemPro
         className,
       )}
     >
-      <div className="relative h-16 w-20 shrink-0 overflow-hidden rounded-lg bg-gradient-to-br from-brand-100 to-violet-100">
+      <div className="relative h-16 w-20 shrink-0 overflow-hidden rounded-lg bg-gradient-to-br from-emerald-50 to-[#f9f7eb]">
         {showCover ? (
           <OptimizedImage
             src={coverUrl!}
@@ -55,7 +55,7 @@ function UserProfilePlanListItem({ plan, className }: UserProfilePlanListItemPro
         <p className="mt-1 text-xs text-slate-600">
           {destination} · {getPlanDaysLabel(plan)} · {getPlanBudgetLabel(plan)}
         </p>
-        <span className="mt-1.5 inline-flex items-center gap-1 rounded-full bg-violet-100 px-2 py-0.5 text-[10px] font-medium text-violet-700">
+        <span className="mt-1.5 inline-flex items-center gap-1 rounded-full bg-emerald-50 px-2 py-0.5 text-[10px] font-medium text-[#2c6b58]">
           <Bot className="h-3 w-3" aria-hidden />
           AI 生成
         </span>

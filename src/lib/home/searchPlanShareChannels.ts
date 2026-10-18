@@ -2,7 +2,7 @@ import { BRAND_DOMAIN } from '@/lib/config/brandCopy';
 import { SITE_PLATFORM_DISCLAIMER, SITE_SHARE_REFERENCE_LINE } from '@/lib/config/siteCompliance';
 import { pickCityShareDouyinScript, pickCityShareXhsNote, type CityShareDouyinScript, type CityShareXhsNote } from '@/data/cityShareSeedKit';
 import { collectSearchPlanShareFragments } from '@/lib/home/searchPlanShareFragments';
-import { searchPlanShareCityName } from '@/lib/home/searchPlanShareCopy';
+import { classifySearchPlanParty, searchPlanShareCityName, searchPlanRouteFlavor } from '@/lib/home/searchPlanShareCopy';
 import { buildSearchPlanShareNote } from '@/lib/home/searchPlanShareNote';
 import type { SearchStructuredPlan } from '@/types/domain/searchStructuredPlan';
 
@@ -149,7 +149,6 @@ function stripShareUrlsAndDays(text: string): string {
     .replace(/\bwww\.\S+/gi, '')
     .replace(/helloroamly\.com/gi, '')
     .replace(/Day\s*[1-9]\d*/gi, '')
-    .replace(/\bD\s*[1-7]\b/gi, '')
     .replace(/第[一二三四五六七八九十\d]+天/g, '');
 }
 
@@ -177,6 +176,129 @@ export function sanitizePosterOverlayText(text: string): string {
     .trim();
 }
 
+function clipSharePhrase(text: string, max = 28): string {
+  return text.replace(/\s+/g, ' ').trim().slice(0, max);
+}
+
+function sharePartyLabel(peopleType: string): string {
+  const focus = classifySearchPlanParty(peopleType);
+  if (focus === 'family') return '亲子慢游';
+  if (focus === 'couple') return '情侣慢游';
+  if (focus === 'solo') return '一人慢游';
+  return '好友慢游';
+}
+
+function shareDayHint(day: SearchStructuredPlan['dayList'][number]): string {
+  const intro = day.spots
+    .map((spot) =>
+      spot.intro
+        .replace(/必体验[:：]?\s*/gu, '')
+        .replace(/时间充裕可选[:：]?\s*/gu, '')
+        .trim(),
+    )
+    .find((text) => text.length >= 4);
+  const introLine = intro?.split(/[。；;]/u)[0]?.trim() ?? '';
+  if (introLine.length >= 4) return clipSharePhrase(introLine);
+  const tipLine = day.tips.split(/[。；;]/u)[0]?.trim() ?? '';
+  if (tipLine.length >= 4) return clipSharePhrase(tipLine);
+  return '按自己的节奏慢慢逛';
+}
+
+function shareDayHighlight(day: SearchStructuredPlan['dayList'][number]): string {
+  const names = day.spots.map((spot) => spot.name.trim()).filter(Boolean).slice(0, 2);
+  const title = day.title.replace(/慢逛|抵达[^，,]*/gu, '').trim();
+  const namePart = names.join('+') || title.slice(0, 16) || '街巷漫步';
+  const food = day.foods[0];
+  const foodBit = food
+    ? `，品尝${clipSharePhrase(
+        [food.shop, (food.dish || '').split(/[、,，]/u)[0]].filter(Boolean).join(''),
+        16,
+      )}`
+    : '';
+  return `D${day.day} ${namePart}，${shareDayHint(day)}${foodBit}`;
+}
+
+function shareOpeningHook(plan: SearchStructuredPlan): string {
+  const city = searchPlanShareCityName(plan);
+  const days = plan.baseInfo.days;
+  const party = sharePartyLabel(plan.baseInfo.peopleType);
+  const spots = plan.dayList.flatMap((day) => day.spots.map((spot) => spot.name.trim()).filter(Boolean));
+  const place = spots.slice(0, 2).join('与') || searchPlanRouteFlavor(plan);
+  return `${city}${days}天${party}｜不用追赶人流，轻松逛${place}`;
+}
+
+function shareSceneLine(plan: SearchStructuredPlan): string {
+  const spots = plan.dayList
+    .flatMap((day) => day.spots.map((spot) => spot.name.trim()).filter(Boolean))
+    .slice(0, 3);
+  const foods = plan.dayList
+    .flatMap((day) =>
+      day.foods.map((food) => food.shop.replace(/（[^）]*）$/u, '').trim()).filter(Boolean),
+    )
+    .slice(0, 2);
+  if (spots.length + foods.length < 2) return '';
+  const head = spots.join('、');
+  return foods.length ? `${head}，再配${foods.join('、')}` : head;
+}
+
+function shareTravelTip(plan: SearchStructuredPlan): string {
+  const traffic = plan.dayList.map((day) => day.traffic?.[0]?.desc?.trim()).find(Boolean);
+  if (traffic) return `出行小提示：${clipSharePhrase(traffic, 36)}`;
+  const hotel = plan.dayList[0]?.hotelArea?.trim();
+  if (hotel) return `出行小提示：住宿优先${clipSharePhrase(hotel, 24)}，少换乘。`;
+  const global = plan.globalTips.find((tip) => tip.trim() && !/预算/.test(tip));
+  if (global) return `出行小提示：${clipSharePhrase(global.replace(/^[^：:]*[:：]/u, ''), 36)}`;
+  return '出行小提示：地铁沿线住宿，近处优先步行。';
+}
+
+/** 发给朋友 / 海报配套文案：开篇 + 三日亮点 + 贴士 + 免责与话题 */
+export function buildStructuredShareCopy(plan: SearchStructuredPlan): string {
+  const highlights = plan.dayList.slice(0, 3).map(shareDayHighlight).join('\n');
+  return withShareFooter(
+    [shareOpeningHook(plan), highlights, shareTravelTip(plan)].filter(Boolean).join('\n'),
+    publicTags(plan),
+  );
+}
+
+function buildWechatShareCopy(plan: SearchStructuredPlan): string {
+  const city = searchPlanShareCityName(plan);
+  const party = sharePartyLabel(plan.baseInfo.peopleType);
+  const hook = `${shareOpeningHook(plan)}。想转给朋友时，就说这是一趟不赶场的${city}${party}。`;
+  return withShareFooter(
+    [hook, plan.dayList.slice(0, 3).map(shareDayHighlight).join('\n'), shareTravelTip(plan)]
+      .filter(Boolean)
+      .join('\n'),
+    publicTags(plan),
+  );
+}
+
+function buildXhsShareCopy(plan: SearchStructuredPlan): string {
+  const city = searchPlanShareCityName(plan);
+  const hook = `${city}这几天，原来可以这么松 🌿`;
+  const scenes = shareSceneLine(plan);
+  const feel = scenes
+    ? `没有赶场清单。${scenes}，把空档留给自己。`
+    : '没有赶场清单，只留江风、小馆和一段自己的步子。';
+  const days = plan.dayList.slice(0, 3).map((day) => `📍 ${shareDayHighlight(day)}`);
+  return withShareFooter(
+    [hook, feel, ...days, shareTravelTip(plan)].join('\n'),
+    `${publicTags(plan)} #城市漫步`,
+  );
+}
+
+function buildDouyinShareCopy(plan: SearchStructuredPlan): string {
+  const city = searchPlanShareCityName(plan);
+  const scenes = shareSceneLine(plan);
+  const spoken = [
+    `${city}这几天，别追人流。`,
+    scenes ? `镜头里就这几处：${scenes}。` : '',
+    ...plan.dayList.slice(0, 3).map(shareDayHighlight),
+    '按自己的节奏就够了。',
+    shareTravelTip(plan),
+  ].filter(Boolean);
+  return withShareFooter(spoken.join('\n'), publicTags(plan));
+}
+
 function fragmentCaptionLine(caption: string): string {
   return (
     caption
@@ -187,30 +309,6 @@ function fragmentCaptionLine(caption: string): string {
       .map((part) => part.trim())
       .find((part) => part.length >= 4) ?? caption
   ).slice(0, 36);
-}
-
-function buildXhsChannelCopy(plan: SearchStructuredPlan): string {
-  const city = searchPlanShareCityName(plan);
-  const seed = pickCityShareXhsNote(plan);
-  const fragments = collectSearchPlanShareFragments(plan).slice(0, 3);
-  const fragmentLines = fragments
-    .map((item) => `${item.name}：${fragmentCaptionLine(item.caption) || `${city}随便走走`}`)
-    .join('\n');
-  const lead = seed
-    ? `${seed.title}\n\n${seed.body}`
-    : `${city}不用赶场，先去${fragments[0]?.name ?? city}停一停。`;
-  return withShareFooter([lead, fragmentLines].filter(Boolean).join('\n\n'), publicTags(plan));
-}
-
-/** 微信朋友圈：一两句点位，不写预算和外链 */
-function buildWechatMomentsCopy(plan: SearchStructuredPlan): string {
-  const city = searchPlanShareCityName(plan);
-  const fragments = collectSearchPlanShareFragments(plan).slice(0, 3);
-  const names = fragments.map((item) => item.name).filter(Boolean);
-  const lead = names.length
-    ? `${city}周末不用赶。${names.join('、')}随便走走。`
-    : `${city}周末不用赶，按自己的节奏随便走走。`;
-  return withShareFooter(lead, publicTags(plan));
 }
 
 /** 知乎轻量问答：长一点但仍是碎片点位，不写成套行程 */
@@ -270,22 +368,19 @@ export function buildSearchPlanChannelCopy(
   plan: SearchStructuredPlan,
   _shareUrl?: string,
 ): string {
-  if (channel === 'wechat') {
-    return buildWechatMomentsCopy(plan);
-  }
+  if (channel === 'wechat') return buildWechatShareCopy(plan);
+  if (channel === 'xhs') return buildXhsShareCopy(plan);
+  if (channel === 'douyin') return buildDouyinShareCopy(plan);
   if (channel === 'zhihu') {
     return buildZhihuAnswerCopy(plan);
   }
-  if (channel === 'douyin' || channel === 'bilibili' || channel === 'kuaishou') {
+  if (channel === 'bilibili' || channel === 'kuaishou') {
     const script = pickCityShareDouyinScript(plan);
     if (script) return buildCityShareDouyinCopy(script);
     return withShareFooter(
       buildSearchPlanShareNote(plan, { density: 'spoken', publicSafe: true, tags: false }),
       publicTags(plan),
     );
-  }
-  if (channel === 'xhs') {
-    return buildXhsChannelCopy(plan);
   }
   const note = pickCityShareXhsNote(plan);
   if (note) return buildCityShareXhsCopy(note);
@@ -309,26 +404,33 @@ export function searchPlanComposeAppUrl(channel: SearchPlanShareChannel, copy: s
 
 export function searchPlanExportHint(channelId: 'wechat' | 'douyin' | 'xhs'): string {
   if (channelId === 'xhs') {
-    return '小红书图文素材已全部就绪。';
+    return '种草文案已复制，汇总海报已保存。打开小红书发图文：选刚保存的海报，输入框长按粘贴。';
   }
   if (channelId === 'wechat') {
-    return '图已下载，话已复制。打开微信发这张图，输入框长按粘贴。电脑请用手机扫下面的码。';
+    return '短文案已复制，汇总海报已保存。打开微信发图后，输入框长按粘贴。';
   }
-  return '竖版图已下载，口播已复制。打开抖音发图文，选这张图，输入框长按粘贴。';
+  return '口播已复制，汇总海报已保存。打开抖音发图文：选刚保存的海报，输入框长按粘贴。';
 }
 
-export function searchPlanExportSteps(channelId: 'wechat' | 'douyin'): string[] {
+export function searchPlanExportSteps(channelId: 'wechat' | 'douyin' | 'xhs'): string[] {
   if (channelId === 'wechat') {
     return [
-      '打开微信，选好友或朋友圈。',
-      '从相册或「下载」里选刚保存的图。',
-      '输入框长按「粘贴」。',
+      '复制走心短文，再下载封面+三日行程汇总海报。',
+      '打开微信发给朋友或朋友圈。',
+      '从相册选刚保存的海报，输入框长按粘贴。',
+    ];
+  }
+  if (channelId === 'xhs') {
+    return [
+      '复制种草文案，再下载封面+三日行程汇总海报。',
+      '打开小红书，点 + 发图文。',
+      '选刚保存的海报，输入框长按粘贴文案。',
     ];
   }
   return [
+    '复制口播短句，再下载竖版行程汇总海报。',
     '打开抖音，点 + 发图文。',
-    '选刚下载的竖版图。',
-    '输入框长按「粘贴」。不要只发文字日常。',
+    '选刚保存的海报，输入框长按粘贴。',
   ];
 }
 

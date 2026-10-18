@@ -20,6 +20,8 @@ import {
   type SessionPreferenceOverride,
 } from '@/lib/agent/travelPreferenceMemory';
 import type { SearchExtractParams } from '@/lib/home/extractSearchParams';
+import { isSnailFlightPageActive, matchSnailFlightButler } from '@/lib/snail-flight/butlerCommands';
+import { useSnailFlightCaptionStore } from '@/lib/snail-flight/captionPackStore';
 import type { SearchStructuredPlan } from '@/types/domain/searchStructuredPlan';
 
 export type { TravelAgentMessage };
@@ -43,6 +45,7 @@ type TravelAgentState = {
   adoptPlan: (plan: SearchStructuredPlan | null) => void;
   startRemix: (plan: SearchStructuredPlan, title: string) => void;
   send: (text: string) => Promise<void>;
+  noteLocal: (userText: string, assistantText: string) => void;
   runTool: (tool: TravelAgentToolName) => Promise<void>;
   rollback: () => void;
   resetPreference: () => void;
@@ -95,7 +98,33 @@ export const useTravelAgentStore = create<TravelAgentState>((set, get) => ({
           : state.messages;
       return { open: true, messages };
     }),
-  closeChat: () => set({ open: false, posterOpen: false, shareOpen: false }),
+  closeChat: () =>
+    set((state) => {
+      const spiralPage =
+        typeof document !== 'undefined' &&
+        document.documentElement.classList.contains('spiral-home-active');
+      const messages =
+        spiralPage && state.messages.length > 40 ? state.messages.slice(-40) : state.messages;
+      if (messages !== state.messages) persist({ ...state, messages });
+      return { open: false, posterOpen: false, shareOpen: false, messages };
+    }),
+  noteLocal: (userText, assistantText) =>
+    set((state) => {
+      const user = userText.trim();
+      const assistant = assistantText.trim();
+      if (!user || !assistant) return state;
+      const next = {
+        ...state,
+        open: true,
+        messages: [
+          ...state.messages,
+          { id: uid(), role: 'user' as const, text: user },
+          { id: uid(), role: 'assistant' as const, text: assistant },
+        ],
+      };
+      persist(next);
+      return next;
+    }),
   closePoster: () => set({ posterOpen: false }),
   closeShare: () => set({ shareOpen: false }),
 
@@ -139,6 +168,29 @@ export const useTravelAgentStore = create<TravelAgentState>((set, get) => ({
   send: async (text) => {
     const trimmed = text.trim();
     if (!trimmed || get().busy) return;
+    if (isSnailFlightPageActive()) {
+      const hit = matchSnailFlightButler(trimmed, useSnailFlightCaptionStore.getState().progress);
+      if (hit) {
+        if (hit.packId) {
+          useSnailFlightCaptionStore.getState().setPack(hit.packId);
+        }
+        set((state) => {
+          const next = {
+            ...state,
+            open: true,
+            busy: false,
+            messages: [
+              ...state.messages,
+              { id: uid(), role: 'user' as const, text: trimmed },
+              { id: uid(), role: 'assistant' as const, text: hit.message },
+            ],
+          };
+          persist(next);
+          return next;
+        });
+        return;
+      }
+    }
     set((state) => ({
       open: true,
       busy: true,
@@ -234,7 +286,15 @@ export const useTravelAgentStore = create<TravelAgentState>((set, get) => ({
         busy: false,
         messages: [
           ...state.messages,
-          { id: uid(), role: 'assistant', text: '这一轮没处理完，请再试一句。' },
+          {
+            id: uid(),
+            role: 'assistant',
+            text:
+              typeof document !== 'undefined' &&
+              document.documentElement.classList.contains('spiral-home-active')
+                ? '这一程没连上，请稍后再试一句；也可以先说目的地和天数。'
+                : '这一轮没处理完，请再试一句。',
+          },
         ],
       }));
     }

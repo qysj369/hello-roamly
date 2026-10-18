@@ -21,7 +21,7 @@ export default function HomeHotCities({ activeQuery, onSelect }: HomeHotCitiesPr
     >
       <p className="font-mono text-xs uppercase tracking-[0.15em] text-emerald-700">快捷出发</p>
       <h2 id="home-hot-cities-title" className="mt-0.5 text-base font-bold text-slate-900 sm:text-lg">
-        热门穷游目的地
+        热门漫行目的地
       </h2>
       <p className="mt-1 text-xs text-slate-500">点城市填入搜索，地图自动定位并规划同类轨迹</p>
 

@@ -1,4 +1,5 @@
 import { trackShareOutcome } from '@/lib/share/analytics/trackShareEvent';
+import { withBrandShareTitle } from '@/lib/config/brandMindshare';
 import { buildShareUrl } from '@/lib/share/shareUrl';
 import { profilePathForUser } from '@/router/paths';
 import type { User } from '@/types/domain/user/user';
@@ -28,14 +29,15 @@ export async function shareUserProfile(
   const tracking = { contentKind: 'user_profile' as const, contentId: user.id };
   const url = buildShareUrl(getUserProfileSharePath(user, isOwnProfile), tracking);
   const text = getUserProfileShareSummary(user, isOwnProfile);
+  const title = withBrandShareTitle(`${user.username} · HelloRoamly`);
 
   try {
     if (navigator.share) {
-      await navigator.share({ title: `${user.username} · Hello Roamly`, text, url });
+      await navigator.share({ title, text, url });
       trackShareOutcome(tracking, 'shared', { channel: 'native', shareUrl: url });
       return 'shared';
     }
-    await navigator.clipboard.writeText(`${text}\n${url}`);
+    await navigator.clipboard.writeText(`${title}\n${text}\n${url}`);
     trackShareOutcome(tracking, 'copied', { channel: 'link', shareUrl: url });
     return 'copied';
   } catch (error) {
@@ -43,7 +45,7 @@ export async function shareUserProfile(
       return 'cancelled';
     }
     try {
-      await navigator.clipboard.writeText(`${text}\n${url}`);
+      await navigator.clipboard.writeText(`${title}\n${text}\n${url}`);
       trackShareOutcome(tracking, 'copied', { channel: 'link', shareUrl: url });
       return 'copied';
     } catch {

@@ -24,25 +24,25 @@ export default function DiscoverRecommendExplainDialog({
       className="max-w-lg"
     >
       <div className="space-y-4">
-        <div className="rounded-xl border border-violet-100 bg-violet-50/80 p-3">
-          <p className="text-xs font-semibold text-violet-900">你的兴趣画像</p>
-          <ul className="mt-2 space-y-1 text-xs text-violet-950/90">
+        <div className="rounded-xl border border-[#b7cdc4] bg-emerald-50/80 p-3">
+          <p className="text-xs font-semibold text-[#2c6b58]">你的兴趣画像</p>
+          <ul className="mt-2 space-y-1 text-xs text-[#2c6b58]/90">
             <li>
-              <span className="text-violet-700">关注兴趣：</span>
+              <span className="text-[#2c6b58]">关注兴趣：</span>
               {profile.interestLabels.join('、') || '未设置'}
             </li>
             <li>
-              <span className="text-violet-700">旅行性格：</span>
+              <span className="text-[#2c6b58]">旅行性格：</span>
               {profile.personalityTitle}
               {profile.personalityTraits.length > 0 && (
-                <span className="text-violet-800/80">
+                <span className="text-[#54786c]">
                   {' '}
                   · {profile.personalityTraits.join('、')}
                 </span>
               )}
             </li>
             <li>
-              <span className="text-violet-700">足迹：</span>
+              <span className="text-[#2c6b58]">足迹：</span>
               {profile.visitedLabels.length > 0 ? profile.visitedLabels.join('、') : '暂无记录'}
             </li>
           </ul>

@@ -44,7 +44,7 @@ const CITY_FOOD_PHOTOS: Record<string, readonly CityFoodPhoto[]> = {
   上海: [
     { src: '/plan-scenes/shanghai/spot-food-shengjian.jpg', keys: ['生煎'] },
     { src: '/plan-scenes/shanghai/spot-food-xiaolong.jpg', keys: ['小笼', '南翔'] },
-    { src: '/plan-scenes/shanghai/spot-food-xiaolong.jpg', keys: ['沈大成', '点心', '糕'] },
+    { src: '/plan-scenes/shanghai/spot-food-shendacheng.jpg', keys: ['沈大成', '点心', '糕'] },
     { src: '/plan-scenes/shanghai/spot-food-benbang.jpg', keys: ['本帮', '红烧'] },
     { src: '/plan-scenes/shanghai/spot-food-cafe.jpg', keys: ['咖啡'] },
   ],
@@ -59,7 +59,7 @@ const FOOD_SRC_HINT = /food|dimsum|dumpling|noodle|hotpot|mapo|cantonese|shengji
 
 function moodPlaceholder(kind: 'scenery' | 'food'): string {
   const [c0, c1] =
-    kind === 'food' ? (['#f3ebe0', '#d9c8b4'] as const) : (['#e8f0e4', '#c5d4b8'] as const);
+    kind === 'food' ? (['#eceae4', '#d5d2c8'] as const) : (['#e8e6e0', '#d2cfc6'] as const);
   const mark = kind === 'food' ? '食' : '景';
   const svg = `<svg xmlns="http://www.w3.org/2000/svg" width="800" height="300" viewBox="0 0 800 300" role="img">
   <defs>
@@ -122,7 +122,82 @@ type PlanAsideHint = {
   }>;
 };
 
-const MIN_ASIDE_CARDS = 4;
+const MAX_ASIDE_CARDS = 24;
+export const MIN_ASIDE_PREVIEW_CARDS = 6;
+
+/** 侧栏补图：只用仓库已有实拍，不新造照片 */
+const CITY_ASIDE_PAD_SCENERY: Record<string, readonly PlanCitySceneryCard[]> = {
+  上海: [
+    { name: '外滩晨光', photoPath: '/city-kit/shanghai/spot-bund.jpg' },
+    { name: '陆家嘴夜色', photoPath: '/city-kit/shanghai/spot-bund-night.jpg' },
+    { name: '豫园灯影', photoPath: '/city-kit/shanghai/spot-yuyuan.jpg' },
+    { name: '黄浦江畔', photoPath: '/city-kit/shanghai/cover.jpg' },
+  ],
+  杭州: [
+    { name: '运河水巷', photoPath: '/city-kit/hangzhou/spot-canal.jpg' },
+    { name: '龙井茶园', photoPath: '/city-kit/hangzhou/spot-longjing.jpg' },
+    { name: '茶园闲坐', photoPath: '/city-kit/hangzhou/spot-teagarden.jpg' },
+    { name: '西湖晨雾', photoPath: '/city-kit/hangzhou/cover.jpg' },
+  ],
+  北京: [
+    { name: '南锣鼓巷', photoPath: '/city-kit/beijing/spot-nanluo.jpg' },
+    { name: '京城一角', photoPath: '/city-kit/beijing/cover.jpg' },
+  ],
+  广州: [
+    { name: '小蛮腰夜色', photoPath: '/city-kit/guangzhou/spot-tower-night.jpg' },
+    { name: '珠江畔', photoPath: '/city-kit/guangzhou/cover.jpg' },
+  ],
+  成都: [
+    { name: '熊猫基地', photoPath: '/city-kit/chengdu/spot-panda.jpg' },
+    { name: '锦里夜色', photoPath: '/city-kit/chengdu/cover.jpg' },
+  ],
+};
+
+export type PlanAsidePreviewCard = {
+  key: string;
+  variant: 'scenery' | 'food';
+  name: string;
+  photoPath: string;
+};
+
+function padAtmospherePhotos(cityName: string, atmosphere: PlanCityAtmosphere): PlanCityAtmosphere {
+  const used = new Set(
+    [...atmosphere.scenery, ...atmosphere.foods].map((item) => item.photoPath).filter(Boolean),
+  );
+  const scenery = [...atmosphere.scenery];
+  for (const extra of CITY_ASIDE_PAD_SCENERY[cityName] ?? []) {
+    if (used.size >= MIN_ASIDE_PREVIEW_CARDS) break;
+    if (!extra.photoPath || used.has(extra.photoPath) || isPlanAsideFoodPhoto(extra.photoPath)) continue;
+    used.add(extra.photoPath);
+    scenery.push(extra);
+  }
+  return { ...atmosphere, scenery };
+}
+
+export function listPlanAsidePreviewCards(atmosphere: PlanCityAtmosphere): PlanAsidePreviewCard[] {
+  const used = new Set<string>();
+  const cards: PlanAsidePreviewCard[] = [];
+  const push = (variant: 'scenery' | 'food', name: string, photoPath: string) => {
+    const src = photoPath.trim();
+    if (!src || used.has(src)) return;
+    used.add(src);
+    cards.push({ key: `${variant}-${src}`, variant, name, photoPath: src });
+  };
+  const max = Math.max(atmosphere.scenery.length, atmosphere.foods.length);
+  for (let index = 0; index < max; index += 1) {
+    const spot = atmosphere.scenery[index];
+    if (spot) push('scenery', spot.name, spot.photoPath);
+    const food = atmosphere.foods[index];
+    if (food) push('food', food.name, food.photoPath);
+  }
+  if (cards.length < MIN_ASIDE_PREVIEW_CARDS) {
+    for (const extra of CITY_ASIDE_PAD_SCENERY[atmosphere.cityName] ?? []) {
+      if (cards.length >= MIN_ASIDE_PREVIEW_CARDS) break;
+      push('scenery', extra.name, extra.photoPath);
+    }
+  }
+  return cards;
+}
 
 function scoreAsideAsset(asset: PlanAsideAsset, hay: string, party: SearchPlanPartyFocus): number {
   const hayHit =
@@ -160,11 +235,11 @@ function pickShanghaiAside(
     if (row.score > 0) take(row.asset);
   }
   for (const row of ranked) {
-    if (picked.length >= MIN_ASIDE_CARDS) break;
+    if (picked.length >= MAX_ASIDE_CARDS) break;
     take(row.asset);
   }
 
-  const cards = picked.slice(0, 12);
+  const cards = picked.slice(0, MAX_ASIDE_CARDS);
   return {
     scenery: cards
       .filter((item) => item.kind !== 'food')
@@ -214,14 +289,18 @@ export function getPlanCityAtmosphere(
 
   if (kit.name === '上海') {
     const picked = pickShanghaiAside(hay, party);
-    return { cityName: kit.name, scenery: picked.scenery, foods: picked.foods };
+    return padAtmospherePhotos(kit.name, {
+      cityName: kit.name,
+      scenery: picked.scenery,
+      foods: picked.foods,
+    });
   }
 
   const usedFood = new Set<string>();
   const sceneryMatched = hay ? kit.spots.filter((spot) => sceneryMatchesPlan(spot, hay)) : [];
   const scenerySource: HoloCitySpotKit[] = [...sceneryMatched];
   for (const spot of kit.spots) {
-    if (scenerySource.length >= MIN_ASIDE_CARDS) break;
+    if (scenerySource.length >= MAX_ASIDE_CARDS) break;
     if (!scenerySource.some((item) => item.photoPath === spot.photoPath)) {
       scenerySource.push(spot);
     }
@@ -242,9 +321,9 @@ export function getPlanCityAtmosphere(
     place: foodPlaceHint(kit.name, name),
   }));
 
-  return {
+  return padAtmospherePhotos(kit.name, {
     cityName: kit.name,
     scenery,
     foods,
-  };
+  });
 }

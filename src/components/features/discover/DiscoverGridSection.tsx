@@ -33,7 +33,7 @@ export default function DiscoverGridSection({
       <div className="flex items-end justify-between gap-2">
         <div className="min-w-0">
           <h2 id={id} className="flex items-center gap-1.5 text-sm font-semibold text-slate-900">
-            <Icon className="h-4 w-4 shrink-0 text-violet-600" aria-hidden />
+            <Icon className="h-4 w-4 shrink-0 text-[#2c6b58]" aria-hidden />
             {title}
             {count != null && (
               <span className="rounded-full bg-slate-100 px-2 py-0.5 text-[10px] font-medium text-slate-600">
@@ -45,12 +45,12 @@ export default function DiscoverGridSection({
             <p className="mt-0.5 text-xs text-slate-500">
               {subtitle}
               {subtitle && sortHint && ' · '}
-              {sortHint && <span className="text-violet-600/90">{sortHint}</span>}
+              {sortHint && <span className="text-[#2c6b58]/90">{sortHint}</span>}
             </p>
           )}
         </div>
         {href && (
-          <Link to={href} className="shrink-0 text-xs font-medium text-violet-700 hover:underline">
+          <Link to={href} className="shrink-0 text-xs font-medium text-[#2c6b58] hover:underline">
             {linkLabel}
           </Link>
         )}

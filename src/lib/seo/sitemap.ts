@@ -68,6 +68,14 @@ export function collectSitemapEntries(): SitemapEntry[] {
     { path: paths.profile, changefreq: 'weekly', priority: 0.5 },
     { path: paths.about, changefreq: 'monthly', priority: 0.4, lastmod: today },
     { path: paths.snailCulture, changefreq: 'monthly', priority: 0.35, lastmod: today },
+    { path: paths.cities, changefreq: 'weekly', priority: 0.8, lastmod: today },
+    { path: paths.budget, changefreq: 'monthly', priority: 0.55, lastmod: today },
+    { path: paths.mp, changefreq: 'weekly', priority: 0.5, lastmod: today },
+    { path: paths.inspire, changefreq: 'weekly', priority: 0.85, lastmod: today },
+    { path: paths.privacy, changefreq: 'monthly', priority: 0.3, lastmod: today },
+    { path: paths.terms, changefreq: 'monthly', priority: 0.3, lastmod: today },
+    { path: paths.contact, changefreq: 'monthly', priority: 0.3, lastmod: today },
+    { path: paths.feedback, changefreq: 'monthly', priority: 0.3, lastmod: today },
   ];
 
   const guidePages: SitemapEntry[] = demoGuides.map((guide) => ({

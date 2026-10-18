@@ -81,12 +81,12 @@ export default function DiscoverFilterStatus({
   return (
     <div
       className={cn(
-        'space-y-2 rounded-2xl border border-violet-200 bg-gradient-to-r from-violet-50 to-fuchsia-50/70 px-4 py-3 shadow-sm',
+        'space-y-2 rounded-2xl border border-[#b7cdc4] bg-gradient-to-r from-emerald-50 to-[#fffef6] px-4 py-3 shadow-sm',
         className,
       )}
     >
       <div className="flex flex-wrap items-center justify-between gap-2">
-        <p className="text-sm font-semibold text-violet-900">
+        <p className="text-sm font-semibold text-[#2c6b58]">
           {total > 0 ? `已找到 ${total} 条旅行灵感` : '这组条件暂时没有内容'}
         </p>
         <div className="flex shrink-0 gap-2">
@@ -94,7 +94,7 @@ export default function DiscoverFilterStatus({
             <button
               type="button"
               onClick={onJumpToFeed}
-              className="inline-flex items-center gap-1 rounded-full bg-violet-600 px-3 py-1.5 text-xs font-semibold text-white hover:bg-violet-700"
+              className="inline-flex items-center gap-1 rounded-full bg-[#2c6b58] px-3 py-1.5 text-xs font-semibold text-white hover:bg-[#245a4a]"
             >
               往下看
               <ChevronDown className="h-3.5 w-3.5" aria-hidden />
@@ -103,7 +103,7 @@ export default function DiscoverFilterStatus({
             <button
               type="button"
               onClick={onRelax}
-              className="rounded-full bg-violet-600 px-3 py-1.5 text-xs font-semibold text-white hover:bg-violet-700"
+              className="rounded-full bg-[#2c6b58] px-3 py-1.5 text-xs font-semibold text-white hover:bg-[#245a4a]"
             >
               换一组条件
             </button>
@@ -111,7 +111,7 @@ export default function DiscoverFilterStatus({
           <button
             type="button"
             onClick={onReset}
-            className="inline-flex items-center gap-1 rounded-full border border-violet-300 bg-white px-3 py-1.5 text-xs font-semibold text-violet-800 hover:bg-violet-100"
+            className="inline-flex items-center gap-1 rounded-full border border-[#b7cdc4] bg-white px-3 py-1.5 text-xs font-semibold text-[#2c6b58] hover:bg-emerald-50"
           >
             <RotateCcw className="h-3 w-3" aria-hidden />
             重置
@@ -126,7 +126,7 @@ export default function DiscoverFilterStatus({
               key={chip.key}
               type="button"
               onClick={chip.onRemove}
-              className="inline-flex items-center gap-1 rounded-full border border-violet-200 bg-white/90 px-2.5 py-1 text-xs font-medium text-violet-900 hover:bg-white"
+              className="inline-flex items-center gap-1 rounded-full border border-[#b7cdc4] bg-white/90 px-2.5 py-1 text-xs font-medium text-[#2c6b58] hover:bg-white"
             >
               {chip.label}
               <X className="h-3 w-3 opacity-60" aria-hidden />

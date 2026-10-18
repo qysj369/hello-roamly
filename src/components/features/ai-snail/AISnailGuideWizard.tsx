@@ -3,6 +3,7 @@ import { Loader2, RotateCcw } from 'lucide-react';
 import AiSnailGuideMessage from '@/components/features/ai-snail/AiSnailGuideMessage';
 import AiSnailGuidePublishSection from '@/components/features/ai-snail/AiSnailGuidePublishSection';
 import AiSnailGuideStepPanel from '@/components/features/ai-snail/AiSnailGuideStepPanel';
+import AiSnailStepProgress from '@/components/features/ai-snail/AiSnailStepProgress';
 import ProductionModeNotice from '@/components/features/app/ProductionModeNotice';
 import { AsyncFeedback } from '@/components/ui';
 import { useAISnailGuideWizard, useAiSnailScrollToBottom } from '@/hooks/ai/useAISnailGuideWizard';
@@ -12,6 +13,7 @@ import { AI_SNAIL_ASSISTANT_NAME } from '@/types/domain/aiSnailGuide';
 import type { AiSnailGuideResult } from '@/types/domain/aiSnailGuide';
 import type { GuidePublishEditorDraft } from '@/types/domain/guidePublish';
 import { cn } from '@/utils/cn';
+import '@/styles/holo-inner.css';
 
 export type AISnailGuideWizardProps = {
   className?: string;
@@ -51,33 +53,33 @@ export default function AISnailGuideWizard({
   }, [initialDestination, step, submitDestination]);
 
   return (
-    <div className={cn('space-y-4', className)}>
+    <div className={cn('holo-ai-snail__wizard space-y-4', className)}>
+      <AiSnailStepProgress step={step} />
+
       <div
         className={cn(
-          'flex flex-col overflow-hidden rounded-2xl border border-slate-200/90 bg-slate-50/50 shadow-sm',
+          'holo-ai-snail__panel flex flex-col overflow-hidden',
           inEditorPhase
             ? 'max-h-[14rem]'
-            : 'h-[min(36rem,calc(100dvh-10rem))] max-h-[calc(100dvh-10rem)]',
+            : 'h-[min(36rem,calc(100dvh-12rem))] max-h-[calc(100dvh-12rem)]',
         )}
       >
-        <header className="flex items-center justify-between gap-3 border-b border-slate-200/80 bg-white px-4 py-3">
+        <header className="holo-ai-snail__panel-header flex items-center justify-between gap-3 px-4 py-3">
           <div className="min-w-0">
-            <h2 className="flex items-center gap-2 text-sm font-bold text-slate-900">
+            <h2 className="flex items-center gap-2 text-sm font-bold">
               <span aria-hidden>🐌</span>
               {AI_SNAIL_ASSISTANT_NAME}
               {inEditorPhase && (
-                <span className="rounded-full bg-emerald-100 px-2 py-0.5 text-[10px] font-semibold text-emerald-800">
-                  草稿已生成
-                </span>
+                <span className="holo-ai-snail__badge">草稿已生成</span>
               )}
             </h2>
-            <p className="mt-0.5 text-xs text-slate-500">
+            <p className="holo-ai-snail__meta mt-0.5 text-xs">
               {aiProvider === 'deepseek'
-                ? '已连接 DeepSeek · 经 /api/ai/generate-guide 生成'
+                ? '已连接 DeepSeek · 经服务端生成'
                 : aiProvider === 'unconfigured'
                   ? `上线模式 · ${getAiProviderDisplayLabel(aiProvider)}`
                   : isProductionAppMode()
-                    ? '请配置 DEEPSEEK_API_KEY 或 VITE_DEEPSEEK_API_KEY'
+                    ? '请配置服务端 DEEPSEEK_API_KEY'
                     : '演示模式 · 配置 API Key 后启用真实生成'}
             </p>
           </div>
@@ -85,7 +87,7 @@ export default function AISnailGuideWizard({
             type="button"
             onClick={wizard.reset}
             disabled={wizard.isGenerating}
-            className="inline-flex shrink-0 items-center gap-1.5 rounded-lg border border-slate-200 px-3 py-1.5 text-xs font-medium text-slate-600 transition hover:bg-slate-50 disabled:opacity-50"
+            className="holo-ai-snail__ghost-btn inline-flex shrink-0 items-center gap-1.5 px-3 py-1.5 text-xs font-medium disabled:opacity-50"
           >
             <RotateCcw className="h-3.5 w-3.5" aria-hidden />
             重新开始
@@ -106,8 +108,8 @@ export default function AISnailGuideWizard({
             <AiSnailGuideMessage key={message.id} message={message} />
           ))}
           {wizard.isGenerating && (
-            <div className="flex items-center gap-2 pl-10 text-xs text-slate-500">
-              <Loader2 className="h-3.5 w-3.5 animate-spin text-emerald-600" aria-hidden />
+            <div className="holo-ai-snail__meta flex items-center gap-2 pl-10 text-xs">
+              <Loader2 className="h-3.5 w-3.5 animate-spin" aria-hidden />
               正在通过 API 生成攻略…
             </div>
           )}

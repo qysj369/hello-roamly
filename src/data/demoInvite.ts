@@ -32,6 +32,13 @@ export const DEFAULT_INVITE_REWARDS: InviteReward[] = [
     status: 'pending',
     condition: '累计邀请 5 位且至少 2 位发布动态',
   },
+  {
+    id: 'reward-invite-city-pack',
+    kind: 'coupon',
+    label: '高清城市灵感素材包',
+    status: 'pending',
+    condition: '邀请 1 位好友完成注册后解锁',
+  },
 ];
 
 export const DEFAULT_DEMO_REFERRALS: InviteReferralRow[] = [

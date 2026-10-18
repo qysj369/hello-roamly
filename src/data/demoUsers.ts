@@ -43,7 +43,7 @@ export const DEMO_USERS: User[] = [
         id: 'moment-1',
         description: '西湖边清晨的葱包烩，配一碗豆浆，才是杭州的正确打开方式。',
         content: '西湖边清晨的葱包烩，配一碗豆浆，才是杭州的正确打开方式。',
-        tags: ['美食', '城市漫步', '穷游'],
+        tags: ['美食', '城市漫步', '漫行'],
         location: '西湖 · 杭州',
         countryCode: 'CN',
         imageUrls: ['https://picsum.photos/seed/roamly-hz/800/600'],
@@ -55,9 +55,9 @@ export const DEMO_USERS: User[] = [
       },
       {
         id: 'moment-2',
-        description: '清迈夜市芒果糯米饭，甜而不腻，穷游党必吃。',
-        content: '清迈夜市芒果糯米饭，甜而不腻，穷游党必吃。',
-        tags: ['美食', '夜市', '穷游'],
+        description: '清迈夜市芒果糯米饭，甜而不腻，漫行党必吃。',
+        content: '清迈夜市芒果糯米饭，甜而不腻，漫行党必吃。',
+        tags: ['美食', '夜市', '漫行'],
         location: '清迈夜市',
         countryCode: 'TH',
         imageUrls: [

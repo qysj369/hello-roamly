@@ -39,7 +39,7 @@ export default function GuidesPage() {
   ]);
 
   return (
-    <MotionPage className="flex flex-col gap-4">
+    <MotionPage className="holo-guides flex flex-col gap-4">
       {routeState?.source !== 'capsule_one' ? (
         <MotionBlock>
           <GuidesAiBanner state={routeState} />
@@ -62,22 +62,20 @@ export default function GuidesPage() {
       </MotionBlock>
 
       <MotionBlock>
-        <section className="rounded-2xl border border-slate-200 bg-white p-5 shadow-sm">
+        <section className="holo-guides__panel">
           <div className="flex flex-wrap items-start justify-between gap-3">
             <div>
-              <h1 className="text-base font-semibold text-slate-900">{SNAIL_UI_COPY.guidesLibraryTitle}</h1>
-              <p className="mt-1 text-sm text-slate-600">{SNAIL_UI_COPY.guidesLibrarySubtitle}</p>            </div>
-            <Link
-              to={paths.guidesPublish}
-              className="inline-flex items-center rounded-xl bg-gradient-to-r from-emerald-600 to-teal-600 px-4 py-2 text-sm font-semibold text-white shadow-sm hover:brightness-105"
-            >
+              <h1 className="holo-guides__title">{SNAIL_UI_COPY.guidesLibraryTitle}</h1>
+              <p className="holo-guides__subtitle">{SNAIL_UI_COPY.guidesLibrarySubtitle}</p>
+            </div>
+            <Link to={paths.guidesPublish} className="holo-guides__cta">
               {SLIME_TRAIL_PUBLISHER.title}
             </Link>
           </div>
-          <p id="guides-search-label" className="mt-4 text-sm font-medium text-slate-700">
+          <p id="guides-search-label" className="holo-guides__label">
             关键词
             {isDebouncing && (
-              <span className="ml-2 text-xs font-normal text-slate-400">筛选中…</span>
+              <span className="ml-2 text-xs font-normal opacity-70">筛选中…</span>
             )}
           </p>
           <input
@@ -85,7 +83,8 @@ export default function GuidesPage() {
             aria-labelledby="guides-search-label"
             value={searchQuery}
             onChange={(event) => setSearchQuery(event.target.value)}
-            placeholder={SNAIL_UI_COPY.guidesSearchPlaceholder}            className="mt-1 block w-full rounded-lg border-slate-300 shadow-sm focus:border-brand-500 focus:ring-brand-500"
+            placeholder={SNAIL_UI_COPY.guidesSearchPlaceholder}
+            className="holo-guides__input"
           />
         </section>
       </MotionBlock>
@@ -94,7 +93,8 @@ export default function GuidesPage() {
         <GuideCardList
           guides={guides}
           title={SNAIL_UI_COPY.guidesListTitle}
-          subtitle="点击卡片查看黏液轨迹详情，或在卡片内打开地图"        />
+          subtitle="点击卡片查看黏液轨迹详情，或在卡片内打开地图"
+        />
       </MotionBlock>
     </MotionPage>
   );

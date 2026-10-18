@@ -109,10 +109,12 @@ body:not(:has(.capsule-app-shell)):not(:has(.holo-app-shell)) .action-btn {
  * 隐藏态必须带 :not(.ft-active)，否则 :not(.sticky):not(.fixed) 比 .ft-active 更高，
  * 会导致已激活板块仍 opacity:0 → 首页地图整块空白。
  * 地图 hero 首屏直出，不参与渐入（避免 WebGL 底图被透明度藏住）。 */
-body:not(:has(.capsule-app-shell)):not(:has(.holo-app-shell))
+body:not(:has(.capsule-app-shell)):not(:has(.holo-app-shell)):not(:has(.holo-inner-shell))
   #main-content
   section:not(.sticky):not(.fixed):not(.ft-active):not(.home-map-trail-wall):not([aria-label='地图一键规划']),
-body:not(:has(.capsule-app-shell)):not(:has(.holo-app-shell)) #main-content .ft-fade-block:not(.ft-active) {
+body:not(:has(.capsule-app-shell)):not(:has(.holo-app-shell)):not(:has(.holo-inner-shell))
+  #main-content
+  .ft-fade-block:not(.ft-active) {
   opacity: 0;
   transform: translateY(28px);
   transition:

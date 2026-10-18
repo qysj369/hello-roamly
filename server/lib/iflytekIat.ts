@@ -356,6 +356,8 @@ export class IflytekIatStreamSession {
         this.wpgs.reset();
         if (finalText) {
           this.callbacks.onFinal?.(finalText);
+        } else {
+          this.callbacks.onError?.('没听清，请靠近麦克风大声说完整句子后再点「说完了」');
         }
         if (!this.closed) {
           try {

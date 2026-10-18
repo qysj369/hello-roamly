@@ -36,5 +36,6 @@ src/_verify_precommit_temp.ts
 
 .env.production
 .env.local
+.env.tencent.local
 .env
 

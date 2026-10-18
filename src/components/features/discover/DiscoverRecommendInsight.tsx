@@ -21,11 +21,11 @@ export default function DiscoverRecommendInsight({
     <>
       <div
         className={cn(
-          'flex items-start gap-2 rounded-xl border border-violet-100 bg-gradient-to-r from-violet-50 to-fuchsia-50/60 px-3 py-2.5',
+          'flex items-start gap-2 rounded-xl border border-[#b7cdc4] bg-gradient-to-r from-emerald-50 to-[#fffef6] px-3 py-2.5',
           className,
         )}
       >
-        <Sparkles className="mt-0.5 h-4 w-4 shrink-0 text-violet-600" aria-hidden />
+        <Sparkles className="mt-0.5 h-4 w-4 shrink-0 text-[#2c6b58]" aria-hidden />
         <div className="min-w-0 flex-1">
           <p className="text-xs font-medium text-slate-900">
             {sortMode === 'recommend'
@@ -35,7 +35,7 @@ export default function DiscoverRecommendInsight({
           <button
             type="button"
             onClick={() => setExplainOpen(true)}
-            className="mt-1 inline-flex items-center gap-1 text-[11px] font-medium text-violet-700 hover:underline"
+            className="mt-1 inline-flex items-center gap-1 text-[11px] font-medium text-[#2c6b58] hover:underline"
           >
             <Info className="h-3 w-3" aria-hidden />
             了解推荐逻辑

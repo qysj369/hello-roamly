@@ -4,11 +4,8 @@ import { bottomNavItems, headerNavItems, paths } from '@/router/paths';
 /** 顶栏 / 底栏固定入口 — 变更需同步 smoke-header-routes.mjs */
 const EXPECTED_PRIMARY_NAV: { label: string; path: string }[] = [
   { label: '首页', path: paths.home },
-  { label: '发现', path: paths.discover },
-  { label: '查看攻略', path: paths.guides },
-  { label: '旅游搭子', path: paths.travelBuddies },
-  { label: '消息', path: paths.messages },
-  { label: '蜗居', path: paths.profile },
+  { label: '管家', path: paths.ai },
+  { label: '我的', path: paths.profile },
 ];
 
 describe('header nav contract', () => {
@@ -20,5 +17,7 @@ describe('header nav contract', () => {
       EXPECTED_PRIMARY_NAV,
     );
     expect(headerNavItems.some((item) => item.to === paths.aiSnail)).toBe(false);
+    expect(headerNavItems.some((item) => item.to === paths.discover)).toBe(false);
+    expect(headerNavItems.some((item) => item.to === paths.travelBuddies)).toBe(false);
   });
 });

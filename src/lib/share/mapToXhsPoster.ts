@@ -1,7 +1,7 @@
 import type { SharePosterInput } from '@/lib/share/posterTypes';
 import type { XhsPosterInput } from '@/lib/share/xhsPosterTypes';
 
-const DEFAULT_HASHTAGS = ['穷游', '旅行攻略', 'HelloRoamly'];
+const DEFAULT_HASHTAGS = ['漫行', '旅行攻略', 'HelloRoamly'];
 
 function normalizeHashtag(tag: string): string {
   const trimmed = tag.replace(/^#/, '').trim();

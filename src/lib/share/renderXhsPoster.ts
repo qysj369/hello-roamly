@@ -54,7 +54,7 @@ export async function renderXhsPoster(input: XhsPosterInput): Promise<Blob> {
 
   ctx.fillStyle = XHS_RED;
   ctx.font = '700 11px system-ui, sans-serif';
-  ctx.fillText('小红书笔记', padX, textY);
+  ctx.fillText(input.badgeLabel?.trim() || '小红书笔记', padX, textY);
 
   ctx.fillStyle = '#94a3b8';
   ctx.font = '500 11px system-ui, sans-serif';

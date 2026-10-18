@@ -63,9 +63,9 @@ export const TRAVEL_PERSONALITY_PRESETS: Record<TravelPersonalityKind, TravelPer
   },
   [TravelPersonalityKind.BudgetNomad]: {
     kind: TravelPersonalityKind.BudgetNomad,
-    title: '穷游/nomad',
+    title: '漫行/nomad',
     summary: '极致性价比，青旅与公共交通是主旋律。',
-    traits: ['穷游', '青旅', '公交'],
+    traits: ['漫行', '青旅', '公交'],
   },
   [TravelPersonalityKind.SocialButterfly]: {
     kind: TravelPersonalityKind.SocialButterfly,
@@ -108,7 +108,7 @@ export const TRAVEL_PERSONALITY_OPTIONS: {
   },
   {
     kind: TravelPersonalityKind.BudgetNomad,
-    label: '穷游/nomad',
+    label: '漫行/nomad',
     hint: TRAVEL_PERSONALITY_PRESETS[TravelPersonalityKind.BudgetNomad].summary,
   },
   {

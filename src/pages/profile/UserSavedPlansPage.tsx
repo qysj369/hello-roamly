@@ -37,7 +37,7 @@ export default function UserSavedPlansPage() {
             <div>
               <h1 className="text-lg font-bold text-slate-900">我的方案</h1>
               <p className="mt-1 text-sm text-slate-600">
-                保存自地图 AI 的穷游方案，含完整追问对话
+                保存自地图 AI 的漫行方案，含完整追问对话
               </p>
             </div>
           </div>

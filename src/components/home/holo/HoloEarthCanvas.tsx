@@ -11,7 +11,7 @@ import { themeTokens } from '@/styles/themeTokens';
 
 /**
  * drei OrbitControls：autoRotateSpeed=2 ≈ 60fps 下 30 秒一圈。
- * 目标 25–30 秒：取 ~28 秒 → 2 * 30 / 28 ≈ 2.14
+ * 品牌展示：缓慢自转；城市弹窗：定位点位 + 可拖拽，无机械自转。
  */
 const BRAND_EARTH_ROTATE_SPEED = 2.14;
 
@@ -69,6 +69,10 @@ type HoloEarthCanvasProps = {
    * 首页蜗牛壳地球默认开启。
    */
   displayOnly?: boolean;
+  /**
+   * 城市弹窗：定位城市 + 可拖拽；取消持续机械自转。
+   */
+  interactivePreview?: boolean;
 };
 
 function useHoloMobileLayout() {
@@ -91,15 +95,24 @@ function HoloEarthScene({
   isMobile,
   tier,
   displayOnly,
+  interactivePreview,
 }: {
   isMobile: boolean;
   tier: DevicePerfTier;
   displayOnly: boolean;
+  interactivePreview: boolean;
 }) {
-  const earthLift = isMobile ? 0.08 : 0.42;
-  /** 移动端 / 低性能：光点静止，避免闪烁占帧 */
-  const softMarkers = displayOnly;
+  /** 弹窗：缩小整组保证圆边完整 */
+  const earthLift = interactivePreview ? 0 : isMobile ? 0.08 : 0.42;
+  const previewScale = interactivePreview ? 0.72 : 1;
+  const softMarkers = displayOnly || interactivePreview;
   const markersGentle = isMobile || tier === 'low' || tier === 'medium';
+  const allowDrag = interactivePreview || !displayOnly;
+  /** 弹窗禁止机械自转；仅首页品牌展示自转 */
+  const autoRotate = displayOnly && !interactivePreview;
+  const rotateSpeed = BRAND_EARTH_ROTATE_SPEED;
+  const minDistance = interactivePreview ? (isMobile ? 16.5 : 17) : isMobile ? 7.2 : 8.2;
+  const maxDistance = interactivePreview ? (isMobile ? 26 : 28) : isMobile ? 26 : 28;
 
   return (
     <>
@@ -114,7 +127,7 @@ function HoloEarthScene({
       ) : null}
       <hemisphereLight args={[themeTokens.hemiSky, themeTokens.hemiGround, 0.38]} />
 
-      <group position={[0, earthLift, 0]}>
+      <group position={[0, earthLift, 0]} scale={previewScale}>
         <Suspense fallback={null}>
           <EarthGlobe
             onCitySelect={() => undefined}
@@ -137,12 +150,12 @@ function HoloEarthScene({
       <OrbitControls
         enableDamping
         dampingFactor={0.05}
-        autoRotate
-        autoRotateSpeed={BRAND_EARTH_ROTATE_SPEED}
-        minDistance={isMobile ? 7.2 : 8.2}
-        maxDistance={isMobile ? 26 : 28}
+        autoRotate={autoRotate}
+        autoRotateSpeed={rotateSpeed}
+        minDistance={minDistance}
+        maxDistance={maxDistance}
         enablePan={false}
-        enableRotate={!displayOnly}
+        enableRotate={allowDrag}
         enableZoom={false}
         target={[0, earthLift, 0]}
       />
@@ -150,9 +163,10 @@ function HoloEarthScene({
   );
 }
 
-/** 首页蜗牛壳内地球 — 默认纯展示缓慢自转 */
+/** 首页蜗牛壳内地球 — 默认纯展示缓慢自转；弹窗可交互预览 */
 export default function HoloEarthCanvas({
   displayOnly = true,
+  interactivePreview = false,
 }: HoloEarthCanvasProps) {
   const isMobile = useHoloMobileLayout();
   const frameRef = useRef<HTMLDivElement>(null);
@@ -164,6 +178,7 @@ export default function HoloEarthCanvas({
       : tier === 'medium'
         ? [1, 1.25]
         : [1, 1.5];
+  const pointerOn = interactivePreview || !displayOnly;
 
   useEffect(() => {
     const el = frameRef.current;
@@ -191,15 +206,17 @@ export default function HoloEarthCanvas({
   }, []);
 
   return (
-    <div ref={frameRef} className="holo-earth__frame" aria-hidden>
+    <div ref={frameRef} className="holo-earth__frame" aria-hidden={!interactivePreview}>
       {viewSize ? (
         <Canvas
           className="holo-earth__canvas"
-          style={{ width: '100%', height: '100%', pointerEvents: displayOnly ? 'none' : 'auto' }}
+          style={{ width: '100%', height: '100%', pointerEvents: pointerOn ? 'auto' : 'none' }}
           size={{ width: viewSize.width, height: viewSize.height, top: 0, left: 0 }}
           camera={{
-            position: [0, isMobile ? 0.45 : 0.75, isMobile ? 14.8 : 13.2],
-            fov: isMobile ? 40 : 42,
+            position: interactivePreview
+              ? [0, 0, isMobile ? 16.8 : 17.2]
+              : [0, isMobile ? 0.45 : 0.75, isMobile ? 14.8 : 13.2],
+            fov: interactivePreview ? 36 : isMobile ? 40 : 42,
             aspect: viewSize.width / viewSize.height,
             near: 0.1,
             far: 1000,
@@ -226,7 +243,12 @@ export default function HoloEarthCanvas({
           }}
         >
           <CanvasAspectSync />
-          <HoloEarthScene isMobile={isMobile} tier={tier} displayOnly={displayOnly} />
+          <HoloEarthScene
+            isMobile={isMobile}
+            tier={tier}
+            displayOnly={displayOnly && !interactivePreview}
+            interactivePreview={interactivePreview}
+          />
         </Canvas>
       ) : null}
     </div>

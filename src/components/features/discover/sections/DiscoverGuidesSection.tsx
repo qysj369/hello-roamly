@@ -21,7 +21,7 @@ export default function DiscoverGuidesSection({
   return (
     <DiscoverGridSection
       id="discover-grid-guides"
-      title={guidesPreviewMode ? '精选攻略' : '穷游攻略'}
+      title={guidesPreviewMode ? '精选攻略' : '漫行攻略'}
       subtitle={
         guidesPreviewMode
           ? '根据兴趣为你挑选 · 查看更多完整列表'

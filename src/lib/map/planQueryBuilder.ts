@@ -1,3 +1,4 @@
+import { isTravelThemeStop } from '@/lib/map/segmentTravelPlaces';
 import {
   extractMultiStopDestinations,
   extractPrimaryLocation,
@@ -22,12 +23,102 @@ export type TravelSearchIntent = {
   transportMode: TransportMode;
 };
 
+/** 首页追问五项齐备后的结构化锁定（传给地图规划 API，避免模型把「偏好」造城） */
+export type ClarifyLockedPlanFields = {
+  city: string;
+  days: number;
+  party: string;
+  budgetYuan: number;
+  preference: string;
+};
+
+const FAKE_CITY_FROM_TAGS =
+  /^(?:约偏|偏好|近郊|近郊慢行|近郊轻游|人文慢逛|美食探店|亲子时光|自然山水|自然山|自然风光|亲子出行|慢游|转场|玩法偏好|旅行偏好|海景|民俗|风光|主题|玩法)$/;
+
+/** 联游脏串「青岛→海景→民俗」只保留第一座真城 */
+export function resolveRealPlanCity(raw: string | null | undefined): string | null {
+  if (!raw?.trim()) {
+    return null;
+  }
+  const parts = raw
+    .split(/[→—－|/]/)
+    .map((part) => part.trim().replace(/市$/, ''))
+    .filter(Boolean);
+  for (const part of parts) {
+    if (part.length >= 2 && !FAKE_CITY_FROM_TAGS.test(part) && !isTravelThemeStop(part)) {
+      return part;
+    }
+  }
+  return null;
+}
+
+function normalizeClarifyCity(raw: string | null | undefined): string | null {
+  return resolveRealPlanCity(raw);
+}
+
+/** 从首页 handoff / 澄清合并文案解析五项锁定（含【目的地锁定】等内部段） */
+export function parseClarifyLockFromHandoff(text: string): ClarifyLockedPlanFields | null {
+  const raw = text.trim();
+  if (!raw) {
+    return null;
+  }
+
+  const city = normalizeClarifyCity(
+    raw.match(/【目的地锁定】([^。【\n，,]+)/)?.[1] ??
+      raw.match(/【用户已确认】城市([^，,\n]+)/)?.[1] ??
+      null,
+  );
+
+  const daysMatch = raw.match(/(\d+)\s*天/);
+  const days = daysMatch?.[1] ? Number.parseInt(daysMatch[1], 10) : null;
+
+  const party = raw.match(/同行[：:]\s*([^，,\n]+)/)?.[1]?.trim() || null;
+  const budgetMatch = raw.match(/预算约(\d+)\s*元/);
+  const budgetYuan = budgetMatch?.[1] ? Number.parseInt(budgetMatch[1], 10) : null;
+  const preference =
+    raw.match(/偏好[：:]\s*([^（(\n。【]+)/)?.[1]?.trim() ||
+    raw.match(/【旅行偏好】([^（(\n]+)/)?.[1]?.trim() ||
+    null;
+
+  if (
+    !city ||
+    days == null ||
+    days < 1 ||
+    days > 14 ||
+    !party ||
+    budgetYuan == null ||
+    budgetYuan <= 0 ||
+    !preference
+  ) {
+    return null;
+  }
+
+  return { city, days, party, budgetYuan, preference };
+}
+
+/**
+ * 首页追问确认后的 API 需求：只传事实，不追加禁令句（禁令会被模型抄成日标题）。
+ */
+export function buildClarifyLockedSearchPlanQuery(
+  originLabel: string | null,
+  lock: ClarifyLockedPlanFields,
+): string {
+  const { city, days, party, budgetYuan, preference } = lock;
+  const origin = originLabel?.trim()
+    ? `从${originLabel.trim()}出发，`
+    : '';
+  return `${origin}去${city}玩${days}天，同行${party}，人均预算约${budgetYuan}元，${preference}`;
+}
+
 const PREFERENCE_RULES: { pattern: RegExp; label: string }[] = [
   { pattern: /美食|小吃|吃|火锅|湘菜|夜市/, label: '美食' },
+  { pattern: /小众|冷门|人少|避世/, label: '小众' },
+  { pattern: /滨海|海边|海岸|沙滩|海湾/, label: '滨海' },
+  { pattern: /古迹|古城|古城墙|遗址|历史街区/, label: '古迹' },
   { pattern: /摄影|拍照|打卡|胶片|出片/, label: '摄影打卡' },
   { pattern: /自然|户外|徒步|山|海|湖|公园/, label: '自然风光' },
-  { pattern: /历史|文化|博物馆|古迹/, label: '历史文化' },
-  { pattern: /穷游|省钱|硬核|低预算/, label: '省钱优先' },
+  { pattern: /历史|文化|博物馆/, label: '历史文化' },
+  { pattern: /穷游|漫行|省钱|硬核|低预算/, label: '省钱优先' },
   { pattern: /当地|人文|体验/, label: '体验当地' },
   { pattern: /露营|帐篷|野营|camping/i, label: '露营' },
   { pattern: /垂钓|钓鱼|水库|渔场/, label: '垂钓' },
@@ -198,7 +289,7 @@ export function buildMultiStopSearchPlanQuery(
     parts.push(`偏好：${intent.preferences.join('、')}`);
   }
   appendIntentPromptLines(intent, parts);
-  parts.push('请给出穷游方案（含交通、住宿、花费清单与每日行程）');
+  parts.push('请给出漫行方案（含交通、住宿、花费清单与每日行程）');
   return parts.join('，');
 }
 
@@ -207,7 +298,11 @@ export function buildEnrichedSearchPlanQuery(
   destinationLabel: string,
   intent: TravelSearchIntent = parseTravelSearchIntent(rawText),
 ): string {
-  const parts = [`想去${destinationLabel}`];
+  const raw = (intent.rawText || rawText).trim();
+  const isSuburbOrAround = /周边|近郊|郊外|城郊|周围/.test(raw);
+  const parts = [
+    isSuburbOrAround ? `想玩${destinationLabel}周边` : `想去${destinationLabel}`,
+  ];
 
   if (intent.days) {
     parts.push(`行程${intent.days}天`);
@@ -221,15 +316,21 @@ export function buildEnrichedSearchPlanQuery(
   appendIntentPromptLines(intent, parts);
 
   if (parts.length === 1) {
-    return intent.rawText || rawText;
+    return raw || rawText;
   }
 
-  parts.push('请给出穷游方案（含交通、住宿、花费清单与每日行程）');
+  if (intent.preferences.includes('露营') || isSuburbOrAround) {
+    parts.push(
+      '请给出可执行的漫行方案：突出营地/玩法与花费，交通从简写清即可，勿写成冗长门到门流水账',
+    );
+  } else {
+    parts.push('请给出漫行方案（含交通、住宿、花费清单与每日行程）');
+  }
   return parts.join('，');
 }
 
 export function buildCrossCityPlanQuery(originLabel: string, destinationLabel: string): string {
-  return `从${originLabel}出发，去${destinationLabel}，门到门穷游方案（须含：①家门口→出发站 ②大交通 ③抵达站→住宿；公交须写具体上车站、换车站与第二路车号、下车站及步行距离，大城市必须写换车）`;
+  return `从${originLabel}出发，去${destinationLabel}，门到门漫行方案（须含：①家门口→出发站 ②大交通 ③抵达站→住宿；公交须写具体上车站、换车站与第二路车号、下车站及步行距离，大城市必须写换车）`;
 }
 
 /** 跨城搜索：合并天数、预算与偏好 */
@@ -279,6 +380,6 @@ export function buildGuidePlanQuery(originLabel: string, guide: TrailWallGuide):
     parts.push(`概要：${summary.slice(0, 96)}`);
   }
 
-  parts.push('请规划穷游行程（含交通、住宿与目的地玩法，尽量贴近参考预算）');
+  parts.push('请规划漫行行程（含交通、住宿与目的地玩法，尽量贴近参考预算）');
   return parts.join('，');
 }

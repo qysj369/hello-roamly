@@ -3,6 +3,7 @@ import { CITY_COORDINATES } from '@/data/cityCoordinates';
 /** 旅行场景 ASR 热词：地名 + 常见口语（讯飞 dhw 会话级热词） */
 const EXTRA_TRAVEL_HOTWORDS = [
   '蜗牛旅行',
+  '漫行',
   '穷游',
   '预算',
   '三天',

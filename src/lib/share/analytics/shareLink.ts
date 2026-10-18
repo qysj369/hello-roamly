@@ -29,6 +29,7 @@ const CODE_TO_KIND: Record<string, ShareContentKind> = {
 const CHANNEL_TO_CODE: Record<ShareChannel, string> = {
   wechat: 'w',
   xhs: 'x',
+  douyin: 'd',
   link: 'l',
   native: 'n',
   unknown: 'u',
@@ -37,6 +38,7 @@ const CHANNEL_TO_CODE: Record<ShareChannel, string> = {
 const CODE_TO_CHANNEL: Record<string, ShareChannel> = {
   w: 'wechat',
   x: 'xhs',
+  d: 'douyin',
   l: 'link',
   n: 'native',
   u: 'unknown',

@@ -4,6 +4,12 @@ import {
   AboutPage,
   AiChatPage,
   AiSnailGuidePage,
+  CitiesPage,
+  ContactPage,
+  FeedbackPage,
+  BudgetEstimatePage,
+  WechatToolPage,
+  TravelInspirePage,
   DiscoverPage,
   GuideDetailPage,
   PublishGuidePage,
@@ -13,7 +19,9 @@ import {
   SnailFlightPage,
   MessagesPage,
   NotFoundPage,
+  PrivacyPage,
   SnailCulturePage,
+  TermsPage,
   TravelBuddiesPage,
   TravelBuddyNewPage,
   TravelPlanDetailPage,
@@ -22,12 +30,14 @@ import {
   UserProfilePage,
 } from '@/router/lazyPages';
 import MapRedirectPage from '@/pages/map/MapRedirectPage';
+import AppRouteErrorPage from '@/pages/AppRouteErrorPage';
 import { paths } from '@/router/paths';
 
 export const appRouter = createBrowserRouter([
   {
     path: paths.home,
     element: <AppShell />,
+    errorElement: <AppRouteErrorPage />,
     children: [
       { index: true, element: <HomePage /> },
       { path: paths.discover.slice(1), element: <DiscoverPage /> },
@@ -48,6 +58,14 @@ export const appRouter = createBrowserRouter([
       { path: paths.travelBuddyNew.slice(1), element: <TravelBuddyNewPage /> },
       { path: paths.about.slice(1), element: <AboutPage /> },
       { path: paths.snailCulture.slice(1), element: <SnailCulturePage /> },
+      { path: paths.cities.slice(1), element: <CitiesPage /> },
+      { path: paths.privacy.slice(1), element: <PrivacyPage /> },
+      { path: paths.terms.slice(1), element: <TermsPage /> },
+      { path: paths.contact.slice(1), element: <ContactPage /> },
+      { path: paths.feedback.slice(1), element: <FeedbackPage /> },
+      { path: paths.budget.slice(1), element: <BudgetEstimatePage /> },
+      { path: paths.mp.slice(1), element: <WechatToolPage /> },
+      { path: paths.inspire.slice(1), element: <TravelInspirePage /> },
       { path: `${paths.drive.slice(1)}/:cityName`, element: <DrivePanoramaPage /> },
       { path: paths.snailFlight.slice(1), element: <SnailFlightPage /> },
       { path: '*', element: <NotFoundPage /> },

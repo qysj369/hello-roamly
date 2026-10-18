@@ -26,7 +26,7 @@ export function createServerDeepSeekCompleter(env: ServerEnv): AiSnailGuideCompl
 
   const client = axios.create({
     baseURL,
-    timeout: 90_000,
+    timeout: 180_000,
     headers: {
       Accept: 'application/json',
       'Content-Type': 'application/json',

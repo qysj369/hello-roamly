@@ -44,7 +44,7 @@ export default function SiteChatConversationList({
               className={({ isActive: routeActive }) =>
                 cn(
                   'flex items-center gap-3 px-4 py-3 transition',
-                  (isActive || routeActive) && 'bg-violet-50/80',
+                  (isActive || routeActive) && 'bg-emerald-50/80',
                   !isActive && !routeActive && 'hover:bg-slate-50',
                 )
               }
@@ -58,7 +58,7 @@ export default function SiteChatConversationList({
                 />
               ) : (
                 <span
-                  className="flex h-11 w-11 shrink-0 items-center justify-center rounded-full bg-violet-100 text-sm font-bold text-violet-700"
+                  className="flex h-11 w-11 shrink-0 items-center justify-center rounded-full bg-emerald-50 text-sm font-bold text-[#2c6b58]"
                   aria-hidden
                 >
                   {conversation.peerUsername.slice(0, 1)}
@@ -83,7 +83,7 @@ export default function SiteChatConversationList({
                 </p>
               </div>
               {conversation.unreadCount > 0 && (
-                <span className="flex h-5 min-w-[1.25rem] shrink-0 items-center justify-center rounded-full bg-violet-600 px-1.5 text-[10px] font-bold text-white">
+                <span className="flex h-5 min-w-[1.25rem] shrink-0 items-center justify-center rounded-full bg-[#2c6b58] px-1.5 text-[10px] font-bold text-white">
                   {conversation.unreadCount > 9 ? '9+' : conversation.unreadCount}
                 </span>
               )}

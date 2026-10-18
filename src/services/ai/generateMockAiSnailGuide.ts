@@ -38,7 +38,7 @@ export function generateMockAiSnailGuide(params: AiSnailGuideParams): AiSnailGui
 
   return {
     id: `snail-mock-${Date.now()}`,
-    title: `${destination} ${params.days} 天穷游攻略（演示）`,
+    title: `${destination} ${params.days} 天漫行攻略（演示）`,
     destination,
     days: params.days,
     budgetLabel,

@@ -277,7 +277,7 @@ export function parseTravelPlanFromAiResponse(raw: string): ParsedTravelPlan {
     summary,
     dailyPlans,
     totalCost,
-    tags: tags.length > 0 ? tags : ['穷游', 'AI'],
+    tags: tags.length > 0 ? tags : ['漫行', 'AI'],
     suitableAudience,
     practicalInfo,
   };

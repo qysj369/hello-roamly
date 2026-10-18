@@ -1,38 +1,85 @@
-import { buildTravelExpertPlannerTagline } from '@/lib/ai/travelExpertPersona';
+import { SNAIL_PLAN_ASSEMBLER_CONTRACT } from '@/lib/config/snailOfficialPlanPrompt';
+import { AI_SLOW_TRAVEL_PROMPT_CONSTRAINTS } from '@/lib/config/productPositioning';
 import {
-  buildCrossCityDay1LocalTransitHint,
-  buildDoorToDoorSegmentRules,
-  buildItinerarySegmentOutputTemplate,
   buildStrictDestinationConstraint,
   buildStrictOriginConstraint,
 } from '@/lib/plan/doorToDoorTransit';
+import {
+  buildSameCityAccuracyConstraint,
+  buildStrictDayCountConstraint,
+  resolveEffectivePlanDays,
+} from '@/lib/plan/planDayConstraint';
 
-/** 地图点击 AI 规划 — 系统 / 用户提示词（简介 + 行程 + 蜗牛提示 + 避坑） */
+/** 地图点击 AI 规划 — 正式系统 / 用户提示词 */
 
 export function buildMapPlanSystemPrompt(): string {
-  return `你是「hello-roamly / 蜗牛旅行」首席穷游规划师，${buildTravelExpertPlannerTagline()}。蜗友把钱攥得比蜗壳还紧，你的任务是：少花钱、多走路、多吃本地、少踩坑——还得写得让人边看边笑。
+  return `${AI_SLOW_TRAVEL_PROMPT_CONSTRAINTS}
 
-文风要求：
-- 幽默、口语、有梗，像损友在微信发长语音，但信息必须真实可用。
-- 可适度自嘲，禁止阴阳怪气、歧视、低俗。
-- 偶尔用 🐌 或「蜗友」点缀，别每句都加 emoji。
+${SNAIL_PLAN_ASSEMBLER_CONTRACT}`;
+}
 
-输出规则（必须遵守）：
-1. 只输出 Markdown 正文，不要 JSON，不要「好的/以下是/作为 AI」等机器开场白。
-2. 必须且仅包含四个区块，标题逐字使用（顺序不可变）：
-   【方案简介】
-   【行程流水账】
-   【蜗牛提示】
-   【避坑指南】
-3. 【方案简介】：2–4 句概括目的地与玩法；附 GFM 花费表（列「项目 | 金额 | 节省技巧」），含交通、餐饮、门票/其他、**总计**；金额用 ¥ 整数。若用户给了预算，总计落在预算 ±10% 内。
-4. 【行程流水账】：门到门细规划。跨城写清：①家门口→出发站 ②大交通 ③抵达站→住宿/首站；每段市内须地铁/公交/出租车三方案+🐌落地最佳；目的地内换区>5km 同样写法。
-5. 【蜗牛提示】：3–4 句推荐，具体店名/街区，每句以句号收尾。
-6. 【避坑指南】：3–4 句避坑，具体地点+金额+替代，**必须最后写完并以句号收尾**。
-7. **定位约束**：用户消息里的地点名即规划中心；莆田≠昆明≠弥勒≠泉州，禁止改目的地。
-8. ${buildItinerarySegmentOutputTemplate()}
-8. 含「出发地」时按门到门全链路规划；${buildDoorToDoorSegmentRules(true)} 公交须写清上车站、换车站、第二路车（大城市）、下车站与步行距离。
-9. 花费自洽：流水账分项与【方案简介】总计误差不超过 ¥10。
-10. **禁止在正文出现**：经纬度、GCJ-02、精确坐标数字对。`;
+function parseLockedBudgetYuan(query: string): number | null {
+  const n = Number.parseInt(query.match(/人均预算约(\d+)\s*元/)?.[1] ?? '', 10);
+  return Number.isFinite(n) && n > 0 ? n : null;
+}
+
+/** 连住与出门接驳：只写一种最省事方式，不套三选一模板 */
+function buildSnailStayPutLock(query: string): string {
+  const lines = [
+    '【住宿连住】多日单城一基址连住，不换酒店（用户明确要求换宿除外）。',
+    '每天正文末写一行：今晚住宿片区：XXX（具体商圈/地铁站周边）。返程日写「今晚住宿片区：返程回家，无需住宿」。',
+    '第2天及以后开头写：从昨晚住宿片区「XXX」出发；先写一种最省事的市内接驳（路线、耗时、费用），再去今日首站，禁止瞬移。',
+    '禁止地铁/公交/打车三选一清单，禁止写「落地最佳」。济南地铁只写3号线、2号线，禁止写成R3/R2。',
+    '同一重景区只主攻一天；最后一天市区轻逛+返程，预留约2.5小时到站，禁止再往返远程景区。',
+  ];
+  if (/自然山水/.test(query)) {
+    lines.push(
+      '青岛三日自然山水：崂山仰口只写第2天；第3天走太平角/八大关外缘等市区海滨，14:00前动身返程，禁止第3天再去仰口、太清、石老人。',
+    );
+  } else if (/美食|情侣/.test(query)) {
+    lines.push(
+      '青岛三日情侣美食须连住中山路/栈桥两晚，禁止改住五四广场、浮山所。全篇只在简介后放一张管道预算表，禁止日间分项表、禁止|------|分隔碎片、禁止分栏对比。',
+      '每段接驳只写地铁或公交一条主线（路线、耗时、费用）；打车只许一句备选，禁止地铁方案+公交方案并列。禁止🐌。',
+      '第1天：济南高铁抵达→中山路安顿→春和楼（中山路146号）→教堂→龙江路/大学路→栈桥（红嘴鸥仅冬春季节大量出没，其余时段仅可观赏海岸礁石，涨潮栈道湿滑注意安全）→团岛市场→营口路啤酒屋。',
+      '第2天：海岸线+傍晚奥帆游船（海上游船仅可在奥帆中心官方售票窗口购票，切勿轻信路边拉客黄牛低价揽客）+台东夜市。雨天备选写完整一句：信号山和海边步道改去台东室内小吃或中山路骑楼避雨，奥帆不开航就回住处，不另列表。',
+      '第3天：团岛/海乐或八大关外缘后，必须写登州路56号青岛啤酒博物馆（须提前在官方公众号实名预约，每日16点停止检票入场）。下午14:00前动身取回行李前往青岛站，全程预留2.5小时充足缓冲，用于行李寄存、安检、候车。',
+      'D1/D2结尾固定写「今晚住宿片区：中山路/栈桥周边」；D3写「今晚住宿片区：返程回家，无需住宿」。每天末写贴合当天的双人消费分项，禁止重复同一句套话。不另起【蜗牛提示】【避坑指南】。',
+    );
+  }
+  return lines.join('');
+}
+
+function buildSnailDay1TransitHint(
+  originName: string,
+  destinationName: string,
+  query: string,
+): string {
+  const origin = originName.trim();
+  const dest = destinationName.trim();
+  if (!origin || !dest) {
+    return '';
+  }
+  const budgetYuan = parseLockedBudgetYuan(query);
+  const haul =
+    budgetYuan != null && budgetYuan >= 2500
+      ? '大交通可按高铁二等核算，普快作为省钱备选写明差额；禁止编造具体车次号。'
+      : '大交通按普快/硬卧核算，高铁仅作备选不计入总计。';
+  return [
+    `第1天从「${origin}」只写一种最省事出门方式到车站（路线、耗时、费用）。`,
+    `${haul}抵达「${dest}」后只写一种接驳到住宿。`,
+    '车次以出发当天 12306 为准。',
+  ].join('');
+}
+
+function buildDestinationSpotHints(locationName: string): string {
+  if (!/天津/.test(locationName)) {
+    return '';
+  }
+  return [
+    '\n【目的地景点要求·天津】流水账须自然覆盖（勿单列推销）：',
+    '古文化街、鼓楼；天津之眼写清傍晚闲逛时段（约 17:30-19:00 灯光/落日更舒服）；',
+    '瓷房子补充外观最佳观景点（正门斜 45° 看彩色瓷片墙，避开正午顶光）。',
+  ].join('');
 }
 
 export function buildMapPlanUserPrompt(
@@ -46,113 +93,27 @@ export function buildMapPlanUserPrompt(
     ? `\n【内部定位参考，勿写入正文】锚点约 (${coords.lng.toFixed(4)}, ${coords.lat.toFixed(4)})，请围绕「${locationName}」规划。`
     : '';
   const originLine = originName?.trim()
-    ? `\n出发地（用户已校正，必须遵守）：${originName.trim()}。\n${buildStrictOriginConstraint(originName)}\n${buildCrossCityDay1LocalTransitHint(originName, locationName)}`
+    ? `\n出发地（用户已校正，必须遵守）：${originName.trim()}。\n${buildStrictOriginConstraint(originName)}\n${buildSnailDay1TransitHint(originName, locationName, trimmed)}`
     : '';
+  const spotHints = buildDestinationSpotHints(locationName);
+  const destLock = buildStrictDestinationConstraint(locationName);
+  const requestedDays = resolveEffectivePlanDays(trimmed, locationName);
+  const dayLock = requestedDays ? `\n${buildStrictDayCountConstraint(requestedDays)}` : '';
+  const lodgingLock = `\n${buildSnailStayPutLock(trimmed)}`;
+  const accuracyLock = `\n${buildSameCityAccuracyConstraint()}`;
+  const budgetYuan = parseLockedBudgetYuan(trimmed);
+  const budgetLock =
+    budgetYuan != null
+      ? budgetYuan >= 2500
+        ? `\n人均总花费须落在约${budgetYuan}元以内（禁止超支）。大交通可用高铁二等为基准，普快写省钱差额；市内地铁+公交，打车一句备选。门票须覆盖简介点名的付费项（如游船、博物馆），表内有的正文必须有。预算表可写交通五类，或拆成大交通/市内交通，须含餐饮、门票、住宿、机动与总计/合计。`
+        : `\n人均总花费须落在约${budgetYuan}元以内（禁止超支）。大交通以平价普快/硬卧为核算基准，高铁只作贵价备选不计入总计；住宿按双人分摊的平价民宿；门票只写行程里真正会去的1–2个点，表内付费景点必须有对应游玩段落；预算表须含交通/餐饮/门票/住宿/机动。`
+      : '';
 
   return `地点：${locationName}
 需求：${trimmed}${originLine}${coordinateLine}
+${destLock}${dayLock}${lodgingLock}${accuracyLock}${budgetLock}${spotHints}
 
-请按系统要求输出四区块（简介 → 行程流水账 → 蜗牛提示 → 避坑指南），每段写完整。预算/天数须严格遵守。`;
-}
-
-function buildCrossCityMockSections(
-  origin: string,
-  locationName: string,
-  trimmedQuery: string,
-): string {
-  return `【方案简介】
-
-${locationName} 穷游约 2–3 天，从 ${origin} 出发。大交通占预算大头，到了再靠腿和公交省钱。
-
-| 项目 | 金额 | 节省技巧 |
-| --- | --- | --- |
-| 大交通（${origin}→${locationName}） | ¥180 | 提前抢二等座 |
-| 市内+餐饮+门票 | ¥235 | 钻巷子、别在景区主街当 ATM |
-| **总计** | **¥415** | 按「${trimmedQuery}」控场 |
-
-【行程流水账】
-
-### 1. 出发·家门口→济南西站（从${origin}）
-
-**地铁**：3 号线转 1 号线，历下上车→济南西站，约 ¥5、40 分钟，早高峰别卡点。
-
-**公交**：「泉城公园南门」站 K139 →「经十路」站换 K156 →「济南西站」东广场，步行约 300 米，约 ¥4、65 分钟，省钱但慢。
-
-**出租车/网约车**：约 ¥30、25 分钟，行李多/赶车可选。
-
-**🐌落地最佳**：推荐地铁，省钱准时；到西站步行至候车厅约 5 分钟。
-
-### 2. 大交通
-
-济南西站→${locationName}高铁约 ¥180、3–4 小时，提前购票。
-
-### 3. 抵达·车站→市区首站
-
-**地铁**：若有地铁线，写清站名+¥+分钟。
-
-**公交**：写清「XX站」上车→线路号→「XX换乘站」换X路→「酒店附近站」下车，步行约X米，¥+分钟（大城市须写换车）。
-
-**出租车/网约车**：约 ¥25–50、20–35 分钟，初到不熟路可选。
-
-**🐌落地最佳**：推荐公交/地铁省钱；赶入住选网约车直达酒店。
-
-**Day 1 下午** — 按需求在${locationName}逛 1–2 个重点（约 ¥80）。
-
-**Day 1 傍晚** — 社区小馆晚饭（约 ¥45），末班公交比熬夜靠谱。
-
-**Day 2** — 补完核心玩法后返程。
-
-【蜗牛提示】
-
-到了${locationName}先问本地人「你自己吃哪家」，比刷十篇攻略快。早市比景区早餐便宜一半。🐌
-
-【避坑指南】
-
-别在车站买「特产礼盒」，往往是义乌分乌。大交通临出发涨价是血泪教训。景区门口拉客拍照先问清价格。`;
-}
-
-export function buildMapPlanMockContent(
-  locationName: string,
-  query: string,
-  originName?: string | null,
-): string {
-  const trimmedQuery = query.trim();
-  const originMatch = trimmedQuery.match(/从(.+?)出发/);
-  const origin = originName?.trim() || originMatch?.[1]?.trim();
-  const isCrossCity = Boolean(origin && origin !== locationName);
-
-  if (isCrossCity && origin) {
-    return buildCrossCityMockSections(origin, locationName, trimmedQuery);
-  }
-
-  return `【方案简介】
-
-${locationName} 半日～一日穷游，腿着走、胃忙着吃。
-
-| 项目 | 金额 | 节省技巧 |
-| --- | --- | --- |
-| 交通 | ¥20 | 公交 + 11 路 |
-| 餐饮 | ¥45 | 钻巷子 |
-| 门票/其他 | ¥30 | 学生证/免费时段 |
-| **总计** | **¥95** | 按「${query.trim()}」控场 |
-
-【行程流水账】
-
-**上午 9:00** — 到 ${locationName} 逛免费街区（约 ¥15 小吃）。
-
-**中午 12:00** — 社区小馆午饭（约 ¥30）。
-
-**下午 14:30** — 按需求安排 1–2 个重点。
-
-**傍晚 18:00** — 补给返程。
-
-【蜗牛提示】
-
-看哪桌本地大爷多就坐哪桌。有时候最佳景点是刚出锅的那一口。🐌
-
-【避坑指南】
-
-景区门口「特产」慎买。导览器租了像供祖宗。别信「最后一席」砍价链接。`;
+按正式系统提示输出。读者可见只有简介一段+Markdown预算表+分天流水账；贴士避坑写进各天。装配层可各写一行【蜗牛提示】【避坑指南】占位句，勿再列条目。天数、目的地、住宿、预算约束必须与用户需求一致。预算表必须用 | 管道，禁止圆点模拟。青岛情侣/美食连住中山路/栈桥。每日行程每个地点后必须跟一句简短游玩亮点，禁止只罗列地名。`;
 }
 
 /** 连续追问 — 仍输出四区块 Markdown */
@@ -161,10 +122,20 @@ export function buildMapPlanContinueSystemPrompt(): string {
 
 补充（连续对话 / 增量修改模式）：
 - 上方对话中已有初版方案；用户会提出修改意见（预算、天数、节奏、交通等）。
-- 请输出**更新后的完整四区块**，顺序不变：【方案简介】【行程流水账】【蜗牛提示】【避坑指南】。
-- **禁止更换目的地城市**；若用户只说「轻松点/压预算」，只改节奏与花费，不要改成别的城市。
-- 简介花费表「总计」须与流水账分项误差 ≤ ¥10；改预算时同步改表与流水账。
-- 若用户要求与之前冲突，以**最新一条用户消息**为准。`;
+- 请输出更新后的完整方案。贴士避坑写入各天；【蜗牛提示】【避坑指南】只写装配占位句。
+- 禁止更换目的地城市；若用户只说「节奏更松弛/降低预算」或旧称「轻松点/压预算」，只改节奏与花费。
+- 简介摘要与花费表「总计」须同步更新。
+- 若用户要求与之前冲突，以最新一条用户消息为准。`;
+}
+
+/** 质检失败后整篇重写，把失败项写给模型 */
+export function buildSnailAuditRepairPrompt(issues: Array<{ message: string }>): string {
+  const lines = issues.map((issue) => `- ${issue.message}`).join('\n');
+  return [
+    '上一稿未通过校验，必须整篇重写，不要在旧稿上打补丁。',
+    lines,
+    '重写硬规则：游记段落；每段交通只写一种最省事接驳；禁止地铁/公交/打车并列、「地铁方案+公交方案」分栏、「三方案」「落地最佳」。行程内禁止再画消费表或|------|。低预算档大交通用普快；人均约2500元及以上可用高铁二等，普快只留一句差额。同一重景区只主攻一天。青岛自然山水才写仰口且只一天；青岛美食/情侣连住中山路或栈桥，禁止五四广场换宿，简介后只留一张管道预算表。栈桥写海鸥季节与涨潮湿滑；奥帆只官方窗口拒黄牛；啤酒博物馆写登州路56号、公众号实名预约、16点停检；第3天写下午14:00前动身取回行李前往青岛站，预留2.5小时缓冲。禁止🐌。住宿连住；人均不超锁定。',
+  ].join('\n');
 }
 
 export function buildMapPlanFollowUpUserPrompt(
@@ -176,33 +147,5 @@ export function buildMapPlanFollowUpUserPrompt(
   return `目的地：${locationName}（不可更改）${hintLine}
 调整需求：${message.trim()}
 
-请根据我们之前的方案和这条新需求，输出更新后的完整四区块穷游方案。`;
-}
-
-export function buildMapPlanContinueMockContent(message: string, locationName: string): string {
-  return `【方案简介】
-
-已按你的要求调整 ${locationName} 方案：${message.trim()}。预算与交通方式已同步更新。
-
-| 项目 | 金额 | 节省技巧 |
-| --- | --- | --- |
-| 交通 | ¥25 | 提前买票 |
-| 餐饮 | ¥50 | 避开景区主街 |
-| **总计** | **¥120** | 还能剩点买水 |
-
-【行程流水账】
-
-**上午** — 按新需求微调景点顺序。
-
-**下午** — 加入你提到的活动。
-
-**傍晚** — 返程。
-
-【蜗牛提示】
-
-${locationName} 老城区傍晚光线适合拍照，不花钱。🐌
-
-【避坑指南】
-
-你提的「${message.trim()}」若涉及夜间出行，末班车时间先查清楚。临时改票容易多花钱。`;
+请根据我们之前的方案和这条新需求，输出更新后的完整四区块漫行方案。`;
 }

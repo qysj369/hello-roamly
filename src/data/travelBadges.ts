@@ -31,7 +31,7 @@ export const DEMO_USER_BADGES: Record<string, UserBadge[]> = {
       id: 'badge-first-plan',
       label: '首条蜗壳',
       kind: 'custom',
-      description: '发布第一条 AI 穷游计划',
+      description: '发布第一条 AI 漫行计划',
     },
     {
       id: 'badge-3-countries',

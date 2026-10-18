@@ -1,4 +1,5 @@
 import { Sparkles } from 'lucide-react';
+import NicheExperienceReferenceSlot from '@/components/business/NicheExperienceReferenceSlot';
 import SnailCultureHint from '@/components/features/community/SnailCultureHint';
 import SnailSlangTerm from '@/components/features/community/SnailSlangTerm';
 import StructuredGuideConstitutionCard from '@/components/features/guides/structured/StructuredGuideConstitutionCard';
@@ -230,6 +231,8 @@ export default function StructuredGuideViewer({
       )}
 
       {isDetail && <SnailCultureHint className="mt-6" />}
+
+      {isDetail ? <NicheExperienceReferenceSlot className="mt-6" /> : null}
 
       {isCompact && (
         <p className="mt-2 text-xs text-slate-500">{coreTag}</p>

@@ -13,6 +13,7 @@ import { useSiteChatStore } from '@/stores/siteChat/store';
 import type { SiteChatConversation } from '@/types/domain/siteChat';
 import type { MessagesPageState } from '@/types/router-state';
 import { cn } from '@/utils/cn';
+import '@/styles/holo-inner.css';
 
 export default function MessagesPage() {
   const { peerUserId } = useParams<{ peerUserId?: string }>();
@@ -79,33 +80,30 @@ export default function MessagesPage() {
   const useBuddyThread = Boolean(routeState?.buddyPostId && activeConversation);
 
   return (
-    <MotionPage className="flex flex-col gap-4">
+    <MotionPage className="holo-messages flex flex-col gap-4">
       <MotionBlock>
-        <header className="flex items-center justify-between gap-2">
+        <header className="holo-messages__header flex items-center justify-between gap-2">
           <div>
-            <h1 className="text-base font-semibold text-slate-900">站内消息</h1>
-            <p className="mt-0.5 text-xs text-slate-500">
+            <h1 className="holo-messages__title">站内消息</h1>
+            <p className="holo-messages__subtitle">
               {useBuddyThread ? '伸出触角 · 结伴初步沟通（轮询同步）' : '与蜗友的私信'}
             </p>
           </div>
-          <Link
-            to={paths.travelBuddies}
-            className="text-xs font-semibold text-brand-600 hover:text-brand-700"
-          >
+          <Link to={paths.travelBuddies} className="holo-messages__link">
             伸出触角
           </Link>
         </header>
       </MotionBlock>
 
-      <MotionBlock className="flex min-h-[28rem] flex-1 flex-col overflow-hidden rounded-2xl border border-slate-200/90 bg-white shadow-sm sm:min-h-[32rem]">
+      <MotionBlock className="holo-messages__panel flex min-h-[28rem] flex-1 flex-col overflow-hidden sm:min-h-[32rem]">
         <div className="grid min-h-[28rem] flex-1 sm:grid-cols-[minmax(0,17rem)_1fr]">
           <aside
             className={cn(
-              'border-b border-slate-200/80 sm:border-b-0 sm:border-r',
+              'holo-messages__aside border-b sm:border-b-0 sm:border-r',
               peerUserId ? 'hidden sm:block' : 'block',
             )}
           >
-            <p className="border-b border-slate-100 px-4 py-2.5 text-xs font-semibold text-slate-500">
+            <p className="holo-messages__aside-title border-b px-4 py-2.5 text-xs font-semibold">
               会话列表
             </p>
             <SiteChatConversationList conversations={conversations} activePeerId={peerUserId} />

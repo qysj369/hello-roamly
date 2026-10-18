@@ -4,7 +4,7 @@ import { beforeEach, describe, expect, it, vi } from 'vitest';
 import HoloSearchPlanShareSheet from '@/components/home/holo/HoloSearchPlanShareSheet';
 import { matchSearchPlanGoldExample } from '@/lib/home/searchPlanGoldExamples';
 import { SEARCH_PLAN_SHARE_REF } from '@/lib/home/searchPlanShareChannels';
-import { copyVisibleText } from '@/utils/copyTextToClipboard';
+import { copyTextToClipboardSync, copyVisibleText } from '@/utils/copyTextToClipboard';
 import { downloadBlob, downloadBlobsSequential } from '@/lib/share/download';
 
 vi.mock('@/utils/copyTextToClipboard', () => ({
@@ -51,6 +51,21 @@ vi.mock('@/lib/home/buildSearchPlanXhsNotePack', async () => {
   };
 });
 
+vi.mock('@/lib/share/renderItinerarySummaryPoster', () => ({
+  renderItinerarySummaryPoster: vi.fn(async () => new Blob(['png'], { type: 'image/png' })),
+}));
+
+vi.mock('@/lib/home/searchPlanShareVisuals', async () => {
+  const actual = await vi.importActual<typeof import('@/lib/home/searchPlanShareVisuals')>(
+    '@/lib/home/searchPlanShareVisuals',
+  );
+  const png = new Blob(['png'], { type: 'image/png' });
+  return {
+    ...actual,
+    renderSearchPlanShareImages: vi.fn(async () => [png, png, png, png, png, png]),
+  };
+});
+
 vi.mock('@/lib/share/download', () => ({
   downloadBlob: vi.fn(),
   downloadBlobsSequential: vi.fn(async () => undefined),
@@ -78,99 +93,89 @@ function renderSheet(onClose = () => undefined, copiedOnOpen = false) {
   );
 }
 
-function visiblePreviewText(): string {
-  const dialog = screen.getByRole('dialog', { name: '发给朋友' });
-  return [
-    screen.getByRole('status').textContent,
-    (screen.getByRole('textbox', { name: '朋友圈短文案' }) as HTMLTextAreaElement).value,
-    (screen.getByRole('textbox', { name: '抖音口播' }) as HTMLTextAreaElement).value,
-    (screen.getByRole('textbox', { name: '小红书种草文案' }) as HTMLTextAreaElement).value,
-    dialog.textContent,
-  ].join('\n');
-}
-
 describe('HoloSearchPlanShareSheet', () => {
   beforeEach(() => {
     vi.mocked(copyVisibleText).mockReturnValue('copied');
+    vi.mocked(copyTextToClipboardSync).mockReturnValue('copied');
     vi.mocked(downloadBlob).mockClear();
     vi.mocked(downloadBlobsSequential).mockClear();
+    vi.mocked(copyTextToClipboardSync).mockClear();
   });
 
-  it('keeps WeChat, Douyin and Xiaohongshu sections without extra apps', async () => {
+  it('starts with stacked channels and a WeChat summary, not empty previews', () => {
     renderSheet();
     expect(screen.getByRole('dialog', { name: '发给朋友' })).toBeTruthy();
-    expect(screen.getByRole('status')).toHaveTextContent(/点微信、抖音或小红书/);
-    expect(screen.getByRole('status')).not.toHaveTextContent(/复制全文|行程亮点|专属贴士/);
-    expect(screen.queryByRole('button', { name: '复制全文' })).toBeNull();
-    expect(screen.queryByRole('textbox', { name: '完整攻略' })).toBeNull();
-    expect(screen.queryByText('完整攻略（复制发给好友）')).toBeNull();
-    expect(screen.getByRole('region', { name: '微信' })).toBeTruthy();
-    expect(screen.getByRole('region', { name: '抖音' })).toBeTruthy();
-    expect(screen.getByRole('region', { name: '小红书' })).toBeTruthy();
-    expect(screen.queryByRole('button', { name: /发到微信/ })).toBeNull();
-    expect(screen.queryByText('还要发抖音 / 知乎 / B站 / 快手')).toBeNull();
-    expect(copyVisibleText).not.toHaveBeenCalled();
-    expect(screen.queryByAltText('扫码打开完整攻略页')).toBeNull();
-    expect(screen.getByRole('img', { name: /抖音竖版/ })).toBeTruthy();
-    expect(screen.getByRole('button', { name: '全屏录屏卡' })).toBeTruthy();
-    expect(screen.getByRole('button', { name: '下载微信海报并复制文案' })).toBeTruthy();
+    expect(screen.getByRole('status')).toHaveTextContent(/复制.*文案|汇总海报|选平台/);
+    expect(screen.getByRole('button', { name: /微信/ })).toBeTruthy();
+    expect(screen.getByRole('button', { name: /抖音/ })).toBeTruthy();
+    expect(screen.getByRole('button', { name: /小红书/ })).toBeTruthy();
     expect(screen.getByRole('textbox', { name: '朋友圈短文案' })).toBeTruthy();
-    expect(screen.getByRole('button', { name: '下载抖音海报并复制口播' })).toBeTruthy();
-    expect(screen.getByRole('textbox', { name: '抖音口播' })).toBeTruthy();
-    expect(screen.getByRole('button', { name: '下载3张小红书海报并复制种草文案' })).toBeTruthy();
-    expect(screen.getByRole('textbox', { name: '小红书种草文案' })).toBeTruthy();
+    expect(screen.queryByRole('textbox', { name: '抖音口播' })).toBeNull();
+    expect(screen.queryByRole('textbox', { name: '小红书种草文案' })).toBeNull();
+    expect(screen.queryByRole('button', { name: '全屏录屏卡' })).toBeNull();
+    expect(screen.queryByRole('button', { name: /发到微信/ })).toBeNull();
+    expect(screen.queryByText('微博')).toBeNull();
+    expect(copyTextToClipboardSync).not.toHaveBeenCalled();
     expect(screen.getByText(/不从事旅行社组团/)).toBeTruthy();
-    expect(visiblePreviewText()).not.toMatch(PRICE_OR_TIP);
-    expect(visiblePreviewText()).toContain(SEARCH_PLAN_SHARE_REF);
-    expect(downloadBlobsSequential).not.toHaveBeenCalled();
   });
 
-  it('downloads WeChat square poster, copies the short note, and shows the QR', async () => {
+  it('shows a filled WeChat preview, steps, copy, download and QR', async () => {
     const user = userEvent.setup();
     renderSheet();
-    await user.click(screen.getByRole('button', { name: '下载微信海报并复制文案' }));
-    expect(downloadBlob).toHaveBeenCalled();
+    await user.click(screen.getByRole('button', { name: /微信/ }));
+    expect(screen.getByRole('region', { name: '微信' })).toBeTruthy();
+    expect(screen.getByText(/打开微信/)).toBeTruthy();
+    expect(screen.getByLabelText('微信汇总海报预览')).toBeTruthy();
+    expect(screen.getByRole('textbox', { name: '朋友圈短文案' })).toBeTruthy();
     const wechatBox = screen.getByRole('textbox', { name: '朋友圈短文案' }) as HTMLTextAreaElement;
     expect(wechatBox.value).not.toContain('helloroamly.com');
     expect(wechatBox.value).not.toMatch(PRICE_OR_TIP);
-    expect(await screen.findByRole('status')).toHaveTextContent(/图已下载|话已复制|微信/);
-    expect(await screen.findByAltText('扫码打开完整攻略页')).toBeTruthy();
+    expect(wechatBox.value).toContain(SEARCH_PLAN_SHARE_REF);
+    expect(wechatBox.value).toContain('D1');
+    expect(wechatBox.value).toContain('出行小提示');
+    expect(wechatBox.value).toMatch(/上海3天好友慢游/);
+    await user.click(screen.getByRole('button', { name: '下载海报' }));
+    expect(downloadBlob).toHaveBeenCalled();
+    expect(await screen.findByRole('status')).toHaveTextContent(/微信|海报|复制/);
+    expect(screen.getAllByAltText('扫码打开这趟行程').length).toBe(1);
   });
 
-  it('hides the QR after switching to Douyin', async () => {
+  it('keeps a combined summary poster when switching to Douyin', async () => {
     const user = userEvent.setup();
     renderSheet();
-    await user.click(screen.getByRole('button', { name: '下载微信海报并复制文案' }));
-    expect(await screen.findByAltText('扫码打开完整攻略页')).toBeTruthy();
-    await user.click(screen.getByRole('button', { name: '下载抖音海报并复制口播' }));
-    expect(screen.queryByAltText('扫码打开完整攻略页')).toBeNull();
+    await user.click(screen.getByRole('button', { name: /微信/ }));
+    expect(screen.getAllByAltText('扫码打开这趟行程').length).toBe(1);
+    await user.click(screen.getByRole('button', { name: /抖音/ }));
+    expect(screen.getByLabelText('抖音汇总海报预览')).toBeTruthy();
+    expect(screen.getAllByAltText('扫码打开这趟行程').length).toBe(1);
   });
 
-  it('downloads Douyin vertical poster and copies spoken copy without a QR', async () => {
+  it('downloads Douyin summary poster and copies spoken copy', async () => {
     const user = userEvent.setup();
     renderSheet();
-    await user.click(screen.getByRole('button', { name: '下载抖音海报并复制口播' }));
+    await user.click(screen.getByRole('button', { name: /抖音/ }));
+    await user.click(screen.getByRole('button', { name: '下载海报' }));
     expect(downloadBlob).toHaveBeenCalled();
     const douyinBox = screen.getByRole('textbox', { name: '抖音口播' }) as HTMLTextAreaElement;
     expect(douyinBox.value).not.toContain('helloroamly.com');
     expect(douyinBox.value).not.toMatch(PRICE_OR_TIP);
-    expect(await screen.findByRole('status')).toHaveTextContent(/竖版图已下载|口播已复制|抖音/);
-    expect(screen.queryByAltText('扫码打开完整攻略页')).toBeNull();
+    expect(await screen.findByRole('status')).toHaveTextContent(/抖音|口播|海报/);
   });
 
-  it('downloads three Xiaohongshu posters and copies the seed note', async () => {
+  it('downloads one Xiaohongshu summary poster and copies the seed note', async () => {
     const user = userEvent.setup();
     renderSheet();
-    await user.click(screen.getByRole('button', { name: '下载3张小红书海报并复制种草文案' }));
-    expect(downloadBlobsSequential).toHaveBeenCalled();
-    const [blobs] = vi.mocked(downloadBlobsSequential).mock.calls[0]!;
-    expect(blobs).toHaveLength(3);
+    await user.click(screen.getByRole('button', { name: /小红书/ }));
+    expect(screen.getByLabelText('小红书汇总海报预览')).toBeTruthy();
+    await user.click(screen.getByRole('button', { name: '复制文案' }));
+    await user.click(screen.getByRole('button', { name: '下载海报' }));
+    expect(downloadBlob).toHaveBeenCalled();
     const xhsBox = screen.getByRole('textbox', { name: '小红书种草文案' }) as HTMLTextAreaElement;
     expect(xhsBox.value).toContain(SEARCH_PLAN_SHARE_REF);
     expect(xhsBox.value).not.toContain('helloroamly.com');
     expect(xhsBox.value).not.toMatch(PRICE_OR_TIP);
-    expect(await screen.findByRole('status')).toHaveTextContent('小红书图文素材已全部就绪。');
-    expect(screen.queryByAltText('扫码打开完整攻略页')).toBeNull();
+    expect(xhsBox.value.length).toBeGreaterThan(80);
+    expect(await screen.findByRole('status')).toHaveTextContent(/小红书|海报|复制/);
   });
 
   it('closes when tapping 关闭', async () => {

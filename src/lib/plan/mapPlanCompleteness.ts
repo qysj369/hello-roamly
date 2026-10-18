@@ -4,6 +4,7 @@ import {
   MAP_PLAN_MAX_CONTINUE_ATTEMPTS,
 } from '@/lib/plan/mapPlanGenerationLimits';
 import { enforcePlanDayCountOnContent } from '@/lib/plan/planDayConstraint';
+import { applyPlanQualityGate } from '@/lib/plan/planQualityGate';
 import { scrubDestinationDriftInPlan } from '@/lib/plan/destinationDriftGuard';
 import { scrubOriginDriftInPlan } from '@/lib/plan/originDriftGuard';
 import {
@@ -91,7 +92,7 @@ export function padMissingMapPlanSections(content: string, locationName: string)
     intro:
       sections.intro.trim() ||
       (sections.itinerary.trim()
-        ? `${place}穷游方案如下，花费见简介表与行程分项。`
+        ? `${place}漫行方案如下，花费见简介表与行程分项。`
         : ''),
     itinerary: sections.itinerary,
     snailTips: ensureSectionReadable(sections.snailTips, snailFallback),
@@ -117,6 +118,9 @@ export function finalizeMapPlanContent(
   if (query?.trim()) {
     sanitized = enforcePlanDayCountOnContent(sanitized, query.trim(), locationName);
   }
+  sanitized = applyPlanQualityGate(sanitized, locationName, {
+    originName,
+  }).content;
   return padMissingMapPlanSections(canonicalizeMapPlanContent(sanitized), locationName);
 }
 
@@ -273,7 +277,7 @@ export function buildInsightsContinuePrompt(content: string): string {
     : PLAN_SECTION_MARKERS.pitfalls;
 
   return [
-    '你上一版穷游方案未写完，用户需要完整方案。',
+    '你上一版漫行方案未写完，用户需要完整方案。',
     `请补全并只输出从「${sectionLabel}」开始到结尾的内容（若该段已有部分内容，从断点接着写）。`,
     tail ? `断点末尾：「${tail}」` : '',
     '必须包含且写完整：【蜗牛提示】至少 2 句；【避坑指南】至少 2 句并以句号收尾。',

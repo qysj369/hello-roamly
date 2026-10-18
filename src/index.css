@@ -2,15 +2,21 @@
 @import 'highlight.js/styles/github.min.css';
 @import './styles/capsule-one.css';
 @import './styles/future-travel.css';
+@import './styles/holo-theme.css';
+@import './styles/page-atmosphere.css';
 @plugin '@tailwindcss/forms';
 
 @theme {
   --font-sans: system-ui, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif;
-  --color-brand-50: #eff6ff;
-  --color-brand-500: #3b82f6;
-  --color-brand-600: #2563eb;
-  --color-brand-700: #1d4ed8;
-  --color-brand-accent: #8b5cf6;
+  /* 与 theme.scss / Holo 色板对齐（浅米白主色绿，去掉旧蓝紫 brand） */
+  --color-brand-50: #eef5f1;
+  --color-brand-200: #b7cdc4;
+  --color-brand-300: #8fb3a5;
+  --color-brand-500: #3d7f6a;
+  --color-brand-600: #2c6b58;
+  --color-brand-700: #245a4a;
+  --color-brand-800: #1d4a3d;
+  --color-brand-accent: #54786c;
 }
 
 @layer base {
@@ -25,8 +31,15 @@
     }
   }
 
+  html {
+    background-color: var(--theme-page-base, #0f2e28);
+  }
+
   body {
-    @apply min-h-dvh overflow-x-hidden text-slate-900 antialiased;
+    @apply min-h-dvh overflow-x-hidden antialiased;
+    color: var(--text-body, #444440);
+    background-color: var(--theme-page-base, #0f2e28);
+    isolation: isolate;
   }
 
   a:focus-visible,
@@ -1168,8 +1181,14 @@
   }
 
   .site-compliance__beian,
-  .site-compliance__contact {
+  .site-compliance__contact,
+  .site-compliance__disclaimer {
     margin: 0;
+  }
+
+  .site-compliance__disclaimer {
+    margin-bottom: 0.45rem;
+    white-space: pre-line;
   }
 
   .site-compliance__contact {
@@ -1278,6 +1297,30 @@
       transform: rotate(360deg);
     }
   }
+}
+
+/* AI 攻略结果：移动端惯性滚动，减少滑动空白闪烁；点击不出现系统蓝框 */
+.plan-result-scroll {
+  -webkit-overflow-scrolling: touch;
+  overscroll-behavior-y: contain;
+  transform: translateZ(0);
+  backface-visibility: hidden;
+  outline: none;
+}
+
+.plan-result-scroll:focus,
+.plan-result-scroll:focus-visible {
+  outline: none;
+}
+
+.plan-result-scroll button:focus,
+.plan-result-scroll button:focus-visible,
+.plan-result-scroll a:focus,
+.plan-result-scroll a:focus-visible {
+  outline: none !important;
+  box-shadow: none;
+  --tw-ring-shadow: 0 0 #0000;
+  --tw-ring-offset-shadow: 0 0 #0000;
 }
 
 @media (prefers-reduced-motion: reduce) {

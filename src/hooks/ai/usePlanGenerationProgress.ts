@@ -21,10 +21,12 @@ function buildProgressMessage(elapsedSec: number, days: number): string {
 export function usePlanGenerationProgress(active: boolean, days: number) {
   const [message, setMessage] = useState<string | null>(null);
   const [estimateSeconds, setEstimateSeconds] = useState(estimateTravelPlanSeconds(days));
+  const [progressPercent, setProgressPercent] = useState(0);
 
   useEffect(() => {
     if (!active) {
       setMessage(null);
+      setProgressPercent(0);
       return;
     }
 
@@ -34,10 +36,14 @@ export function usePlanGenerationProgress(active: boolean, days: number) {
 
     const startedAt = Date.now();
     setMessage(buildProgressMessage(0, safeDays));
+    setProgressPercent(6);
 
     const timer = window.setInterval(() => {
       const elapsedSec = Math.floor((Date.now() - startedAt) / 1000);
       setMessage(buildProgressMessage(elapsedSec, safeDays));
+      // 缓动逼近 92%，完成时由组件卸载归零，避免假进度卡死在 100%
+      const ratio = Math.min(0.92, elapsedSec / Math.max(estimate, 1));
+      setProgressPercent(Math.max(6, Math.round(ratio * 100)));
     }, 1000);
 
     return () => {
@@ -45,5 +51,5 @@ export function usePlanGenerationProgress(active: boolean, days: number) {
     };
   }, [active, days]);
 
-  return { message, estimateSeconds };
+  return { message, estimateSeconds, progressPercent };
 }

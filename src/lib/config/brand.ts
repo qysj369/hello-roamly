@@ -9,12 +9,15 @@ import {
   BRAND_LOCKUP,
   BRAND_FUNCTION_DESC,
   BRAND_MARK,
+  BRAND_ABOUT_SNAIL_TITLE,
+  BRAND_ABOUT_SNAIL_BODY,
+  BRAND_ABOUT_VALUES,
 } from '@/lib/config/brandCopy';
 
 /** 站点展示名 */
 export const APP_NAME = BRAND_NAME;
 
-/** 品牌主色 / 辅助色 */
+/** 品牌主色 / 辅助色（粒子等遗留引用；页面主视觉以 theme.scss 为准） */
 export const BRAND_COLORS = {
   primary: '#3B82F6',
   secondary: '#8B5CF6',
@@ -37,6 +40,9 @@ export {
   BRAND_FUNCTION_DESC,
   BRAND_POSITIONING,
   BRAND_PILLARS_LINE,
+  BRAND_ABOUT_SNAIL_TITLE,
+  BRAND_ABOUT_SNAIL_BODY,
+  BRAND_ABOUT_VALUES,
 };
 
 /** @deprecated */

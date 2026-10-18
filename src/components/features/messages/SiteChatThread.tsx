@@ -85,7 +85,7 @@ export default function SiteChatThread({
           />
         ) : (
           <span
-            className="flex h-10 w-10 items-center justify-center rounded-full bg-violet-100 text-sm font-bold text-violet-700"
+            className="flex h-10 w-10 items-center justify-center rounded-full bg-emerald-50 text-sm font-bold text-[#2c6b58]"
             aria-hidden
           >
             {conversation.peerUsername.slice(0, 1)}

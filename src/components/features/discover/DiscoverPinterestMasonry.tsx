@@ -86,11 +86,11 @@ function DiscoverPinterestMasonry({
     return (
       <div
         className={cn(
-          'overflow-hidden rounded-2xl border border-dashed border-violet-200 bg-gradient-to-b from-violet-50/80 to-white px-4 py-8 text-center',
+          'overflow-hidden rounded-2xl border border-dashed border-[#b7cdc4] bg-gradient-to-b from-emerald-50/80 to-[#fffef6] px-4 py-8 text-center',
           className,
         )}
       >
-        <div className="mx-auto flex h-12 w-12 items-center justify-center rounded-full bg-violet-100 text-violet-700">
+        <div className="mx-auto flex h-12 w-12 items-center justify-center rounded-full bg-emerald-50 text-[#2c6b58]">
           <Sparkles className="h-6 w-6" aria-hidden />
         </div>
         <p className="mt-3 text-base font-semibold text-slate-800">
@@ -115,7 +115,7 @@ function DiscoverPinterestMasonry({
                     onSuggestDestination(pick.destinationHint);
                   }
                 }}
-                className="group overflow-hidden rounded-xl border border-slate-200 bg-white text-left shadow-sm transition hover:-translate-y-0.5 hover:border-violet-200 hover:shadow-md"
+                className="group overflow-hidden rounded-xl border border-slate-200 bg-white text-left shadow-sm transition hover:-translate-y-0.5 hover:border-[#b7cdc4] hover:border-[#b7cdc4]"
               >
                 <div className="relative aspect-[4/3] w-full">
                   <OptimizedImage
@@ -128,7 +128,7 @@ function DiscoverPinterestMasonry({
                 </div>
                 <div className="p-2">
                   <p className="line-clamp-1 text-xs font-semibold text-slate-800">{pick.title}</p>
-                  <p className="mt-0.5 text-[10px] text-violet-600">点我探索 →</p>
+                  <p className="mt-0.5 text-[10px] text-[#2c6b58]">点我探索 →</p>
                 </div>
               </button>
             ))}
@@ -140,7 +140,7 @@ function DiscoverPinterestMasonry({
             <button
               type="button"
               onClick={() => onRelaxFilters(relaxedFilters)}
-              className="rounded-full bg-violet-600 px-4 py-2 text-sm font-semibold text-white shadow-sm hover:bg-violet-700"
+              className="rounded-full bg-[#2c6b58] px-4 py-2 text-sm font-semibold text-white shadow-sm hover:bg-[#245a4a]"
             >
               放宽筛选，看更多内容
             </button>
@@ -151,7 +151,7 @@ function DiscoverPinterestMasonry({
                   key={city}
                   type="button"
                   onClick={() => onSuggestDestination(city)}
-                  className="rounded-full border border-violet-200 bg-violet-50 px-3 py-1.5 text-xs font-medium text-violet-800 hover:bg-violet-100"
+                  className="rounded-full border border-[#b7cdc4] bg-emerald-50 px-3 py-1.5 text-xs font-medium text-[#2c6b58] hover:bg-emerald-50"
                 >
                   看 {city}
                 </button>
@@ -176,7 +176,7 @@ function DiscoverPinterestMasonry({
               id="discover-masonry-users-title"
               className="flex items-center gap-1.5 text-sm font-semibold text-slate-900"
             >
-              <Users className="h-4 w-4 text-violet-600" aria-hidden />
+              <Users className="h-4 w-4 text-[#2c6b58]" aria-hidden />
               热门旅人
             </h3>
             <span className="text-[10px] text-slate-400">{userSortHint}</span>
@@ -244,7 +244,7 @@ function DiscoverPinterestMasonry({
           <div ref={sentinelRef as Ref<HTMLDivElement>} className="h-px w-full" aria-hidden />
           {isLoadingMore && (
             <p className="flex items-center justify-center gap-2 text-sm text-slate-500">
-              <Loader2 className="h-4 w-4 animate-spin text-violet-600" aria-hidden />
+              <Loader2 className="h-4 w-4 animate-spin text-[#2c6b58]" aria-hidden />
               加载更多 Pin…
             </p>
           )}

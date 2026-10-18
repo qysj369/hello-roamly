@@ -1,4 +1,5 @@
 import { useMemo, useState, type FormEvent } from 'react';
+import { createPortal } from 'react-dom';
 import {
   SNAIL_FLIGHT_CITIES,
   SNAIL_FLIGHT_DEFAULT_DEST_ID,
@@ -25,7 +26,7 @@ export default function SnailFlightBookingDialog({
     onConfirm(fromId, toId);
   };
 
-  return (
+  return createPortal(
     <div
       className="snail-flight-modal"
       role="dialog"
@@ -73,6 +74,7 @@ export default function SnailFlightBookingDialog({
           </button>
         </div>
       </form>
-    </div>
+    </div>,
+    document.body,
   );
 }

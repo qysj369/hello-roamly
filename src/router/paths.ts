@@ -17,6 +17,19 @@ export const paths = {
   travelBuddyNew: '/travel-buddy/new',
   about: '/about',
   snailCulture: '/snail-culture',
+  /** 热门城市二级列表 */
+  cities: '/cities',
+  privacy: '/privacy',
+  terms: '/terms',
+  contact: '/contact',
+  /** 产品反馈（城市信息 / 攻略 / 交互） */
+  feedback: '/feedback',
+  /** 精打细算 · 出行预算测算（永久免费，仅参考） */
+  budget: '/budget',
+  /** 公众号内嵌轻量行程工具（无 3D） */
+  mp: '/mp',
+  /** 可抓取旅行知识库（周末漫游 / 单人短途 / 亲子出游） */
+  inspire: '/inspire',
   drive: '/drive',
   /** 登上蜗牛号 · 国内低空观光（独立入口） */
   snailFlight: '/snail-flight',
@@ -98,24 +111,18 @@ export type PrimaryNavItem = {
   end: boolean;
 };
 
-/** 桌面顶栏 / 移动抽屉 — 与底栏入口对齐 */
+/** 桌面顶栏 / 移动抽屉 — 只留管家主线，空社区入口不再占导航 */
 export const headerNavItems = [
   { to: paths.home, label: '首页', end: true },
-  { to: paths.discover, label: '发现', end: true },
-  { to: paths.guides, label: '查看攻略', end: false },
-  { to: paths.travelBuddies, label: '旅游搭子', end: true },
-  { to: paths.messages, label: '消息', end: false },
-  { to: paths.profile, label: '蜗居', end: true },
+  { to: paths.ai, label: '管家', end: true },
+  { to: paths.profile, label: '我的', end: true },
 ] as const satisfies readonly PrimaryNavItem[];
 
 /** 移动端底栏 */
 export const bottomNavItems = [
   { to: paths.home, label: '首页', end: true },
-  { to: paths.discover, label: '发现', end: true },
-  { to: paths.guides, label: '查看攻略', end: false },
-  { to: paths.travelBuddies, label: '旅游搭子', end: true },
-  { to: paths.messages, label: '消息', end: false },
-  { to: paths.profile, label: '蜗居', end: true },
+  { to: paths.ai, label: '管家', end: true },
+  { to: paths.profile, label: '我的', end: true },
 ] as const satisfies readonly PrimaryNavItem[];
 
 /** 顶栏菜单（含全部入口） */

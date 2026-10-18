@@ -17,11 +17,11 @@ export default function AboutContentModerationSection() {
 
   return (
     <MotionSection
-      className="rounded-2xl border border-violet-200/90 bg-gradient-to-br from-violet-50/80 via-white to-white p-6 shadow-sm"
+      className="rounded-2xl border border-[#b7cdc4] bg-gradient-to-br from-emerald-50/80 via-[#fffef6] to-[#fffef6] p-6 shadow-sm"
       delay={0.1}
     >
       <div className="flex items-center gap-2">
-        <span className="flex h-9 w-9 items-center justify-center rounded-xl bg-violet-600/10 text-violet-700">
+        <span className="flex h-9 w-9 items-center justify-center rounded-xl bg-emerald-50 text-[#2c6b58]">
           <Shield className="h-5 w-5" aria-hidden />
         </span>
         <div>
@@ -35,7 +35,7 @@ export default function AboutContentModerationSection() {
       <ul className="mt-3 space-y-1.5 text-xs text-slate-600">
         {copy.about.moderationBullets.map((item) => (
           <li key={item} className="flex gap-2">
-            <span className="text-violet-500" aria-hidden>
+            <span className="text-[#54786c]" aria-hidden>
               ·
             </span>
             {item}
@@ -45,7 +45,7 @@ export default function AboutContentModerationSection() {
 
       <div className="mt-4 grid gap-2 sm:grid-cols-2">
         {CONTENT_MODERATION_SCENES.map((scene) => (
-          <div key={scene.id} className="rounded-lg border border-violet-100 bg-white/80 px-3 py-2">
+          <div key={scene.id} className="rounded-lg border border-[#b7cdc4] bg-white/80 px-3 py-2">
             <p className="text-xs font-semibold text-slate-800">{scene.label}</p>
             <p className="mt-0.5 text-[10px] leading-relaxed text-slate-500">{scene.description}</p>
           </div>
@@ -71,7 +71,7 @@ export default function AboutContentModerationSection() {
         </div>
       </dl>
 
-      <div className="mt-5 rounded-xl border border-violet-100 bg-white/90 p-4">
+      <div className="mt-5 rounded-xl border border-[#b7cdc4] bg-white/90 p-4">
         <p className="text-xs font-semibold text-slate-800">{copy.about.moderationDemoTitle}</p>
         <ContentModerationChecker className="mt-3" scene="ai_chat" />
       </div>

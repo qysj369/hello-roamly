@@ -26,10 +26,34 @@ export default function TravelPlanActivityTimelineItem({
   isLast,
   defaultExpanded = false,
 }: TravelPlanActivityTimelineItemProps) {
-  const [expanded, setExpanded] = useState(defaultExpanded);
+  const costLabel = formatActivityCost(activity.cost);
+  const hasDetails = Boolean(activity.location?.trim() || costLabel);
+  const [expanded, setExpanded] = useState(defaultExpanded && hasDetails);
   const reduceMotion = useReducedMotion();
   const panelId = useId();
-  const costLabel = formatActivityCost(activity.cost);
+
+  const header = (
+    <>
+      <span className="shrink-0 rounded-lg bg-brand-50 px-2 py-1 font-mono text-xs font-semibold text-brand-700">
+        {activity.time}
+      </span>
+      <span className="min-w-0 flex-1">
+        <span
+          className={cn(
+            'text-sm font-medium text-slate-900',
+            !expanded && 'line-clamp-2',
+          )}
+        >
+          {activity.description}
+        </span>
+        {!expanded && activity.location && (
+          <span className="mt-0.5 block truncate text-xs text-slate-500">
+            {activity.location}
+          </span>
+        )}
+      </span>
+    </>
+  );
 
   return (
     <li
@@ -42,37 +66,29 @@ export default function TravelPlanActivityTimelineItem({
       />
 
       <div className="overflow-hidden rounded-xl border border-slate-200/90 bg-white shadow-sm">
-        <button
-          type="button"
-          className="flex w-full items-start gap-3 px-3 py-3 text-left transition hover:bg-slate-50/80"
-          aria-expanded={expanded}
-          aria-controls={panelId}
-          onClick={() => setExpanded((open) => !open)}
-        >
-          <span className="shrink-0 rounded-lg bg-brand-50 px-2 py-1 font-mono text-xs font-semibold text-brand-700">
-            {activity.time}
-          </span>
-          <span className="min-w-0 flex-1">
-            <span className="line-clamp-2 text-sm font-medium text-slate-900">
-              {activity.description}
-            </span>
-            {!expanded && activity.location && (
-              <span className="mt-0.5 block truncate text-xs text-slate-500">
-                {activity.location}
-              </span>
-            )}
-          </span>
-          <ChevronDown
-            className={cn(
-              'mt-0.5 h-4 w-4 shrink-0 text-slate-400 transition-transform',
-              expanded && 'rotate-180',
-            )}
-            aria-hidden
-          />
-        </button>
+        {hasDetails ? (
+          <button
+            type="button"
+            className="flex w-full items-start gap-3 px-3 py-3 text-left transition hover:bg-slate-50/80"
+            aria-expanded={expanded}
+            aria-controls={panelId}
+            onClick={() => setExpanded((open) => !open)}
+          >
+            {header}
+            <ChevronDown
+              className={cn(
+                'mt-0.5 h-4 w-4 shrink-0 text-slate-400 transition-transform',
+                expanded && 'rotate-180',
+              )}
+              aria-hidden
+            />
+          </button>
+        ) : (
+          <div className="flex w-full items-start gap-3 px-3 py-3">{header}</div>
+        )}
 
         <AnimatePresence initial={false}>
-          {expanded && (
+          {hasDetails && expanded && (
             <motion.div
               id={panelId}
               role="region"
@@ -84,7 +100,6 @@ export default function TravelPlanActivityTimelineItem({
               className="overflow-hidden border-t border-slate-100"
             >
               <div className="space-y-2 bg-slate-50/60 px-3 py-3 text-sm text-slate-600">
-                <p className="leading-relaxed text-slate-700">{activity.description}</p>
                 {activity.location && (
                   <p className="flex items-start gap-1.5 text-xs">
                     <MapPin className="mt-0.5 h-3.5 w-3.5 shrink-0 text-brand-600" aria-hidden />

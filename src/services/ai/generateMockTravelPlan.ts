@@ -14,11 +14,11 @@ export function generateMockTravelPlan(prompt: string, options: TravelOptions): 
   const days = options.days ?? DEFAULT_TRAVEL_OPTIONS.days;
   const { dailyPlans, totalCost } = buildMockDailyPlans(destination, options);
 
-  const summary = `基于「${prompt.slice(0, 48)}${prompt.length > 48 ? '…' : ''}」生成的${destination}${days}天穷游方案，总预算约 ¥${totalCost}。`;
+  const summary = `基于「${prompt.slice(0, 48)}${prompt.length > 48 ? '…' : ''}」生成的${destination}${days}天漫行方案，总预算约 ¥${totalCost}。`;
 
   return assembleTravelPlan(
     {
-      title: `AI · ${destination}${days}天穷游方案`,
+      title: `AI · ${destination}${days}天漫行方案`,
       summary,
       dailyPlans,
       totalCost,

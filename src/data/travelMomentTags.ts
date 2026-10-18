@@ -2,7 +2,7 @@
 export const TRAVEL_MOMENT_TAG_PRESETS = [
   '美食',
   '摄影',
-  '穷游',
+  '漫行',
   '自然风光',
   '城市漫步',
   '人文',

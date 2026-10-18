@@ -3,6 +3,7 @@ import { useState } from 'react';
 import { copy } from '@/content/copy';
 import { DEMO_CURRENT_USER_ID } from '@/data/demoUsers';
 import InviteCodeCard, { InviteCodeCardSkeleton } from '@/components/features/invite/InviteCodeCard';
+import InviteRewardsPanel from '@/components/features/invite/InviteRewardsPanel';
 import MotionSection from '@/components/motion/MotionSection';
 import { useInviteSummary } from '@/hooks/invite/useInviteSummary';
 import { hasInviteBackend, isInviteEnabled } from '@/lib/invite/config';
@@ -84,7 +85,12 @@ export default function AboutInviteSection() {
           {isProduction ? copy.about.invitePanelTitlePublic : copy.about.inviteDemoTitle}
         </p>
         {isPending && <InviteCodeCardSkeleton />}
-        {summary && <InviteCodeCard className="mt-3" summary={summary} compact />}
+        {summary && (
+          <>
+            <InviteCodeCard className="mt-3" summary={summary} compact />
+            <InviteRewardsPanel className="mt-4" userId={DEMO_CURRENT_USER_ID} summary={summary} />
+          </>
+        )}
       </div>
 
       {!isProduction ? (

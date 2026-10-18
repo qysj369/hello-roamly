@@ -61,8 +61,10 @@ interface ImportMetaEnv {
   readonly VITE_ALLOW_FOREIGN_IMAGE_PROXY?: string;
   /** 分享效果统计（默认开启；0 关闭） */
   readonly VITE_SHARE_ANALYTICS_ENABLED?: string;
-  /** 邀请好友奖励（中国版默认开启；0 关闭） */
+  /** 邀请好友奖励（须 VITE_OPEN_BUSINESS=1 且本开关=1） */
   readonly VITE_INVITE_ENABLED?: string;
+  /** 商业扩展总开关 isOpenBusiness（1 开启插槽/分销/会员增量；默认关闭） */
+  readonly VITE_OPEN_BUSINESS?: string;
   /** 后端 API 根路径；未配置则用 demo 数据 */
   readonly VITE_API_BASE_URL?: string;
   /** 开发/演示 Bearer（会打进前端，生产慎用） */

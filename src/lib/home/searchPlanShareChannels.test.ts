@@ -5,6 +5,7 @@ import {
   SEARCH_PLAN_SHARE_CTA,
   SEARCH_PLAN_SHARE_REF,
   buildSearchPlanChannelCopy,
+  buildStructuredShareCopy,
   sanitizeShareExportText,
   sanitizePosterOverlayText,
   searchPlanComposeAppUrl,
@@ -62,15 +63,33 @@ describe('searchPlanShareChannels', () => {
       expect(copy).not.toContain('Hello Roamly');
     }
     expect(xhs).toContain('上海博物馆');
+    expect(xhs).toContain('🌿');
+    expect(xhs).toContain('📍');
     expect(xhs).not.toContain('【口播】');
     expect(douyin).not.toContain('【口播】');
-    expect(douyin).toContain('#上海点心');
+    expect(douyin).toContain('#上海慢游');
+    expect(douyin).toContain('别追人流');
     expect(douyin).toContain('蟹粉小笼');
     expect(wechat).toContain('沈大成');
     expect(wechat).toContain('上海博物馆');
-    expect(wechat).toContain('周末不用赶');
-    expect(wechat.length).toBeLessThan(xhs.length);
+    expect(wechat).toContain('不用追赶人流');
+    expect(wechat).toContain('D1');
+    expect(wechat).toContain('出行小提示');
+    expect(wechat).not.toEqual(xhs);
     expect(xhs).not.toContain('别被网红点位的人流推着走');
+  });
+
+  it('builds a four-block seed note instead of a single thin sentence', () => {
+    const copy = buildStructuredShareCopy(friends);
+    expect(copy).toMatch(/上海3天好友慢游/);
+    expect(copy).toContain('D1');
+    expect(copy).toContain('D2');
+    expect(copy).toContain('D3');
+    expect(copy).toContain('出行小提示');
+    expect(copy).toContain(SEARCH_PLAN_SHARE_REF);
+    expect(copy).toContain('#上海慢游');
+    expect(copy).toContain('#周末去哪');
+    expect(copy.split('\n').length).toBeGreaterThan(6);
   });
 
   it('folds Zhihu / Bilibili / Kuaishou copy as lightweight public notes', () => {
@@ -150,26 +169,28 @@ describe('searchPlanShareChannels', () => {
     expect(searchPlanComposeAppUrl(douyin, copy)).not.toContain('openRecord');
   });
 
-  it('tells Douyin users to download a static poster and spoken copy', () => {
+  it('tells Douyin users to save vertical photos and spoken copy', () => {
     const douyin = SEARCH_PLAN_SHARE_CHANNELS.find((item) => item.id === 'douyin')!;
-    expect(searchPlanShareGuide(douyin, true)).toContain('竖版图已下载');
     expect(searchPlanShareGuide(douyin, true)).toContain('口播已复制');
-    expect(searchPlanShareGuide(douyin, false)).toContain('打开抖音');
+    expect(searchPlanShareGuide(douyin, true)).toContain('汇总海报');
+    expect(searchPlanShareGuide(douyin, false)).toContain('汇总海报');
   });
 
-  it('uses Hangzhou / Chengdu / Xi’an seed fragments instead of multi-day routes', () => {
+  it('keeps Hangzhou / Chengdu / Xi’an city names in the structured seed note', () => {
     const hangzhou = miniCityPlan('杭州', '西湖苏堤');
     const chengdu = miniCityPlan('成都', '宽窄巷子');
     const xian = miniCityPlan('西安', '西安城墙');
     const hzDouyin = buildSearchPlanChannelCopy('douyin', hangzhou, 'https://helloroamly.com/?share=1');
     const cdXhs = buildSearchPlanChannelCopy('xhs', chengdu, 'https://helloroamly.com/?share=1');
     const xaXhs = buildSearchPlanChannelCopy('xhs', xian, 'https://helloroamly.com/?share=1');
-    expect(hzDouyin).toContain('沿着苏堤慢慢散步');
-    expect(hzDouyin).toContain('#杭州citywalk');
-    expect(cdXhs).toContain('拒绝流水线打卡');
-    expect(xaXhs).toContain('傍晚登城墙');
+    expect(hzDouyin).toContain('西湖苏堤');
+    expect(hzDouyin).toContain('#杭州慢游');
+    expect(cdXhs).toContain('宽窄巷子');
+    expect(xaXhs).toContain('西安城墙');
     for (const copy of [hzDouyin, cdXhs, xaXhs]) {
       expect(copy).toContain(SEARCH_PLAN_SHARE_REF);
+      expect(copy).toContain('D1');
+      expect(copy).toContain('出行小提示');
       expect(copy).not.toContain(SEARCH_PLAN_DISCLAIMER);
       expect(copy).not.toContain('Day 1');
       expect(copy).not.toContain('一键定制');

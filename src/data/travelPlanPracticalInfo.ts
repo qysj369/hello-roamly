@@ -5,7 +5,7 @@ const PRACTICAL_BY_GUIDE_ID: Record<string, TravelPlanPracticalInfo> = {
   hangzhou: {
     accommodationTips: [
       '优先选地铁沿线的青旅或连锁酒店，步行可达景区的片区略贵但省时间。',
-      '周末西湖周边房源紧张，建议提前 3–5 天预订；淡季工作日可当日比价。',
+      '周末西湖周边房源紧张，建议提前 3–5 天看好住处；淡季工作日可当日比价。',
       '若住龙翔桥 / 定安路附近，夜间出行方便，注意 23 点后公交减少。',
     ],
     transportationTips: [
@@ -22,7 +22,7 @@ const PRACTICAL_BY_GUIDE_ID: Record<string, TravelPlanPracticalInfo> = {
   xiamen: {
     accommodationTips: [
       '住中山路 / 轮渡码头附近便于早晚逛吃；鼓浪屿需订船票+岛上住宿，行李轻装。',
-      '曾厝垵民宿多，夜间可能吵，看房型评价再下单。',
+      '曾厝垵民宿多，夜间可能吵，看房型评价再决定住哪。',
       '旺季（暑期、国庆）价格翻倍，能错峰尽量错峰。',
     ],
     transportationTips: [
@@ -49,7 +49,7 @@ const PRACTICAL_BY_GUIDE_ID: Record<string, TravelPlanPracticalInfo> = {
     ],
     precautions: [
       '热门小吃排队久，错峰用餐；辣度较高，肠胃敏感者适量。',
-      '博物馆类景点多需预约（如陕西历史博物馆），提前在官方平台抢票。',
+      '博物馆类景点多需提前查验预约通道（如陕西历史博物馆），建议出发前在官方平台确认余票。',
       '古城内拉客「低价团」勿轻信，行程以官方信息为准。',
     ],
   },
@@ -75,7 +75,7 @@ const PRACTICAL_BY_GUIDE_ID: Record<string, TravelPlanPracticalInfo> = {
 const DEFAULT_PRACTICAL: TravelPlanPracticalInfo = {
   accommodationTips: [
     '优先选择地铁/公交便利区域，减少每日通勤时间和费用。',
-    '多平台比价预订，关注可免费取消的房型。',
+    '多平台比价看房，关注可免费取消的房型。',
   ],
   transportationTips: [
     '市内移动以公共交通 + 步行为主，提前下载当地地铁/公交乘车码。',

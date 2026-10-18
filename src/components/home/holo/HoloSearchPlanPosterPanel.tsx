@@ -44,7 +44,7 @@ export default function HoloSearchPlanPosterPanel({
   copyPlainText,
   onClose,
 }: HoloSearchPlanPosterPanelProps) {
-  const shareUrl = searchPlanPosterShareUrl(savedSessionId, plan.baseInfo);
+  const shareUrl = searchPlanPosterShareUrl(savedSessionId, plan.baseInfo, plan);
   const safeName = defaultSearchPlanTitle(plan).replace(/[\\/:*?"<>|]/g, '_').slice(0, 36);
   const posterVariants = useMemo(
     () =>

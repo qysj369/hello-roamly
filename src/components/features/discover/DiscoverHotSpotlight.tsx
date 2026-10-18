@@ -39,7 +39,7 @@ export default function DiscoverHotSpotlight({
           <Flame className="h-4 w-4 text-orange-500" aria-hidden />
           {title}
         </h2>
-        <Link to={paths.guides} className="text-xs font-medium text-violet-700 hover:underline">
+        <Link to={paths.guides} className="text-xs font-medium text-[#2c6b58] hover:underline">
           更多攻略
         </Link>
       </div>
@@ -50,7 +50,7 @@ export default function DiscoverHotSpotlight({
           <Link
             key={pick.item.id}
             to={getHotPickHref(pick.item)}
-            className="group relative w-[min(72vw,280px)] shrink-0 overflow-hidden rounded-2xl border border-slate-200/90 bg-slate-900 shadow-md transition hover:-translate-y-0.5 hover:shadow-lg md:w-auto md:shrink"
+            className="group relative w-[min(72vw,280px)] shrink-0 overflow-hidden rounded-xl border border-[#b7cdc4] bg-slate-900 shadow-none transition hover:border-[#2c6b58] md:w-auto md:shrink"
           >
             <div className="aspect-[4/5] w-full">
               <OptimizedImage

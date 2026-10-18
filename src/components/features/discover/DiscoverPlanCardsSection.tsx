@@ -20,11 +20,11 @@ function FeedSectionTitle({ title, href }: { title: string; href?: string }) {
   return (
     <div className="flex items-center justify-between gap-2">
       <h2 className="flex items-center gap-1.5 text-sm font-semibold text-slate-900">
-        <MapPinned className="h-4 w-4 text-violet-600" aria-hidden />
+        <MapPinned className="h-4 w-4 text-[#2c6b58]" aria-hidden />
         {title}
       </h2>
       {href && (
-        <Link to={href} className="text-xs font-medium text-violet-700 hover:underline">
+        <Link to={href} className="text-xs font-medium text-[#2c6b58] hover:underline">
           查看全部
         </Link>
       )}

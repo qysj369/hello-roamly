@@ -22,7 +22,7 @@ export default function GuidePublishMetaSection({ draft, onUpdateDraft }: GuideP
             id="guide-title"
             value={draft.title}
             onChange={(value) => onUpdateDraft({ title: value })}
-            placeholder="例如：济南 3 天穷游攻略"
+            placeholder="例如：济南 3 天漫行攻略"
           />
         </div>
         <div>

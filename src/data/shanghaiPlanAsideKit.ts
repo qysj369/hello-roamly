@@ -113,7 +113,7 @@ export const SHANGHAI_PLAN_ASIDE_ASSETS: readonly PlanAsideAsset[] = [
   },
   {
     name: '沈大成点心',
-    photoPath: '/plan-scenes/shanghai/spot-food-xiaolong.jpg',
+    photoPath: '/plan-scenes/shanghai/spot-food-shendacheng.jpg',
     keys: ['沈大成', '条头糕', '点心'],
     kind: 'food',
     parties: ['friends', 'family', 'solo'],

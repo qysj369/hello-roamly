@@ -35,7 +35,7 @@ function buildOverviewItems(plan: TravelPlan): OverviewItem[] {
       label: '总天数',
       value: getPlanDaysLabel(plan),
       icon: CalendarDays,
-      accent: 'from-violet-500/15 to-violet-600/5 text-violet-700',
+      accent: 'from-[#2c6b58]/15 to-[#2c6b58]/5 text-[#2c6b58]',
     },
     {
       key: 'audience',

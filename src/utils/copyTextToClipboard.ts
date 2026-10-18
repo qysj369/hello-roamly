@@ -8,6 +8,29 @@ export function shouldUseNativeShare(): boolean {
   return window.matchMedia('(hover: none) and (pointer: coarse)').matches;
 }
 
+/** 从页面上看得见的输入框复制。隐藏 1px 框会报成功但剪贴板仍是空的。 */
+export function copyVisibleText(node: HTMLTextAreaElement | HTMLInputElement): CopyTextResult {
+  const text = node.value.trim();
+  if (!text || typeof window === 'undefined') {
+    return 'failed';
+  }
+  const wasReadOnly = node.readOnly;
+  try {
+    node.readOnly = false;
+    node.focus();
+    node.select();
+    node.setSelectionRange(0, node.value.length);
+    if (document.execCommand('copy')) {
+      return 'copied';
+    }
+  } catch {
+    /* fall through */
+  } finally {
+    node.readOnly = wasReadOnly;
+  }
+  return copyTextToClipboardSync(text);
+}
+
 /** 同步复制 — 在用户点击瞬间执行，避免 async 导致剪贴板权限丢失 */
 export function copyTextToClipboardSync(text: string): CopyTextResult {
   const trimmed = text.trim();
@@ -15,26 +38,51 @@ export function copyTextToClipboardSync(text: string): CopyTextResult {
     return 'failed';
   }
 
+  const selection = typeof window.getSelection === 'function' ? window.getSelection() : null;
+  const saved: Range[] = [];
+  if (selection) {
+    for (let index = 0; index < selection.rangeCount; index += 1) {
+      saved.push(selection.getRangeAt(index));
+    }
+  }
+
+  const host = document.createElement('div');
+  host.setAttribute('contenteditable', 'true');
+  host.setAttribute('aria-hidden', 'true');
+  host.style.cssText = [
+    'position:fixed',
+    'top:0',
+    'left:0',
+    'width:min(90vw, 640px)',
+    'height:auto',
+    'max-height:30vh',
+    'opacity:0.01',
+    'z-index:2147483647',
+    'white-space:pre-wrap',
+    'overflow:hidden',
+    'font-size:16px',
+    'pointer-events:none',
+  ].join(';');
+  host.textContent = trimmed;
+  document.body.appendChild(host);
+
   try {
-    const textarea = document.createElement('textarea');
-    textarea.value = trimmed;
-    textarea.style.position = 'fixed';
-    textarea.style.top = '0';
-    textarea.style.left = '0';
-    textarea.style.width = '2px';
-    textarea.style.height = '2px';
-    textarea.style.opacity = '0';
-    document.body.appendChild(textarea);
-    textarea.focus();
-    textarea.select();
-    textarea.setSelectionRange(0, trimmed.length);
-    const copied = document.execCommand('copy');
-    document.body.removeChild(textarea);
-    if (copied) {
+    const range = document.createRange();
+    range.selectNodeContents(host);
+    selection?.removeAllRanges();
+    selection?.addRange(range);
+    host.focus();
+    if (document.execCommand('copy')) {
       return 'copied';
     }
   } catch {
-    // fallback below
+    /* fall through */
+  } finally {
+    document.body.removeChild(host);
+    selection?.removeAllRanges();
+    for (const range of saved) {
+      selection?.addRange(range);
+    }
   }
 
   return 'failed';

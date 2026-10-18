@@ -174,6 +174,18 @@ export function compactGeocodeLabelForDisplay(label: string): string {
     return trimmed;
   }
 
+  // 「济南市历下区 → 杭州」展示取目的地，避免被压成「历下」
+  if (/[→➜]/.test(trimmed)) {
+    const lastStop = trimmed
+      .split(/[→➜]/)
+      .map((part) => part.trim())
+      .filter(Boolean)
+      .at(-1);
+    if (lastStop && lastStop !== trimmed) {
+      return compactGeocodeLabelForDisplay(lastStop);
+    }
+  }
+
   const withoutProvince = stripProvince(trimmed);
   const segments = withoutProvince.split(/[,，]/).map((part) => part.trim()).filter(Boolean);
   if (segments.length >= 2) {

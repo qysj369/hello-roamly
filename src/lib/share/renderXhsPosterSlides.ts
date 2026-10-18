@@ -16,14 +16,17 @@ function planXhsSlideUrls(input: XhsPosterInput): {
   imageUrls: string[];
   hasSummary: boolean;
 } {
-  const deduped = [...new Set((input.slideImageUrls ?? []).filter(Boolean))];
+  const noteUrls = (input.noteSlides ?? []).map((slide) => slide.imageUrl).filter(Boolean);
+  const deduped = [...new Set((noteUrls.length ? noteUrls : input.slideImageUrls ?? []).filter(Boolean))];
   let imageUrls = deduped.slice(0, MAX_IMAGE_SLIDES_AFTER_CARD);
 
   if (imageUrls.length === 0 && input.coverImageUrl) {
     imageUrls = [input.coverImageUrl];
   }
 
-  const hasSummary = Boolean(input.summarySlide?.lines?.some((line) => line.trim()));
+  const hasSummary = Boolean(
+    !input.noteSlides?.length && input.summarySlide?.lines?.some((line) => line.trim()),
+  );
 
   return { imageUrls, hasSummary };
 }
@@ -41,16 +44,19 @@ export async function renderXhsPosterSlides(input: XhsPosterInput): Promise<Blob
   slides.push(await renderXhsPosterWithBadge(input, 1, totalPages));
 
   let page = 2;
-  for (const imageUrl of imageUrls) {
+  for (const [index, imageUrl] of imageUrls.entries()) {
     if (page > totalPages) {
       break;
     }
+    const note = input.noteSlides?.[index];
     slides.push(
       await renderXhsImageSlide({
         imageUrl,
         pageIndex: page,
         totalPages,
-        caption: input.locationLabel ? `📍 ${input.locationLabel}` : undefined,
+        eyebrow: note?.eyebrow,
+        title: note?.title,
+        caption: note?.caption ?? (input.locationLabel ? `📍 ${input.locationLabel}` : undefined),
       }),
     );
     page += 1;

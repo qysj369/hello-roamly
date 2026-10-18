@@ -159,7 +159,7 @@ export default function HistorySidebar() {
               <header className="flex items-center justify-between gap-3 border-b border-slate-100 px-4 py-4">
                 <div>
                   <h2 className="text-base font-bold text-slate-900">规划历史</h2>
-                  <p className="mt-0.5 text-xs text-slate-500">最近 AI 穷游规划与追问</p>
+                  <p className="mt-0.5 text-xs text-slate-500">最近 AI 漫行规划与追问</p>
                 </div>
                 <button
                   type="button"

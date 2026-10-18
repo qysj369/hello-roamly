@@ -73,7 +73,7 @@ function DiscoverMasonryFeedSection({
             <button
               type="button"
               onClick={() => setExplainOpen(true)}
-              className="mt-1 inline-flex items-center gap-1 text-[11px] font-medium text-violet-700 hover:underline"
+              className="mt-1 inline-flex items-center gap-1 text-[11px] font-medium text-[#2c6b58] hover:underline"
             >
               <Info className="h-3 w-3" aria-hidden />
               了解推荐逻辑

@@ -1,0 +1,76 @@
+/**
+ * 全站背景氛围（仅 CSS）
+ * 内页：深绿 #0F2E28
+ * 首页：浅海盐蓝渐变 #F7FBFF → #DDEBF7
+ */
+
+:root {
+  --theme-page-base: #0f2e28;
+  --theme-page-deep: #081a16;
+  --theme-page-mid: #14362f;
+  --theme-page-gold: #d8b96a;
+  --theme-page-sun: #f8d392;
+  --theme-page-sky: #62b8d8;
+  --theme-page-sand-pink: #d8a78c;
+  --theme-page-glow-green: #a8ff78;
+}
+
+:root.holo-home-active,
+html.holo-home-active {
+  --theme-page-base: #f7fbff;
+  --theme-page-deep: #ddebf7;
+  --theme-page-mid: #ddebf7;
+  --holo-m-bg: #f7fbff;
+  --holo-m-assist: #ddebf7;
+  --holo-m-primary: #254a52;
+  --holo-m-accent: #4a90a4;
+  --holo-m-warm: #f5efe4;
+  --holo-m-muted: #6d8790;
+  --holo-m-mist: #a8c9cc;
+  --holo-m-search-line: #b8d7dc;
+}
+
+html {
+  background-color: var(--theme-page-base, #0f2e28);
+}
+
+body {
+  background-color: var(--theme-page-base, #0f2e28);
+  background-image: none;
+}
+
+html.holo-home-active,
+html.holo-home-active body {
+  background-color: #f7fbff;
+  background-image: linear-gradient(180deg, #f7fbff 0%, #ddebf7 100%);
+}
+
+body::before {
+  content: '';
+  position: fixed;
+  inset: 0;
+  z-index: -2;
+  pointer-events: none;
+  background-color: var(--theme-page-base, #0f2e28);
+  background-image: none;
+  opacity: 1;
+}
+
+html.holo-home-active body::before {
+  background-color: transparent;
+  background-image: linear-gradient(180deg, #f7fbff 0%, #ddebf7 100%);
+  background-repeat: no-repeat;
+  background-size: cover;
+  background-blend-mode: normal;
+  opacity: 1;
+}
+
+html:not(.holo-home-active) body::before {
+  background-image: none;
+  background-blend-mode: normal;
+}
+
+body::after {
+  content: none;
+  display: none;
+}

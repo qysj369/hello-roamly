@@ -62,7 +62,7 @@ export type AiSnailInsights = {
   recommendations: string;
 };
 
-/** AI蜗牛生成的完整穷游攻略 */
+/** AI蜗牛生成的完整漫行攻略 */
 export type AiSnailGuideResult = {
   id: string;
   title: string;
@@ -74,6 +74,11 @@ export type AiSnailGuideResult = {
   dailyJournal: AiSnailDailyJournal[];
   snailInsights: AiSnailInsights;
   generatedAt: string;
+  /** 商业扩展预留；空则不渲染 */
+  distributeLink?: string | null;
+  paidGuideId?: string | null;
+  activityTag?: string | null;
+  memberOnly?: boolean | null;
 };
 
 export const AI_SNAIL_BUDGET_OPTIONS: {

@@ -1,16 +1,28 @@
 /**
- * 首页 Hero 插画 — 蜗牛拖拽地球
- * 已锁定用户原图裁切版，禁止再改线条/重绘。
- * 仅允许调整外层容器尺寸、位置、外边距与 CSS 动画。
+ * 首页 Hero 插画 — 锁定 PNG 定稿（勿再改图形）
+ * 本期固化：外层轻柔浮动；触角摆动 / 地球本体自转 → 二期（需分层素材）。
+ * 低端机由 softMotion=false 降级为静态。
  */
 import snailDragEarth from '@/assets/snail-drag-earth.png';
 
-export default function HeroSnailGraphic({ className = '' }: { className?: string }) {
+type HeroSnailGraphicProps = {
+  className?: string;
+  /** false 时关闭浮动，展示静态线稿 */
+  softMotion?: boolean;
+};
+
+export default function HeroSnailGraphic({
+  className = '',
+  softMotion = true,
+}: HeroSnailGraphicProps) {
   return (
-    <div className={`holo-home__snail-deco ${className}`.trim()} aria-hidden>
+    <div
+      className={`holo-home__snail-deco snail-earth-container${softMotion ? '' : ' is-static'} ${className}`.trim()}
+      aria-hidden
+    >
       <img
         src={snailDragEarth}
-        alt=""
+        alt="蜗牛旅行"
         className="holo-home__snail-img"
         width={837}
         height={377}

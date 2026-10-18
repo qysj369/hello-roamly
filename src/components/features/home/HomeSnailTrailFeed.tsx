@@ -32,7 +32,7 @@ export default function HomeSnailTrailFeed() {
 
   const destination = extractSearchDestination(searchQuery.trim());
   const subtitle = destination
-    ? `与「${destination}」相关的真实穷游路线 · 首页展示 ${previewCards.length} 条`
+    ? `与「${destination}」相关的真实漫行路线 · 首页展示 ${previewCards.length} 条`
     : `真实花费清单与行程流水账 · 全站已有 ${guideCount}+ 条黏液轨迹`;
 
   return (

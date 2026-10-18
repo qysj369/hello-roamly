@@ -42,7 +42,7 @@ export default function GuideDetailPage() {
   useShareLandingTracking({ contentKind: 'guide', contentId: guideId });
 
   return (
-    <MotionPage className="relative flex flex-col gap-4">
+    <MotionPage className="holo-guide-detail relative flex flex-col gap-4">
       <MotionBlock>
         <button
           type="button"

@@ -42,7 +42,11 @@ export function getAiProviderDisplay(): AiProviderDisplay {
     return 'deepseek';
   }
   if (isProductionAppMode()) {
-    return 'unconfigured';
+    /**
+     * 上线包故意不带 VITE_DEEPSEEK_API_KEY（见 DEPLOY-MEMO），
+     * 实际走服务端 DEEPSEEK_API_KEY。UI 不应显示「未配置 AI」。
+     */
+    return 'deepseek';
   }
   return 'mock';
 }
@@ -58,11 +62,20 @@ export function getAiProviderDisplayLabel(display: AiProviderDisplay = getAiProv
 }
 
 const PRODUCTION_AI_ERROR =
-  '上线模式需要配置 VITE_DEEPSEEK_API_KEY。请在 .env.local 填入 DeepSeek Key 后重启 pnpm dev。';
+  '上线模式需要在服务端配置 DEEPSEEK_API_KEY（勿把 Key 打进前端包）。';
 
-/** 上线模式下强制要求 DeepSeek；演示模式不校验 */
+/**
+ * 浏览器直连 DeepSeek 时校验。
+ * 上线模式走服务端 DEEPSEEK_API_KEY，不因缺少 VITE_ Key 误判。
+ * 本地穷游流式生成也走 /api/ai/* + 服务端 Key；VITE_ 仅用于少数浏览器直连路径，生产/本地请用两套 Key。
+ */
 export function assertAiServiceReady(): void {
-  if (isProductionAppMode() && !isDeepSeekConfigured()) {
-    throw new Error(PRODUCTION_AI_ERROR);
+  if (isProductionAppMode()) {
+    return;
+  }
+  if (!isDeepSeekConfigured()) {
+    throw new Error(
+      '此功能需浏览器直连 DeepSeek：请在 .env.local 配置开发专用 VITE_DEEPSEEK_API_KEY（勿与生产 Key 混用）；漫行生成请优先配置服务端 DEEPSEEK_API_KEY。',
+    );
   }
 }

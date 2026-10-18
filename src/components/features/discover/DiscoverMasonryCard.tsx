@@ -37,9 +37,9 @@ export type DiscoverMasonryCardProps = {
 
 const KIND_META = {
   guide: { label: '攻略', Icon: BookOpen, accent: 'bg-emerald-500/90' },
-  plan: { label: '计划', Icon: MapPinned, accent: 'bg-violet-500/90' },
-  savedPlan: { label: '穷游方案', Icon: MapPinned, accent: 'bg-brand-500/90' },
-  moment: { label: '瞬间', Icon: Sparkles, accent: 'bg-fuchsia-500/90' },
+  plan: { label: '计划', Icon: MapPinned, accent: 'bg-[#54786c]/90' },
+  savedPlan: { label: '漫行方案', Icon: MapPinned, accent: 'bg-brand-500/90' },
+  moment: { label: '瞬间', Icon: Sparkles, accent: 'bg-[#2c6b58]/90' },
 } as const;
 
 function PinShell({
@@ -69,7 +69,7 @@ function PinShell({
     <Link
       to={href}
       className={cn(
-        'group relative block overflow-hidden rounded-2xl bg-slate-200 shadow-sm ring-1 ring-black/5 transition duration-300 hover:-translate-y-0.5 hover:shadow-xl hover:ring-violet-200/60',
+        'group relative block overflow-hidden rounded-xl bg-slate-200 shadow-none ring-1 ring-[#b7cdc4]/70 transition duration-300 hover:ring-[#2c6b58]/35',
         className,
       )}
     >
@@ -125,7 +125,7 @@ function CardShell({
     <Link
       to={href}
       className={cn(
-        'group block overflow-hidden rounded-2xl border border-slate-200/90 bg-white shadow-sm transition hover:-translate-y-0.5 hover:shadow-md',
+        'group block overflow-hidden rounded-xl border border-[#b7cdc4] bg-[#fffef6] shadow-none transition hover:border-[#2c6b58]',
         className,
       )}
     >

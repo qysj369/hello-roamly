@@ -1,3 +1,9 @@
+.holo-drive__compliance {
+  padding: 8px 16px 12px;
+  border-top: 1px solid var(--holo-border-light, var(--theme-line));
+  background: color-mix(in srgb, var(--theme-bg) 92%, transparent);
+}
+
 .holo-drive {
   min-height: 100dvh;
   display: flex;
@@ -9,8 +15,17 @@
 
 .holo-drive--cabin {
   background:
-    radial-gradient(120% 80% at 50% 0%, rgba(120, 170, 190, 0.22), transparent 55%),
-    linear-gradient(180deg, #d9e4ea 0%, #eaf0f3 42%, #dfe8ed 100%);
+    radial-gradient(
+      120% 80% at 50% 0%,
+      color-mix(in srgb, var(--theme-sky) 28%, transparent),
+      transparent 55%
+    ),
+    linear-gradient(
+      180deg,
+      color-mix(in srgb, var(--theme-sky) 22%, var(--theme-bg)) 0%,
+      var(--theme-bg) 42%,
+      color-mix(in srgb, var(--theme-sand) 18%, var(--theme-bg)) 100%
+    );
 }
 
 .holo-drive__header {
@@ -398,7 +413,27 @@
 }
 
 .holo-drive__street-overlay--muted {
-  background: rgba(234, 240, 243, 0.94);
+  background: color-mix(in srgb, var(--theme-bg) 94%, transparent);
+}
+
+.holo-drive__street-overlay--loading {
+  gap: 10px;
+  background: color-mix(in srgb, var(--theme-bg) 92%, transparent);
+}
+
+.holo-drive__loading-spinner {
+  width: 28px;
+  height: 28px;
+  border: 2px solid color-mix(in srgb, var(--theme-secondary) 35%, transparent);
+  border-top-color: var(--theme-accent);
+  border-radius: 50%;
+  animation: holo-drive-spin 0.9s linear infinite;
+}
+
+@keyframes holo-drive-spin {
+  to {
+    transform: rotate(360deg);
+  }
 }
 
 /* —— HUD —— */
@@ -643,6 +678,14 @@
   gap: 8px;
 }
 
+.holo-drive--mobile-preview .holo-drive__actions {
+  grid-template-columns: 1fr;
+}
+
+.holo-drive--mobile-preview .holo-drive__actions .holo-drive__btn--primary {
+  order: -1;
+}
+
 .holo-drive--cabin .holo-drive__actions {
   max-width: 420px;
   margin: 0 auto;
@@ -689,52 +732,95 @@
   }
 
   .holo-drive__main {
-    gap: 8px;
-    padding: 8px 10px calc(8px + env(safe-area-inset-bottom));
+    gap: 6px;
+    padding: 6px 8px calc(6px + env(safe-area-inset-bottom));
+  }
+
+  .holo-drive--cabin .holo-drive__main {
+    gap: 6px;
   }
 
   .holo-drive__cabin {
-    height: min(74dvh, 560px);
-    min-height: min(74dvh, 560px);
+    height: min(78dvh, 640px);
+    min-height: min(78dvh, 640px);
   }
 
   .holo-drive--cabin .holo-drive__street {
     height: 100%;
     min-height: 100%;
-    border-radius: 16px;
+    border-radius: 14px;
+    touch-action: pan-y;
   }
 
   .holo-drive__hud {
-    padding: 10px 8px 8px;
+    padding: 8px 6px 6px;
+  }
+
+  .holo-drive__hud-glass {
+    opacity: 0.35;
   }
 
   .holo-drive__gauge {
-    min-width: 64px;
-    padding: 7px 8px;
+    min-width: 58px;
+    padding: 6px 8px;
+    border-radius: 12px;
   }
 
   .holo-drive__gauge-value {
-    font-size: 18px;
+    font-size: 16px;
+  }
+
+  .holo-drive__gauge-sub {
+    display: none;
   }
 
   .holo-drive__speed-num {
-    font-size: 28px;
+    font-size: 26px;
   }
 
   .holo-drive__dash {
-    padding: 8px 10px 10px;
-    border-radius: 16px;
+    padding: 8px 8px 9px;
+    border-radius: 14px;
+    gap: 6px;
+  }
+
+  .holo-drive__dash-hint {
+    font-size: 10px;
+  }
+
+  .holo-drive__speed-presets {
+    gap: 4px;
   }
 
   .holo-drive__speed-chip {
-    min-width: 52px;
-    padding: 5px 6px;
+    min-width: 48px;
+    padding: 5px 5px;
+    font-size: 10px;
   }
 
   .holo-drive__play {
-    min-width: 72px;
-    padding: 9px 14px;
+    min-width: 68px;
+    padding: 8px 12px;
     font-size: 12px;
+  }
+
+  .holo-drive__mode-switch {
+    gap: 6px;
+    overflow-x: auto;
+    justify-content: flex-start;
+    padding-bottom: 2px;
+    -webkit-overflow-scrolling: touch;
+  }
+
+  .holo-drive__mode-chip {
+    flex: 0 0 auto;
+    padding: 6px 10px;
+    font-size: 11px;
+  }
+
+  .holo-drive--cabin .holo-drive__alt-cities,
+  .holo-drive--cabin .holo-drive__actions {
+    display: none;
   }
 
   .holo-drive__intro {
@@ -761,6 +847,11 @@
     padding: 9px 10px;
     font-size: 12px;
   }
+
+  .holo-drive--loading .holo-drive__mode-switch {
+    opacity: 0.55;
+    pointer-events: none;
+  }
 }
 
 @media (min-width: 769px) {
@@ -772,4 +863,40 @@
     height: calc(100dvh - 140px);
     min-height: calc(100dvh - 140px);
   }
+}
+
+/* 移动端轻量街景预览（不挂载完整驾驶舱） */
+.holo-drive--mobile-preview .holo-drive__main {
+  display: flex;
+  flex-direction: column;
+  gap: 14px;
+  padding: 16px;
+  box-sizing: border-box;
+}
+
+.holo-drive__mobile-video {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  width: 100%;
+  border: 1px solid var(--holo-border-light, var(--theme-line));
+  border-radius: 14px;
+  overflow: hidden;
+  background: color-mix(in srgb, var(--theme-surface, #fffef6) 92%, transparent);
+}
+
+.holo-drive__mobile-video-el {
+  display: block;
+  width: 100%;
+  max-height: min(52vh, 420px);
+  background: #111;
+  object-fit: contain;
+}
+
+.holo-drive__mobile-hint {
+  margin: 0;
+  padding: 0 12px 12px;
+  color: var(--theme-muted, var(--holo-text-gray));
+  font-size: 12px;
+  line-height: 1.5;
 }

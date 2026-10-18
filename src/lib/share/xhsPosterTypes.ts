@@ -5,8 +5,17 @@ export type XhsPosterInput = {
   body: string;
   hashtags: string[];
   coverImageUrl?: string;
+  /** 封面角标，默认「小红书笔记」 */
+  badgeLabel?: string;
   /** 笔记卡片后的全屏配图（最多 8 张，加封面卡共最多 9 张） */
   slideImageUrls?: string[];
+  /** 点点式每日图卡：有则优先生成带标题的实拍页 */
+  noteSlides?: Array<{
+    imageUrl: string;
+    eyebrow?: string;
+    title?: string;
+    caption?: string;
+  }>;
   /** 末尾文字要点页（适合攻略/行程） */
   summarySlide?: {
     title: string;
@@ -26,7 +35,7 @@ export type XhsNoteCopyText = {
 };
 
 export type SharePosterVariant = {
-  id: 'wechat' | 'xhs';
+  id: 'wechat' | 'xhs' | 'douyin';
   label: string;
   hint: string;
   downloadFilename: string;

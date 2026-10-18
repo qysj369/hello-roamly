@@ -87,18 +87,18 @@ export default function DiscoverActiveFilterBar({
   return (
     <div
       className={cn(
-        'flex flex-wrap items-center gap-2 rounded-xl border border-violet-200/80 bg-violet-50/60 px-3 py-2',
+        'flex flex-wrap items-center gap-2 rounded-xl border border-[#b7cdc4] bg-emerald-50/60 px-3 py-2',
         className,
       )}
       aria-label="当前筛选"
     >
-      <span className="text-xs font-medium text-violet-800">已选</span>
+      <span className="text-xs font-medium text-[#2c6b58]">已选</span>
       {chips.map((chip) => (
         <button
           key={chip.key}
           type="button"
           onClick={chip.onRemove}
-          className="inline-flex items-center gap-1 rounded-full border border-violet-300/80 bg-white px-2.5 py-1 text-xs font-medium text-violet-900 hover:bg-violet-100"
+          className="inline-flex items-center gap-1 rounded-full border border-[#b7cdc4] bg-white px-2.5 py-1 text-xs font-medium text-[#2c6b58] hover:bg-emerald-50"
         >
           {chip.label}
           <X className="h-3 w-3 opacity-70" aria-hidden />
@@ -107,7 +107,7 @@ export default function DiscoverActiveFilterBar({
       <button
         type="button"
         onClick={onReset}
-        className="ml-auto text-xs font-semibold text-violet-700 hover:underline"
+        className="ml-auto text-xs font-semibold text-[#2c6b58] hover:underline"
       >
         全部清除
       </button>

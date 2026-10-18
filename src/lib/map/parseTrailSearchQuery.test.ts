@@ -143,6 +143,48 @@ describe('开封亲子游四天', () => {
     expect(extractPrimaryLocation('开封亲子游四天')).toBe('开封');
   });
 
+  it('does not treat 亲子出行 as a multi-stop with Hangzhou', () => {
+    expect(extractMultiStopDestinations('杭州亲子出行三天')).toEqual([]);
+    expect(extractSearchDestination('杭州亲子出行三天')).toBe('杭州');
+    expect(extractSearchDestination('杭州，同行：亲子，预算约2500元')).toBe('杭州');
+  });
+
+  it('does not split 自然山水 into fake stop 自然山', () => {
+    expect(extractMultiStopDestinations('杭州3天自然山水')).toEqual([]);
+    expect(extractSearchDestination('杭州3天自然山水')).toBe('杭州');
+  });
+
+  it('does not treat 海景/民俗/偏好 as Qingdao sister cities', () => {
+    expect(extractMultiStopDestinations('青岛3天海景民俗自然山水')).toEqual([]);
+    expect(extractSearchDestination('青岛3天海景民俗自然山水')).toBe('青岛');
+    expect(extractMultiStopDestinations('青岛→海景→民俗')).toEqual([]);
+    expect(extractSearchDestination('去青岛玩3天，同行情侣，人均预算约1500元，自然山水')).toBe(
+      '青岛',
+    );
+    expect(extractSearchDestination('济南情侣青岛3天人均4000美食游')).toBe('青岛');
+    expect(extractSearchDestination('从济南出发，好友结伴，杭州玩3天，不设预算，山水主题')).toBe(
+      '杭州',
+    );
+  });
+
+  it('does not split 去杭州玩 into 去杭→州玩→同行', () => {
+    const query = '去杭州玩3天，同行情侣，人均预算约1500元，自然山水';
+    expect(extractMultiStopDestinations(query)).toEqual([]);
+    expect(extractSearchDestination(query)).toBe('杭州');
+    expect(extractMultiStopDestinations('去成都玩3天，同行单人，人均预算约1200元，美食探店')).toEqual(
+      [],
+    );
+    expect(extractSearchDestination('去成都玩3天，同行单人，人均预算约1200元，美食探店')).toBe(
+      '成都',
+    );
+    expect(extractMultiStopDestinations('去西安玩3天，同行亲子，人均预算约1800元，人文慢逛')).toEqual(
+      [],
+    );
+    expect(extractSearchDestination('去西安玩3天，同行亲子，人均预算约1800元，人文慢逛')).toBe(
+      '西安',
+    );
+  });
+
   it('parses four days in travel intent', () => {
     const intent = parseTravelSearchIntent('开封亲子游四天');
     expect(intent.days).toBe(4);

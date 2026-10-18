@@ -21,7 +21,7 @@ export const DEMO_TRAVEL_BUDDY_SEEKING: UserCompanionIntent[] = [
   {
     id: 'seek-nomad-vn',
     userId: 'user-nomad',
-    planTitle: '越南柬埔寨陆路穷游',
+    planTitle: '越南柬埔寨陆路漫行',
     destination: '越南',
     days: 7,
     budgetLabel: '¥2,800',

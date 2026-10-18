@@ -32,8 +32,8 @@ export default function DiscoverFilterChips<T extends string>({
             className={cn(
               'shrink-0 rounded-full border px-4 py-2.5 text-sm font-medium transition sm:px-3 sm:py-1 sm:text-xs',
               value === option.value
-                ? 'border-violet-600 bg-violet-600 text-white'
-                : 'border-slate-200 bg-white text-slate-600 hover:border-violet-200',
+                ? 'border-[#2c6b58] bg-[#2c6b58] text-white'
+                : 'border-slate-200 bg-white text-slate-600 hover:border-[#b7cdc4]',
             )}
             aria-pressed={value === option.value}
           >

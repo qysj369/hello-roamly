@@ -4,7 +4,7 @@ import { useGlobalMapPlanningStore } from '@/stores/globalMapPlanning/store';
 const PLAN_LOADING_MESSAGES = [
   '已收到需求，正在连接 AI…',
   '正在撰写简介与行程…',
-  '行程出来后会接着补蜗牛提示…',
+  '正在把贴士写进各天行程…',
   '马上呈现完整方案…',
 ] as const;
 

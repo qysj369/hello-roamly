@@ -1,33 +1,97 @@
 /* 蜗牛旅行 · 浅米白极简全局主题（固定色彩系统 · 对齐设计定稿） */
 
-$theme-bg: #fdfbf4;
-$theme-bg-soft: #f6f3e8;
-$theme-surface: #ffffff;
-$theme-ink: #1b3b30;
-$theme-muted: #3d5f52;
-$theme-faint: #6a8a7c;
-$theme-line: #c5d6cc;
-$theme-accent: #1b3b30;
-$theme-accent-soft: #3d5f52;
-$theme-accent-warm: #b07a5a;
-$theme-brand-from: #1b3b30;
+/* —— 设计稿命名（与下方 theme-* 同源） —— */
+$bg-base: #f9f7ef;
+$bg-card: #fffffb;
+/* 移动端首页搜索条：柔和米白 + 浅描边 */
+$bg-search: #f8f8f6;
+$line-search: #e6e6e2;
+$color-main: #285948;
+$color-assist: #72a893;
+$color-sand: #d9c8b4;
+$color-sky: #98b8c7;
+$text-title: #222c28;
+$text-body: #444440;
+$text-light: #70706a;
+
+/* 全站氛围底：深绿旅行底（仅页面底层，不改品牌绿 / 浅色导航） */
+$page-ink: #0f2e28;
+$page-teal: #0a1f1b;
+$page-olive: #1f4a41;
+$page-gold: #d8b96a;
+
+/* —— 兼容既有 theme-* 命名 —— */
+$theme-bg: $bg-base;
+$theme-bg-soft: #f3f0e4;
+$theme-surface: $bg-card;
+$theme-surface-raised: #f7f3e8;
+$theme-title: $text-title;
+$theme-ink: $text-body;
+$theme-muted: #5a6f66;
+$theme-faint: $text-light;
+$theme-line: #c5d4cb;
+$theme-accent: $color-main;
+$theme-accent-soft: $color-assist;
+$theme-accent-warm: $color-sand;
+$theme-accent-sky: $color-sky;
+$theme-brand-from: $color-main;
 $theme-brand-to: #eef5f1;
-$theme-earth-glow: rgba(27, 59, 48, 0.14);
+$theme-earth-glow: rgba(114, 168, 147, 0.14);
+$theme-primary: $color-main;
+$theme-secondary: $color-assist;
+$theme-body: $text-body;
+$theme-sand: $color-sand;
+$theme-sky: $color-sky;
 
 $theme-radius-sm: 6px;
 $theme-radius-md: 12px;
 $theme-radius-lg: 20px;
 
-$theme-shadow-sm: 0 1px 4px rgba(68, 68, 64, 0.04);
-$theme-shadow-md: 0 4px 14px rgba(68, 68, 64, 0.06);
+$theme-shadow-sm: 0 1px 4px rgba(34, 44, 40, 0.05);
+$theme-shadow-md: 0 4px 14px rgba(34, 44, 40, 0.07);
 $theme-font: 'PingFang SC', 'Noto Sans SC', 'Segoe UI', system-ui, sans-serif;
+
+/* 垂直径向：顶心提亮、四边压暗（金光束改由首页 Hero 局部叠加） */
+$theme-bg-gradient:
+  radial-gradient(
+    ellipse 85% 70% at 50% 18%,
+    #{$page-olive} 0%,
+    color-mix(in srgb, #{$page-ink} 70%, #{$page-olive}) 46%,
+    #{$page-ink} 72%,
+    #{$page-teal} 100%
+  ),
+  radial-gradient(
+    ellipse 120% 70% at 50% 110%,
+    #{$page-teal} 0%,
+    transparent 55%
+  ),
+  linear-gradient(
+    180deg,
+    #{$page-ink} 0%,
+    color-mix(in srgb, #{$page-olive} 55%, #{$page-ink}) 48%,
+    #{$page-teal} 100%
+  );
 
 :root,
 .holo-app-shell,
 :root.holo-home-active {
+  --bg-base: #{$bg-base};
+  --bg-card: #{$bg-card};
+  --bg-search: #{$bg-search};
+  --line-search: #{$line-search};
+  --color-main: #{$color-main};
+  --color-assist: #{$color-assist};
+  --color-sand: #{$color-sand};
+  --color-sky: #{$color-sky};
+  --text-title: #{$text-title};
+  --text-body: #{$text-body};
+  --text-light: #{$text-light};
+
   --theme-bg: #{$theme-bg};
   --theme-bg-soft: #{$theme-bg-soft};
   --theme-surface: #{$theme-surface};
+  --theme-surface-raised: #{$theme-surface-raised};
+  --theme-title: #{$theme-title};
   --theme-ink: #{$theme-ink};
   --theme-muted: #{$theme-muted};
   --theme-faint: #{$theme-faint};
@@ -35,6 +99,14 @@ $theme-font: 'PingFang SC', 'Noto Sans SC', 'Segoe UI', system-ui, sans-serif;
   --theme-accent: #{$theme-accent};
   --theme-accent-soft: #{$theme-accent-soft};
   --theme-accent-warm: #{$theme-accent-warm};
+  --theme-accent-sky: #{$theme-accent-sky};
+  --theme-primary: #{$theme-primary};
+  --theme-secondary: #{$theme-secondary};
+  --theme-body: #{$theme-body};
+  --theme-sand: #{$theme-sand};
+  --theme-sky: #{$theme-sky};
+  --color-primary: #{$theme-primary};
+  --color-secondary: #{$theme-secondary};
   --theme-brand-from: #{$theme-brand-from};
   --theme-brand-to: #{$theme-brand-to};
   --theme-brand-gradient: linear-gradient(135deg, #{$theme-brand-from} 0%, #{$theme-brand-to} 100%);
@@ -45,14 +117,22 @@ $theme-font: 'PingFang SC', 'Noto Sans SC', 'Segoe UI', system-ui, sans-serif;
   --theme-shadow-sm: #{$theme-shadow-sm};
   --theme-shadow-md: #{$theme-shadow-md};
   --theme-font: #{$theme-font};
-  /* 首页主体禁止全屏渐变，仅保留变量供局部装饰复用 */
-  --theme-bg-gradient: #{$theme-bg};
+  /* 页面底层氛围；卡片 / 导航仍用 --theme-bg / --bg-card 浅米白 */
+  --theme-page-base: #{$page-ink};
+  --theme-page-teal: #{$page-teal};
+  --theme-page-olive: #{$page-olive};
+  --theme-page-gold: #{$page-gold};
+  --theme-bg-gradient: #{$theme-bg-gradient};
+  --theme-page-bg: #{$theme-bg-gradient};
+  /* 暗底上的标题 / 辅助字（Hero / 页脚标语等） */
+  --theme-on-dark-title: color-mix(in srgb, #{$bg-card} 90%, #{$page-gold});
+  --theme-on-dark-body: color-mix(in srgb, #{$bg-base} 78%, #{$page-gold});
+  --theme-on-dark-muted: color-mix(in srgb, #{$page-gold} 42%, #{$color-assist});
 
-  /* 兼容旧 holo 变量名，统一映射到浅米白主题（无霓虹） */
   --holo-cyan: #{$theme-accent-soft};
-  --holo-cyan-light: #c5d6cb;
+  --holo-cyan-light: #{$theme-sky};
   --holo-cyan-dark: #{$theme-accent};
-  --holo-text-dark: #{$theme-ink};
+  --holo-text-dark: #{$theme-title};
   --holo-text-gray: #{$theme-muted};
   --holo-text-light: #{$theme-faint};
   --holo-bg-main: #{$theme-bg};

@@ -42,13 +42,13 @@ function MatchScoreRing({ score }: { score: number }) {
           fill="none"
           strokeWidth="6"
           strokeLinecap="round"
-          className="stroke-violet-500"
+          className="stroke-[#2c6b58]"
           strokeDasharray={circumference}
           strokeDashoffset={offset}
         />
       </svg>
       <div className="absolute inset-0 flex flex-col items-center justify-center">
-        <span className="text-lg font-bold tabular-nums leading-none text-violet-700">
+        <span className="text-lg font-bold tabular-nums leading-none text-[#2c6b58]">
           {Math.round(score)}
         </span>
         <span className="text-[9px] font-medium text-slate-500">匹配度</span>
@@ -91,11 +91,11 @@ export default function TravelBuddyMatchCard({
                 src={candidate.avatar}
                 displayName={candidate.username}
                 size={44}
-                className="h-11 w-11 shrink-0 rounded-xl ring-2 ring-violet-100"
+                className="h-11 w-11 shrink-0 rounded-xl ring-2 ring-[#b7cdc4]/50"
               />
             ) : (
               <span
-                className="flex h-11 w-11 shrink-0 items-center justify-center rounded-xl bg-violet-100 text-base font-bold text-violet-700"
+                className="flex h-11 w-11 shrink-0 items-center justify-center rounded-xl bg-emerald-50 text-base font-bold text-[#2c6b58]"
                 aria-hidden
               >
                 {candidate.username.slice(0, 1)}
@@ -103,7 +103,7 @@ export default function TravelBuddyMatchCard({
             )}
             <div className="min-w-0">
               <h3 className="truncate text-base font-semibold text-slate-900">{candidate.username}</h3>
-              <p className="text-xs font-medium text-violet-700">{candidate.travelPersonality.title}</p>
+              <p className="text-xs font-medium text-[#2c6b58]">{candidate.travelPersonality.title}</p>
             </div>
           </div>
 
@@ -189,7 +189,7 @@ export default function TravelBuddyMatchCard({
         <button
           type="button"
           onClick={handleChat}
-          className="inline-flex flex-1 items-center justify-center gap-2 rounded-xl bg-violet-600 px-4 py-2.5 text-sm font-semibold text-white shadow-sm hover:bg-violet-700"
+          className="inline-flex flex-1 items-center justify-center gap-2 rounded-xl bg-[#2c6b58] px-4 py-2.5 text-sm font-semibold text-white shadow-sm hover:bg-[#245a4a]"
         >
           <MessageCircle className="h-4 w-4" aria-hidden />
           发起聊天

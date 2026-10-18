@@ -4,11 +4,12 @@ import {
   DEFAULT_TRAVEL_OPTIONS,
   resolveTravelOptionsBudget,
 } from '@/types/domain/travelOptions';
+import { AI_SLOW_TRAVEL_PROMPT_CONSTRAINTS } from '@/lib/config/productPositioning';
 
 const JSON_SCHEMA_HINT = `请只输出一个 JSON 对象（不要 Markdown 代码块），字段如下：
 {
   "title": "string，计划标题",
-  "summary": "string，1–3 句整体概述",
+  "summary": "string，1 句概述",
   "dailyPlans": [
     {
       "day": 1,
@@ -16,31 +17,33 @@ const JSON_SCHEMA_HINT = `请只输出一个 JSON 对象（不要 Markdown 代�
       "activities": [
         {
           "time": "09:00",
-          "description": "string，活动内容（20–40字）",
-          "location": "string，可选具体地点",
+          "description": "string，活动内容（12–22字）",
+          "location": "string，具体地点",
           "cost": 0
         }
       ]
     }
   ],
   "totalCost": 1500,
-  "tags": ["string", "2–3 个标签"],
-  "suitableAudience": "string，如 穷游党、周末出行",
+  "tags": ["string", "2 个标签"],
+  "suitableAudience": "string，如 慢行党",
   "practicalInfo": {
-    "accommodationTips": ["string，2 条住宿建议"],
-    "transportationTips": ["string，2 条交通提示"],
-    "precautions": ["string，2 条注意事项"]
+    "accommodationTips": ["string，1 条住宿建议"],
+    "transportationTips": ["string，1 条交通提示"],
+    "precautions": ["string，1 条注意事项"]
   }
 }`;
 
+/** 产品底线：基础 AI 漫行攻略与预算测算永久免费（见 productPositioning）。 */
 export function buildTravelPlanSystemPrompt(): string {
-  return `你是蜗牛旅行的旅行规划引擎，根据用户需求生成穷游向的行程 JSON。
+  return `你是蜗牛旅行的漫行规划引擎，根据用户需求生成松弛慢游向的行程 JSON。
+${AI_SLOW_TRAVEL_PROMPT_CONSTRAINTS}
 要求：
 - 预算敏感、每日 activities 时间合理（09:00–21:00）、totalCost 与各项 cost 大致匹配
-- 每一天 3 个 activities 即可，description 简洁具体（怎么去、玩什么、花多少钱）
-- location 写真实 POI 或街区名，便于地图标注
-- practicalInfo 每类 2 条，可执行即可
-- 优先输出完整 JSON，控制篇幅，避免冗长
+- 每一天恰好 3 个 activities；其中至少 1 个是闲逛/喝茶/散步类松弛空档；description 短句（怎么去/玩什么/花多少）
+- location 写真实 POI、老街或街区名；弱化流水线网红打卡点
+- practicalInfo 每类仅 1 条；禁止特惠/抢购/预订/下单等电商词
+- 必须一次输出完整可用 JSON；禁止解释、禁止冗长
 ${JSON_SCHEMA_HINT}`;
 }
 

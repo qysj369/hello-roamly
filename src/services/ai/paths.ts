@@ -5,6 +5,7 @@ export const AI_API = {
   deepseek: '/api/ai/deepseek',
   generatePlan: '/api/ai/generate-plan',
   generatePlanStream: '/api/ai/generate-plan-stream',
+  generatePlanJson: '/api/ai/generate-plan-json',
   continueChat: '/api/ai/continue-chat',
   continueChatStream: '/api/ai/continue-chat-stream',
   planTools: '/api/ai/plan-tools',

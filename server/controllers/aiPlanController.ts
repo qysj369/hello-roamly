@@ -64,6 +64,5 @@ export async function generateMapPlan(body: GenerateMapPlanRequest, env: ServerE
       originName: body.originName?.trim() || null,
     },
     completer,
-    { forceMock: !completer },
   );
 }

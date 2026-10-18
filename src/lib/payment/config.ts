@@ -1,4 +1,5 @@
 import { readEnv } from '@/lib/config/env';
+import { isOpenBusiness } from '@/lib/business/businessConfig';
 
 function isTruthyFlag(value: string | undefined): boolean {
   if (!value) {
@@ -8,8 +9,14 @@ function isTruthyFlag(value: string | undefined): boolean {
   return normalized === '1' || normalized === 'true' || normalized === 'yes';
 }
 
-/** 是否在 UI 展示支付入口（不代表已签约商户） */
+/**
+ * 支付 UI：须 isOpenBusiness 且 VITE_PAYMENT_UI_ENABLED=1。
+ * 关闭商业总开关时与纯免费站一致。
+ */
 export function isPaymentUiEnabled(): boolean {
+  if (!isOpenBusiness()) {
+    return false;
+  }
   return isTruthyFlag(readEnv('VITE_PAYMENT_UI_ENABLED'));
 }
 

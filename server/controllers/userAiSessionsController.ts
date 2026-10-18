@@ -264,3 +264,17 @@ export async function deleteUserAiSession(
   await writeDevDb(rootDir, db);
   return true;
 }
+
+/** 清掉未保存的调试/测试会话，保留用户点过「保存方案」的记录 */
+export async function purgeUnsavedUserAiSessions(
+  rootDir: string,
+): Promise<{ removed: number; kept: number }> {
+  const db = await readDevDb(rootDir);
+  const kept = db.userAiSessions.filter((entry) => entry.isSaved);
+  const removed = db.userAiSessions.length - kept.length;
+  if (removed > 0) {
+    db.userAiSessions = kept;
+    await writeDevDb(rootDir, db);
+  }
+  return { removed, kept: kept.length };
+}

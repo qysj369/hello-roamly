@@ -1,5 +1,16 @@
 import { useEffect, useRef, useState } from 'react';
 import SnailFlightHud from '@/components/snail-flight/SnailFlightHud';
+import { captionCueToFire } from '@/lib/snail-flight/captionPacks';
+import { useSnailFlightCaptionStore } from '@/lib/snail-flight/captionPackStore';
+import {
+  captionHoldMs,
+  isArrivalCaption,
+  resolveFlightCaption,
+  shouldBeginLandingTransition,
+  shouldHoldWaypointCaption,
+  SNAIL_FLIGHT_CAPTION_FADE_MS,
+  syncCaptionVoiceText,
+} from '@/lib/snail-flight/captions';
 import { listSnailFlightImagerySources } from '@/lib/snail-flight/imagery';
 import {
   detectSnailFlightQuality,
@@ -7,7 +18,6 @@ import {
   snailFlightResolutionScale,
 } from '@/lib/snail-flight/quality';
 import {
-  narrationAt,
   offsetLonLat,
   sampleFlightPose,
   SNAIL_FLIGHT_DURATION_MS,
@@ -89,11 +99,86 @@ export default function SnailFlightViewer({
   const [progress, setProgress] = useState(0);
   const [captionsOn, setCaptionsOn] = useState(true);
   const [muted, setMuted] = useState(false);
-  const [canMute, setCanMute] = useState(false);
   const [fading, setFading] = useState(false);
   const [error, setError] = useState<string | null>(null);
-  const [narration, setNarration] = useState(() => narrationAt(route, 0));
+  const packId = useSnailFlightCaptionStore((state) => state.packId);
+  const [captionBeatId, setCaptionBeatId] = useState('');
+  const [captionCardId, setCaptionCardId] = useState('takeoff');
+  const [captionVisible, setCaptionVisible] = useState(false);
+  const captionCard = resolveFlightCaption(route, packId, captionCardId);
   const ambienceRef = useRef<Ambience | null>(null);
+  const progressLabelRef = useRef<HTMLParagraphElement>(null);
+  const progressBarRef = useRef<HTMLSpanElement>(null);
+  const lastPctRef = useRef(-1);
+  const flightDoneRef = useRef(false);
+  const arrivalCaptionDoneRef = useRef(false);
+  const captionCycleRef = useRef(0);
+  const captionsOnRef = useRef(captionsOn);
+  const onLandedRef = useRef(onLanded);
+  const firedCuesRef = useRef(new Set<string>());
+  const tryFinishRef = useRef<() => void>(() => undefined);
+  captionsOnRef.current = captionsOn;
+  onLandedRef.current = onLanded;
+  tryFinishRef.current = () => {
+    if (landedRef.current) return;
+    if (
+      !shouldBeginLandingTransition({
+        flightDone: flightDoneRef.current,
+        captionsOn: captionsOnRef.current,
+        arrivalCaptionDone: arrivalCaptionDoneRef.current,
+      })
+    ) {
+      return;
+    }
+    landedRef.current = true;
+    setFading(true);
+    onLandedRef.current();
+  };
+
+  useEffect(() => {
+    if (!captionsOn) {
+      setCaptionVisible(false);
+      tryFinishRef.current();
+      return undefined;
+    }
+    if (!shouldHoldWaypointCaption(captionBeatId)) {
+      setCaptionVisible(false);
+      return undefined;
+    }
+    const cycle = captionCycleRef.current + 1;
+    captionCycleRef.current = cycle;
+    if (isArrivalCaption(captionBeatId)) {
+      arrivalCaptionDoneRef.current = false;
+    }
+    const hold = captionHoldMs(fast);
+    const delayIn = cycle === 1 ? 32 : SNAIL_FLIGHT_CAPTION_FADE_MS;
+    setCaptionVisible(false);
+    let arrivalTimer = 0;
+    const showTimer = window.setTimeout(() => {
+      if (captionCycleRef.current !== cycle) return;
+      setCaptionCardId(captionBeatId);
+      setCaptionVisible(true);
+    }, delayIn);
+    const hideTimer = window.setTimeout(() => {
+      if (captionCycleRef.current !== cycle) return;
+      setCaptionVisible(false);
+      if (!isArrivalCaption(captionBeatId)) return;
+      arrivalTimer = window.setTimeout(() => {
+        if (captionCycleRef.current !== cycle) return;
+        arrivalCaptionDoneRef.current = true;
+        tryFinishRef.current();
+      }, SNAIL_FLIGHT_CAPTION_FADE_MS);
+    }, delayIn + hold);
+    return () => {
+      window.clearTimeout(showTimer);
+      window.clearTimeout(hideTimer);
+      window.clearTimeout(arrivalTimer);
+    };
+  }, [captionsOn, fast, captionBeatId]);
+
+  useEffect(() => {
+    syncCaptionVoiceText(captionVisible ? captionCard : null, captionVisible);
+  }, [captionCard, captionVisible]);
 
   useEffect(() => {
     const host = hostRef.current;
@@ -102,10 +187,14 @@ export default function SnailFlightViewer({
     const duration = fast ? SNAIL_FLIGHT_FAST_DURATION_MS : SNAIL_FLIGHT_DURATION_MS;
     let viewer: {
       destroy: () => void;
-      camera: { setView: (opts: unknown) => void };
+      camera: {
+        lookAt: (target: unknown, offset: unknown) => void;
+        frustum: { near?: number };
+      };
       scene: { screenSpaceCameraController: Record<string, boolean> };
     } | null = null;
     let raf = 0;
+    let landSafetyTimer = 0;
     let cancelled = false;
 
     const onKey = (event: KeyboardEvent) => {
@@ -130,7 +219,7 @@ export default function SnailFlightViewer({
       lastPtrRef.current = { x: event.clientX, y: event.clientY };
       const look = lookRef.current;
       look.heading += dx * 0.0045;
-      look.pitch = Math.min(0.28, Math.max(-0.55, look.pitch - dy * 0.0038));
+      look.pitch = Math.min(0.1, Math.max(-0.32, look.pitch - dy * 0.0038));
     };
     const onPointerUp = (event: PointerEvent) => {
       draggingRef.current = false;
@@ -169,18 +258,35 @@ export default function SnailFlightViewer({
           return;
         }
         nextViewer.resolutionScale = snailFlightResolutionScale(quality);
-        nextViewer.scene.globe.maximumScreenSpaceError = quality === 'low' ? 3.6 : 2;
-        nextViewer.scene.globe.tileCacheSize = quality === 'low' ? 40 : 100;
-        nextViewer.scene.globe.enableLighting = quality === 'high';
+        nextViewer.scene.globe.maximumScreenSpaceError = quality === 'low' ? 2 : 1;
+        nextViewer.scene.globe.tileCacheSize = quality === 'low' ? 80 : 140;
+        nextViewer.scene.globe.preloadAncestors = true;
+        nextViewer.scene.globe.preloadSiblings = true;
+        nextViewer.scene.globe.enableLighting = false;
         nextViewer.scene.fog.enabled = false;
         if (nextViewer.scene.skyAtmosphere) {
-          nextViewer.scene.skyAtmosphere.show = quality === 'high';
+          nextViewer.scene.skyAtmosphere.show = false;
         }
-        nextViewer.scene.globe.showGroundAtmosphere = quality === 'high';
+        if (nextViewer.scene.skyBox) {
+          nextViewer.scene.skyBox.show = false;
+        }
+        nextViewer.scene.globe.showGroundAtmosphere = false;
+        nextViewer.scene.backgroundColor = Cesium.Color.fromCssColorString('#1a2420');
         if (nextViewer.scene.moon) {
           nextViewer.scene.moon.show = false;
         }
         nextViewer.shadows = false;
+        nextViewer.scene.logarithmicDepthBuffer = true;
+        const frustum = nextViewer.camera.frustum as { near?: number; far?: number; fov?: number };
+        if (typeof frustum.near === 'number') {
+          frustum.near = 1;
+        }
+        if (typeof frustum.far === 'number') {
+          frustum.far = 8_000_000;
+        }
+        if (typeof frustum.fov === 'number') {
+          frustum.fov = (52 * Math.PI) / 180;
+        }
         const controller = nextViewer.scene.screenSpaceCameraController;
         controller.enableRotate = false;
         controller.enableTranslate = false;
@@ -190,11 +296,6 @@ export default function SnailFlightViewer({
         controller.enableCollisionDetection = false;
 
         nextViewer.imageryLayers.removeAll();
-        nextViewer.imageryLayers.addImageryProvider(
-          await Cesium.TileMapServiceImageryProvider.fromUrl(
-            Cesium.buildModuleUrl('Assets/Textures/NaturalEarthII'),
-          ),
-        );
         const maxLevel = snailFlightImageryMaxLevel(quality);
         listSnailFlightImagerySources().forEach((source) => {
           nextViewer.imageryLayers.addImageryProvider(
@@ -202,6 +303,9 @@ export default function SnailFlightViewer({
               url: source.url,
               subdomains: source.subdomains,
               maximumLevel: maxLevel,
+              tileWidth: 256,
+              tileHeight: 256,
+              hasAlphaChannel: false,
               credit: source.credit,
             }),
           );
@@ -215,33 +319,67 @@ export default function SnailFlightViewer({
 
         if (quality === 'high') {
           ambienceRef.current = createAmbience();
-          setCanMute(Boolean(ambienceRef.current));
         }
+
+        firedCuesRef.current = new Set();
+        const applyProgress = (t: number) => {
+          const clamped = Math.min(1, Math.max(0, t));
+          const pct = clamped * 100;
+          const rounded = Math.round(pct);
+          if (progressBarRef.current) {
+            progressBarRef.current.style.width = `${pct}%`;
+          }
+          useSnailFlightCaptionStore.getState().setProgress(clamped);
+          if (lastPctRef.current === rounded) return;
+          lastPctRef.current = rounded;
+          if (progressLabelRef.current) {
+            progressLabelRef.current.textContent = `飞行进度 ${rounded}%`;
+          }
+          setProgress(clamped);
+        };
 
         const start = performance.now();
         const tick = (now: number) => {
           if (cancelled || !viewer) return;
           const t = Math.min(1, (now - start) / duration);
           const pose = sampleFlightPose(route, t);
-          const shifted = offsetLonLat(pose.lon, pose.lat, pose.heading, lookRef.current.lateral);
-          viewer.camera.setView({
-            destination: Cesium.Cartesian3.fromDegrees(shifted.lon, shifted.lat, pose.height),
-            orientation: {
-              heading: pose.heading + lookRef.current.heading,
-              pitch: -0.34 + lookRef.current.pitch,
-              roll: 0,
-            },
-          });
-          const beat = narrationAt(route, t);
-          setProgress((prev) => (Math.abs(prev - t) > 0.008 ? t : prev));
-          setNarration((prev) => (prev.id === beat.id ? prev : beat));
-          if (t >= 1 && !landedRef.current) {
-            landedRef.current = true;
-            setProgress(1);
-            setFading(true);
-            window.setTimeout(() => {
-              if (!cancelled) onLanded();
-            }, 1080);
+          const heading = pose.heading + lookRef.current.heading;
+          const shifted = offsetLonLat(pose.lon, pose.lat, heading, lookRef.current.lateral);
+          const pitch = Math.min(-0.72, Math.max(-1.05, -0.88 + lookRef.current.pitch));
+          const aheadM = pose.height / Math.tan(-pitch);
+          const east = Math.sin(heading) * aheadM;
+          const north = Math.cos(heading) * aheadM;
+          const dLat = north / 111_320;
+          const dLon = east / (111_320 * Math.cos((shifted.lat * Math.PI) / 180) || 1);
+          viewer.camera.lookAt(
+            Cesium.Cartesian3.fromDegrees(shifted.lon + dLon, shifted.lat + dLat, 0),
+            new Cesium.HeadingPitchRange(heading, pitch, Math.hypot(pose.height, aheadM)),
+          );
+          if (typeof viewer.camera.frustum.near === 'number') {
+            viewer.camera.frustum.near = 0.5;
+          }
+          applyProgress(t);
+          const cue = captionCueToFire(t, firedCuesRef.current);
+          if (cue && shouldHoldWaypointCaption(cue.id)) {
+            firedCuesRef.current.add(cue.id);
+            setCaptionBeatId((prev) => (prev === cue.id ? prev : cue.id));
+          }
+          if (t >= 1) {
+            flightDoneRef.current = true;
+            const arrivalId = ['qingdao-land', 'qingdao-coast', 'approach'].find((id) =>
+              firedCuesRef.current.has(id),
+            );
+            if (!arrivalId && captionsOnRef.current) {
+              firedCuesRef.current.add('qingdao-land');
+              setCaptionBeatId((prev) => (prev === 'qingdao-land' ? prev : 'qingdao-land'));
+            }
+            tryFinishRef.current();
+            if (!landedRef.current && !landSafetyTimer) {
+              landSafetyTimer = window.setTimeout(() => {
+                arrivalCaptionDoneRef.current = true;
+                tryFinishRef.current();
+              }, captionHoldMs(fast) + SNAIL_FLIGHT_CAPTION_FADE_MS * 2);
+            }
             return;
           }
           raf = window.requestAnimationFrame(tick);
@@ -258,6 +396,7 @@ export default function SnailFlightViewer({
     return () => {
       cancelled = true;
       window.cancelAnimationFrame(raf);
+      window.clearTimeout(landSafetyTimer);
       host.removeEventListener('pointerdown', onPointerDown);
       host.removeEventListener('pointermove', onPointerMove);
       host.removeEventListener('pointerup', onPointerUp);
@@ -267,7 +406,7 @@ export default function SnailFlightViewer({
       ambienceRef.current = null;
       viewer?.destroy();
     };
-  }, [fast, onLanded, route]);
+  }, [fast, route]);
 
   return (
     <div className="snail-flight" aria-label="蜗牛号低空观光">
@@ -277,10 +416,12 @@ export default function SnailFlightViewer({
       {error ? <p className="snail-flight__status">{error}。可退出后重试。</p> : null}
       <SnailFlightHud
         progress={progress}
-        narration={narration}
+        narration={captionCard}
         captionsOn={captionsOn}
+        captionVisible={captionVisible}
         muted={muted}
-        canMute={canMute}
+        progressLabelRef={progressLabelRef}
+        progressBarRef={progressBarRef}
         onExit={onExit}
         onToggleCaptions={() => setCaptionsOn((value) => !value)}
         onToggleMute={() => {

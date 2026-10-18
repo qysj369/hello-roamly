@@ -51,7 +51,7 @@ export default function UserProfileSavedPlansSection({
 
       {!isLoading && !error && items.length === 0 ? (
         <p className="rounded-xl border border-dashed border-slate-200 bg-slate-50 py-8 text-center text-sm text-slate-500">
-          还没有保存的方案。在地图生成穷游方案后，点击「保存方案」即可收录。
+          还没有保存的方案。在地图生成漫行方案后，点击「保存方案」即可收录。
         </p>
       ) : null}
 

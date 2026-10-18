@@ -11,7 +11,7 @@ export type UserProfileInviteSectionProps = {
   className?: string;
 };
 
-/** 个人主页：邀请好友得奖励 */
+/** 个人主页：邀请入口（默认关闭；开启时亦避免电商促销话术） */
 export default function UserProfileInviteSection({ userId, className }: UserProfileInviteSectionProps) {
   const { data: summary, isPending, isError, error, refetch } = useInviteSummary(userId);
 
@@ -31,8 +31,8 @@ export default function UserProfileInviteSection({ userId, className }: UserProf
           <Gift className="h-5 w-5" aria-hidden />
         </span>
         <div>
-          <h2 className="text-base font-semibold text-slate-900">邀请好友得奖励</h2>
-          <p className="mt-0.5 text-xs text-slate-500">分享邀请码，好友注册后双方可获积分与徽章</p>
+          <h2 className="text-base font-semibold text-slate-900">邀请蜗友一起慢爬</h2>
+          <p className="mt-0.5 text-xs text-slate-500">分享邀请码，让更多人用上免费漫行工具</p>
         </div>
       </div>
 

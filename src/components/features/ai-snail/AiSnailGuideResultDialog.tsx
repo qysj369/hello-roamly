@@ -39,7 +39,7 @@ export default function AiSnailGuideResultDialog({
     <Dialog
       open={open}
       onClose={onClose}
-      title="穷游攻略已生成"
+      title="漫行攻略已生成"
       description="花费清单、行程流水账与蜗牛启示已就绪，可复制分享。"
       confirmLabel="好的"
       onConfirm={onClose}

@@ -74,6 +74,18 @@ const API_ROUTES: ApiRoute[] = [
     modulePath: '/server/api/drive-videos/handler.ts',
     exportName: 'handleDriveVideosApi',
   },
+  {
+    method: 'POST',
+    path: '/api/feedback',
+    modulePath: '/server/api/feedback.ts',
+    exportName: 'handleFeedbackApi',
+  },
+  {
+    method: 'GET',
+    path: '/api/wechat/js-config',
+    modulePath: '/server/api/wechat/js-config.ts',
+    exportName: 'handleWechatJsConfigApi',
+  },
 ];
 
 function matchApiRoute(url: string | undefined, method: string | undefined): ApiRoute | null {
@@ -138,6 +150,10 @@ type TravelPlanApiModule = {
 
 type CompanionSketchApiModule = {
   handleCompanionSketchApi: GuideApiModule['handleGenerateGuideApi'];
+};
+
+type PlanJsonApiModule = {
+  handleGeneratePlanJsonApi: GuideApiModule['handleGenerateGuideApi'];
 };
 
 function loadHandler(
@@ -218,6 +234,7 @@ function mountApiMiddleware(server: ViteDevServer): void {
   let companionSketchHandlerPromise:
     | Promise<CompanionSketchApiModule['handleCompanionSketchApi']>
     | null = null;
+  let planJsonHandlerPromise: Promise<PlanJsonApiModule['handleGeneratePlanJsonApi']> | null = null;
 
   const getGuideHandler = () => {
     if (!guideHandlerPromise) {
@@ -319,13 +336,18 @@ function mountApiMiddleware(server: ViteDevServer): void {
     return travelPlanHandlerPromise;
   };
 
-  const getCompanionSketchHandler = () => {
-    if (!companionSketchHandlerPromise) {
-      companionSketchHandlerPromise = server
-        .ssrLoadModule('/server/api/ai/companion-sketch.ts')
-        .then((mod) => (mod as CompanionSketchApiModule).handleCompanionSketchApi);
+  const getCompanionSketchHandler = () =>
+    server
+      .ssrLoadModule('/server/api/ai/companion-sketch.ts')
+      .then((mod) => (mod as CompanionSketchApiModule).handleCompanionSketchApi);
+
+  const getPlanJsonHandler = () => {
+    if (!planJsonHandlerPromise) {
+      planJsonHandlerPromise = server
+        .ssrLoadModule('/server/api/ai/generate-plan-json.ts')
+        .then((mod) => (mod as PlanJsonApiModule).handleGeneratePlanJsonApi);
     }
-    return companionSketchHandlerPromise;
+    return planJsonHandlerPromise;
   };
 
   server.middlewares.use((req, res, next) => {
@@ -344,12 +366,25 @@ function mountApiMiddleware(server: ViteDevServer): void {
 
     const pathname = req.url?.split('?')[0] ?? '';
 
+    // DeepSeek 贵价路由：按 IP 限流，防止连点/重试把余额打空
     if (pathname.startsWith('/api/ai/') && !enforceAiRateLimit(req, res, env, pathname)) {
       return;
     }
 
     if (pathname === '/api/ai/generate-guide') {
       void getGuideHandler()
+        .then((handle) => handle(req, res, env))
+        .catch((error: unknown) => {
+          const message = error instanceof Error ? error.message : 'API 处理失败';
+          res.statusCode = 500;
+          res.setHeader('Content-Type', 'application/json; charset=utf-8');
+          res.end(JSON.stringify({ error: message }));
+        });
+      return;
+    }
+
+    if (pathname === '/api/ai/generate-plan-json') {
+      void getPlanJsonHandler()
         .then((handle) => handle(req, res, env))
         .catch((error: unknown) => {
           const message = error instanceof Error ? error.message : 'API 处理失败';

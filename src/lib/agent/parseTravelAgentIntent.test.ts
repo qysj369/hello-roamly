@@ -5,6 +5,7 @@ describe('parseTravelAgentIntent', () => {
   it('routes site tools from one sentence', () => {
     expect(parseTravelAgentIntent('帮我保存行程', true)).toEqual({ type: 'save' });
     expect(parseTravelAgentIntent('生成海报', true)).toEqual({ type: 'poster' });
+    expect(parseTravelAgentIntent('确认行程，生成图文资产包', true)).toEqual({ type: 'poster' });
     expect(parseTravelAgentIntent('复制分享链接', true)).toEqual({ type: 'copy_link' });
     expect(parseTravelAgentIntent('发给朋友', true)).toEqual({ type: 'share' });
     expect(parseTravelAgentIntent('发微信', true)).toEqual({ type: 'share' });

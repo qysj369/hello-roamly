@@ -6,7 +6,7 @@ export type ShareContentKind =
   | 'user_profile';
 
 /** 分享渠道 / 样式 */
-export type ShareChannel = 'wechat' | 'xhs' | 'link' | 'native' | 'unknown';
+export type ShareChannel = 'wechat' | 'xhs' | 'douyin' | 'link' | 'native' | 'unknown';
 
 /** 分享行为 */
 export type ShareAction =

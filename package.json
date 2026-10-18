@@ -13,6 +13,8 @@
     "build:deploy": "pnpm run seo:generate && vite build",
     "build:deploy:capsule": "node scripts/capsule-deploy-build.mjs",
     "build:deploy:holo": "node scripts/holo-deploy-build.mjs",
+    "deploy:holo": "powershell -NoProfile -ExecutionPolicy Bypass -File deploy/deploy-holo-oneclick.ps1",
+    "deploy:holo:ssh-setup": "powershell -NoProfile -ExecutionPolicy Bypass -File scripts/setup-holo-ssh.ps1",
     "build:deploy:safe": "pnpm run seo:generate && node scripts/deploy-build.mjs",
     "build:promo": "powershell -NoProfile -ExecutionPolicy Bypass -Command \"$env:VITE_APP_MODE='production'; $env:VITE_MAP_DEV_DEMO='0'; $env:VITE_HOME_LAYOUT='launch'; $env:VITE_INVITE_ENABLED='1'; $env:VITE_SHARE_ANALYTICS_ENABLED='1'; pnpm run build:deploy\"",
     "build:ssg": "pnpm run build && pnpm run prerender",

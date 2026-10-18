@@ -4,6 +4,7 @@ import {
   SITE_ICP_URL,
   SITE_MPS_BEIAN_NUMBER,
   SITE_MPS_BEIAN_URL,
+  SITE_PLATFORM_DISCLAIMER,
 } from '@/lib/config/siteCompliance';
 import { cn } from '@/utils/cn';
 
@@ -27,8 +28,9 @@ export default function SiteComplianceBar({
         isAbout && 'site-compliance--about',
         className,
       )}
-      aria-label="备案与投诉举报"
+      aria-label="备案、免责声明与投诉举报"
     >
+      <p className="site-compliance__disclaimer">{SITE_PLATFORM_DISCLAIMER}</p>
       <p className="site-compliance__beian">
         <a
           href={SITE_ICP_URL}

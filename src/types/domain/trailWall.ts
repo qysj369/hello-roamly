@@ -24,7 +24,7 @@ export type TrailWallFilter = 'all' | TrailWallFilterTag;
 
 export const TRAIL_WALL_FILTERS: { value: TrailWallFilter; label: string }[] = [
   { value: 'all', label: '全部轨迹' },
-  { value: 'budget', label: '硬壳穷游' },
+  { value: 'budget', label: '硬壳漫行' },
   { value: 'food', label: '美食' },
   { value: 'photo', label: '摄影' },
   { value: 'nature', label: '自然' },

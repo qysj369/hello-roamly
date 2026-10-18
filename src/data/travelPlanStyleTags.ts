@@ -21,7 +21,7 @@ export const TRAVEL_PLAN_STYLE_TAGS_BY_GUIDE_ID: Record<string, TravelPlanStyleT
 
 const DEFAULT_STYLE_TAGS: TravelPlanStyleTag[] = [
   { id: 'explore', label: '冒险探索', tone: 'brand' },
-  { id: 'budget', label: '穷游精选', tone: 'emerald' },
+  { id: 'budget', label: '漫行精选', tone: 'emerald' },
 ];
 
 export function getTravelPlanStyleTags(guideId: string): TravelPlanStyleTag[] {

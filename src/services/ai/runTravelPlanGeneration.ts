@@ -30,7 +30,7 @@ export async function runTravelPlanGeneration(
       { role: 'system', content: buildTravelPlanSystemPrompt() },
       { role: 'user', content: buildTravelPlanUserPrompt(trimmedPrompt, options) },
     ],
-    temperature: 0.45,
+    temperature: 0.3,
     maxTokens: resolveTravelPlanMaxTokens(days),
     jsonMode: true,
   });

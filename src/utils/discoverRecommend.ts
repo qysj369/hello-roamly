@@ -209,7 +209,7 @@ export function scoreDiscoverFeedItem(
   if (item.kind === 'savedPlan') {
     return {
       score: 72 + recencyScore(item.updatedAt) * 0.1,
-      reasons: [`${item.locationName} 穷游方案`, '蜗友公开分享'],
+      reasons: [`${item.locationName} 漫行方案`, '蜗友公开分享'],
     };
   }
 

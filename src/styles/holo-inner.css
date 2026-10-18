@@ -1,0 +1,1190 @@
+/* 内页外壳：与 Holo 首页锁定色板对齐（#f9f7eb / #2c6b58） */
+
+.holo-inner-shell {
+  --theme-bg: #f9f7eb;
+  --theme-surface: #fffef6;
+  --theme-accent: #2c6b58;
+  --theme-muted: #54786c;
+  --theme-line: #b7cdc4;
+  --theme-faint: #54786c;
+  --theme-ink: #2c6b58;
+  --holo-inner-header-h: 56px;
+
+  min-height: 100dvh;
+  /* 氛围底由 body 固定层承担 */
+  background: transparent;
+  color: var(--theme-accent);
+  font-family: var(--theme-font, 'PingFang SC', 'Noto Sans SC', 'Segoe UI', system-ui, sans-serif);
+  overflow-x: clip;
+}
+
+.holo-inner-shell__header {
+  position: sticky;
+  top: 0;
+  z-index: 50;
+  height: var(--holo-inner-header-h);
+  border-bottom: 1px solid var(--theme-line);
+  background: color-mix(in srgb, var(--theme-surface) 96%, transparent);
+  backdrop-filter: blur(12px);
+  -webkit-backdrop-filter: blur(12px);
+}
+
+.holo-inner-shell__header-inner {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  width: 100%;
+  max-width: 72rem;
+  height: 100%;
+  margin: 0 auto;
+  padding: 0 16px;
+  box-sizing: border-box;
+}
+
+.holo-inner-shell__brand {
+  display: inline-flex;
+  min-width: 0;
+  text-decoration: none;
+  color: inherit;
+}
+
+.holo-inner-shell__brand:focus-visible {
+  outline: none;
+  border-radius: 8px;
+  box-shadow: 0 0 0 2px color-mix(in srgb, var(--theme-accent) 35%, transparent);
+}
+
+.holo-inner-shell__brand .snail-brand-logo__zh {
+  color: var(--theme-accent);
+  font-size: 15px;
+}
+
+.holo-inner-shell__brand .snail-brand-logo__en {
+  color: var(--theme-muted);
+  font-size: 11px;
+}
+
+.holo-inner-shell__brand .snail-brand-logo__slogan {
+  display: none;
+}
+
+.holo-inner-shell__header-right {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  min-width: 0;
+}
+
+.holo-inner-shell__page-label {
+  margin: 0;
+  color: var(--theme-muted);
+  font-size: 12px;
+  font-weight: 500;
+  letter-spacing: 0.12em;
+  white-space: nowrap;
+}
+
+.holo-inner-shell__home-link {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  min-height: 36px;
+  padding: 0 12px;
+  border: 1px solid var(--theme-line);
+  border-radius: 999px;
+  color: var(--theme-accent);
+  font-size: 12px;
+  letter-spacing: 0.06em;
+  text-decoration: none;
+  background: transparent;
+}
+
+.holo-inner-shell__home-link:hover,
+.holo-inner-shell__home-link:focus-visible {
+  border-color: var(--theme-accent);
+  outline: none;
+}
+
+.holo-inner-shell__main {
+  width: 100%;
+  max-width: 72rem;
+  margin: 12px auto 0;
+  padding: 18px 16px calc(88px + env(safe-area-inset-bottom));
+  box-sizing: border-box;
+  border: 1px solid color-mix(in srgb, #d9c8b4 42%, var(--theme-line));
+  border-radius: 16px;
+  background: color-mix(in srgb, var(--theme-surface) 95%, transparent);
+  backdrop-filter: blur(12px);
+  -webkit-backdrop-filter: blur(12px);
+  box-shadow: 0 10px 32px color-mix(in srgb, #0a121d 20%, transparent);
+}
+
+.holo-inner-shell__compliance {
+  max-width: 72rem;
+  margin: 8px auto 0;
+  padding: 4px 16px calc(80px + env(safe-area-inset-bottom));
+  color: var(--theme-muted);
+  font-size: 11px;
+}
+
+/* 行程详情：毛玻璃 + 入场动画会让微信/PC 扫码页只剩标题卡 */
+.holo-inner-shell__main:has(.holo-plan-detail),
+.holo-inner-shell__main--plan {
+  backdrop-filter: none;
+  -webkit-backdrop-filter: none;
+  overflow: visible;
+}
+
+@media (min-width: 1024px) {
+  .holo-inner-shell {
+    --holo-inner-header-h: 64px;
+  }
+
+  .holo-inner-shell__header-inner {
+    padding: 0 28px;
+  }
+
+  .holo-inner-shell__main {
+    padding: 20px 28px 40px;
+  }
+
+  .holo-inner-shell__brand .snail-brand-logo__zh {
+    font-size: 17px;
+  }
+}
+
+/* —— 攻略页内容外壳（页面根 .holo-guides） —— */
+.holo-guides {
+  --theme-bg: #f9f7eb;
+  --theme-surface: #fffef6;
+  --theme-accent: #2c6b58;
+  --theme-muted: #54786c;
+  --theme-line: #b7cdc4;
+  display: flex;
+  flex-direction: column;
+  gap: 14px;
+}
+
+.holo-guides__panel {
+  border: 1.5px solid var(--theme-line);
+  border-radius: 14px;
+  background: var(--theme-surface);
+  box-shadow: none;
+  padding: 18px 16px;
+}
+
+.holo-guides__title {
+  margin: 0;
+  color: var(--theme-accent);
+  font-size: 16px;
+  font-weight: 600;
+  letter-spacing: 0.04em;
+}
+
+.holo-guides__subtitle {
+  margin: 6px 0 0;
+  color: var(--theme-muted);
+  font-size: 13px;
+  line-height: 1.55;
+}
+
+.holo-guides__cta {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  min-height: 40px;
+  padding: 0 16px;
+  border: 1.5px solid var(--theme-accent);
+  border-radius: 999px;
+  background: var(--theme-accent);
+  color: #f9f7eb;
+  font-size: 13px;
+  font-weight: 560;
+  letter-spacing: 0.06em;
+  text-decoration: none;
+}
+
+.holo-guides__cta:hover {
+  filter: brightness(1.05);
+}
+
+.holo-guides__label {
+  margin: 14px 0 0;
+  color: var(--theme-muted);
+  font-size: 13px;
+  font-weight: 500;
+}
+
+.holo-guides__input {
+  margin-top: 6px;
+  display: block;
+  width: 100%;
+  border: 1.5px solid var(--theme-line);
+  border-radius: 10px;
+  background: var(--theme-bg);
+  color: var(--theme-accent);
+  box-shadow: none;
+}
+
+.holo-guides__input:focus {
+  border-color: var(--theme-accent);
+  outline: none;
+  box-shadow: 0 0 0 3px color-mix(in srgb, var(--theme-accent) 16%, transparent);
+}
+
+/* 列表卡：去重阴影，细边线 */
+.holo-guides section.rounded-2xl,
+.holo-guides article.rounded-2xl {
+  border-color: var(--theme-line) !important;
+  background: var(--theme-surface) !important;
+  box-shadow: none !important;
+}
+
+.holo-guides h1,
+.holo-guides h2,
+.holo-guides h3 {
+  color: var(--theme-accent);
+}
+
+.holo-guides .text-slate-600,
+.holo-guides .text-slate-500,
+.holo-guides .text-slate-400 {
+  color: var(--theme-muted) !important;
+}
+
+.holo-guides .text-brand-600,
+.holo-guides .text-brand-700,
+.holo-guides .text-emerald-800 {
+  color: var(--theme-accent) !important;
+}
+
+.holo-guides .bg-brand-50,
+.holo-guides .bg-emerald-100,
+.holo-guides .bg-slate-100 {
+  background: color-mix(in srgb, var(--theme-accent) 8%, var(--theme-bg)) !important;
+  color: var(--theme-accent) !important;
+}
+
+/* AI 横幅降噪 */
+.holo-guides-banner {
+  position: relative;
+  border: 1.5px solid var(--theme-line, #b7cdc4);
+  border-radius: 14px;
+  background: color-mix(in srgb, var(--theme-accent, #2c6b58) 5%, var(--theme-surface, #fffef6));
+  padding: 14px 16px;
+  box-shadow: none;
+  color: var(--theme-accent, #2c6b58);
+}
+
+.holo-guides-banner__eyebrow {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  margin: 0;
+  color: var(--theme-muted, #54786c);
+  font-size: 11px;
+  letter-spacing: 0.1em;
+}
+
+.holo-guides-banner__body {
+  margin: 8px 0 0;
+  padding-right: 28px;
+  color: var(--theme-accent, #2c6b58);
+  font-size: 14px;
+  line-height: 1.55;
+}
+
+.holo-guides-banner__meta {
+  margin: 4px 0 0;
+  color: var(--theme-muted, #54786c);
+  font-size: 12px;
+}
+
+.holo-guides-banner__close {
+  position: absolute;
+  top: 10px;
+  right: 10px;
+  border: none;
+  border-radius: 8px;
+  background: transparent;
+  color: var(--theme-muted, #54786c);
+  padding: 4px;
+  cursor: pointer;
+}
+
+.holo-guides-banner__close:hover {
+  color: var(--theme-accent, #2c6b58);
+  background: color-mix(in srgb, var(--theme-accent, #2c6b58) 8%, transparent);
+}
+
+/* —— 发现页内容外壳（页面根 .holo-discover） —— */
+.holo-discover {
+  --theme-bg: #f9f7eb;
+  --theme-surface: #fffef6;
+  --theme-accent: #2c6b58;
+  --theme-muted: #54786c;
+  --theme-line: #b7cdc4;
+}
+
+.holo-discover h1,
+.holo-discover h2,
+.holo-discover h3 {
+  color: var(--theme-accent);
+}
+
+.holo-discover .text-slate-900,
+.holo-discover .text-slate-800 {
+  color: var(--theme-accent) !important;
+}
+
+.holo-discover .text-slate-600,
+.holo-discover .text-slate-500,
+.holo-discover .text-slate-400 {
+  color: var(--theme-muted) !important;
+}
+
+.holo-discover section.rounded-2xl,
+.holo-discover article.rounded-2xl {
+  border-color: var(--theme-line) !important;
+  box-shadow: none !important;
+}
+
+/* 底栏：米白 + 主色激活 */
+.holo-inner-shell nav[aria-label='底部导航'] {
+  border-top-color: var(--theme-line);
+  background: color-mix(in srgb, var(--theme-surface) 94%, transparent);
+}
+
+.holo-inner-shell nav[aria-label='底部导航'] a.text-brand-600,
+.holo-inner-shell nav[aria-label='底部导航'] a[aria-current='page'] {
+  color: var(--theme-accent) !important;
+}
+
+/* —— AI 蜗牛（页面根 .holo-ai-snail） —— */
+.holo-ai-snail {
+  --theme-bg: #f9f7eb;
+  --theme-surface: #fffef6;
+  --theme-accent: #2c6b58;
+  --theme-muted: #54786c;
+  --theme-line: #b7cdc4;
+  color: var(--theme-accent);
+}
+
+.holo-ai-snail__intro {
+  margin-bottom: 14px;
+}
+
+.holo-ai-snail__title {
+  margin: 0;
+  color: var(--theme-accent);
+  font-size: 1.25rem;
+  font-weight: 650;
+  letter-spacing: 0.04em;
+}
+
+.holo-ai-snail__subtitle,
+.holo-ai-snail__hint,
+.holo-ai-snail__meta,
+.holo-ai-snail__footer {
+  color: var(--theme-muted);
+}
+
+.holo-ai-snail__subtitle {
+  margin: 6px 0 0;
+  font-size: 13px;
+  line-height: 1.55;
+}
+
+.holo-ai-snail__hint {
+  margin: 8px 0 0;
+  font-size: 12px;
+}
+
+.holo-ai-snail__inline-link {
+  color: var(--theme-accent);
+  font-weight: 600;
+  text-decoration: underline;
+  text-underline-offset: 2px;
+}
+
+.holo-ai-snail__steps {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+  margin: 0 0 4px;
+  padding: 0;
+  list-style: none;
+}
+
+.holo-ai-snail__step {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  min-height: 28px;
+  padding: 0 10px 0 4px;
+  border: 1px solid var(--theme-line);
+  border-radius: 999px;
+  background: var(--theme-surface);
+  color: var(--theme-muted);
+  font-size: 12px;
+}
+
+.holo-ai-snail__step-dot {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 20px;
+  height: 20px;
+  border-radius: 999px;
+  background: color-mix(in srgb, var(--theme-accent) 10%, var(--theme-bg));
+  color: var(--theme-accent);
+  font-size: 10px;
+  font-weight: 700;
+}
+
+.holo-ai-snail__step.is-active {
+  border-color: var(--theme-accent);
+  color: var(--theme-accent);
+  background: color-mix(in srgb, var(--theme-accent) 8%, var(--theme-surface));
+}
+
+.holo-ai-snail__step.is-active .holo-ai-snail__step-dot,
+.holo-ai-snail__step.is-done .holo-ai-snail__step-dot {
+  background: var(--theme-accent);
+  color: #f9f7eb;
+}
+
+.holo-ai-snail__step.is-done {
+  border-color: color-mix(in srgb, var(--theme-accent) 35%, var(--theme-line));
+  color: var(--theme-accent);
+}
+
+.holo-ai-snail__panel {
+  border: 1.5px solid var(--theme-line);
+  border-radius: 14px;
+  background: color-mix(in srgb, var(--theme-surface) 88%, var(--theme-bg));
+  box-shadow: none;
+}
+
+.holo-ai-snail__panel-header {
+  border-bottom: 1px solid var(--theme-line);
+  background: var(--theme-surface);
+  color: var(--theme-accent);
+}
+
+.holo-ai-snail__badge {
+  display: inline-flex;
+  align-items: center;
+  border-radius: 999px;
+  padding: 2px 8px;
+  background: color-mix(in srgb, var(--theme-accent) 12%, var(--theme-bg));
+  color: var(--theme-accent);
+  font-size: 10px;
+  font-weight: 650;
+}
+
+.holo-ai-snail__ghost-btn {
+  border: 1px solid var(--theme-line);
+  border-radius: 10px;
+  background: transparent;
+  color: var(--theme-muted);
+}
+
+.holo-ai-snail__ghost-btn:hover {
+  border-color: var(--theme-accent);
+  color: var(--theme-accent);
+}
+
+.holo-ai-snail__footer {
+  border-top: 1px solid var(--theme-line);
+  background: var(--theme-surface);
+}
+
+.holo-ai-snail__primary-btn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  min-height: 44px;
+  padding: 0 18px;
+  border: 1.5px solid var(--theme-accent);
+  border-radius: 12px;
+  background: var(--theme-accent);
+  color: #f9f7eb;
+  font-size: 13px;
+  font-weight: 650;
+  letter-spacing: 0.04em;
+  box-shadow: none;
+}
+
+.holo-ai-snail__primary-btn:hover {
+  filter: brightness(1.05);
+}
+
+.holo-ai-snail__secondary-btn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  min-height: 42px;
+  padding: 0 14px;
+  border: 1.5px solid var(--theme-line);
+  border-radius: 12px;
+  background: color-mix(in srgb, var(--theme-accent) 8%, var(--theme-bg));
+  color: var(--theme-accent);
+  font-size: 13px;
+  font-weight: 600;
+}
+
+.holo-ai-snail__input {
+  border: 1.5px solid var(--theme-line);
+  border-radius: 12px;
+  background: var(--theme-bg);
+  color: var(--theme-accent);
+  padding: 12px 14px;
+  font-size: 14px;
+  box-shadow: none;
+}
+
+.holo-ai-snail__input:focus {
+  border-color: var(--theme-accent);
+  outline: none;
+  box-shadow: 0 0 0 3px color-mix(in srgb, var(--theme-accent) 16%, transparent);
+}
+
+.holo-ai-snail__option {
+  border: 1.5px solid var(--theme-line);
+  border-radius: 12px;
+  background: var(--theme-surface);
+  color: var(--theme-accent);
+  padding: 8px 12px;
+  font-size: 13px;
+  font-weight: 550;
+}
+
+.holo-ai-snail__option:hover {
+  border-color: var(--theme-accent);
+}
+
+.holo-ai-snail__option.is-selected {
+  border-color: var(--theme-accent);
+  background: color-mix(in srgb, var(--theme-accent) 12%, var(--theme-surface));
+}
+
+.holo-ai-snail__option:disabled {
+  cursor: not-allowed;
+  opacity: 0.5;
+}
+
+.holo-ai-snail__avatar.is-user {
+  background: #54786c;
+  color: #f9f7eb;
+}
+
+.holo-ai-snail__avatar.is-bot {
+  background: var(--theme-accent);
+  color: #f9f7eb;
+}
+
+.holo-ai-snail__bubble-label {
+  color: var(--theme-accent);
+  letter-spacing: 0.08em;
+}
+
+.holo-ai-snail__bubble-label.is-user {
+  color: var(--theme-muted);
+}
+
+.holo-ai-snail__bubble {
+  border-radius: 14px;
+  box-shadow: none;
+}
+
+.holo-ai-snail__bubble.is-user {
+  border-top-right-radius: 6px;
+  background: var(--theme-accent);
+  color: #f9f7eb;
+}
+
+.holo-ai-snail__bubble.is-bot {
+  border-top-left-radius: 6px;
+  border: 1px solid var(--theme-line);
+  border-left: 3px solid var(--theme-accent);
+  background: var(--theme-surface);
+  color: var(--theme-accent);
+}
+
+/* —— 搭子 / 资料 / 消息（批次 B） —— */
+.holo-buddies,
+.holo-profile,
+.holo-messages {
+  --theme-bg: #f9f7eb;
+  --theme-surface: #fffef6;
+  --theme-accent: #2c6b58;
+  --theme-muted: #54786c;
+  --theme-line: #b7cdc4;
+  color: var(--theme-accent);
+}
+
+.holo-buddies__title,
+.holo-messages__title,
+.holo-profile h1 {
+  color: var(--theme-accent);
+}
+
+.holo-buddies__subtitle,
+.holo-messages__subtitle {
+  margin: 4px 0 0;
+  color: var(--theme-muted);
+  font-size: 13px;
+}
+
+.holo-buddies__cta {
+  min-height: 40px;
+  padding: 0 14px;
+  border: 1.5px solid var(--theme-accent);
+  border-radius: 12px;
+  background: var(--theme-accent);
+  color: #f9f7eb;
+  font-size: 13px;
+  font-weight: 650;
+  text-decoration: none;
+}
+
+.holo-buddies__cta:hover {
+  filter: brightness(1.05);
+}
+
+.holo-buddies__back,
+.holo-profile__back,
+.holo-messages__link {
+  color: var(--theme-accent);
+  text-decoration: none;
+  font-weight: 600;
+}
+
+.holo-buddies__panel,
+.holo-profile__panel,
+.holo-messages__panel {
+  border: 1.5px solid var(--theme-line);
+  border-radius: 14px;
+  background: var(--theme-surface);
+  box-shadow: none;
+}
+
+.holo-messages__aside {
+  border-color: var(--theme-line);
+  background: color-mix(in srgb, var(--theme-surface) 92%, var(--theme-bg));
+}
+
+.holo-messages__aside-title {
+  border-color: var(--theme-line);
+  color: var(--theme-muted);
+}
+
+.holo-buddies h2,
+.holo-profile h2,
+.holo-messages h1 {
+  color: var(--theme-accent);
+}
+
+.holo-buddies .text-slate-600,
+.holo-buddies .text-slate-500,
+.holo-profile .text-slate-600,
+.holo-profile .text-slate-500,
+.holo-messages .text-slate-600,
+.holo-messages .text-slate-500 {
+  color: var(--theme-muted) !important;
+}
+
+/* —— 批次 C：攻略详情 / 发布 / 行程 / 关于 —— */
+.holo-guide-detail,
+.holo-guide-publish,
+.holo-plan-detail,
+.holo-about {
+  --theme-bg: #f9f7eb;
+  --theme-surface: #fffef6;
+  --theme-accent: #2c6b58;
+  --theme-muted: #54786c;
+  --theme-line: #b7cdc4;
+  color: var(--theme-accent);
+}
+
+.holo-guide-detail article.rounded-2xl,
+.holo-guide-publish header.rounded-2xl,
+.holo-plan-detail article.rounded-2xl,
+.holo-plan-detail header.rounded-2xl,
+.holo-about__panel {
+  border-color: var(--theme-line) !important;
+  background: var(--theme-surface) !important;
+  box-shadow: none !important;
+}
+
+.holo-guide-detail h1,
+.holo-guide-detail h2,
+.holo-guide-publish h1,
+.holo-plan-detail h1,
+.holo-plan-detail h2,
+.holo-about h2,
+.holo-about h3 {
+  color: var(--theme-accent);
+}
+
+.holo-guide-detail .text-slate-600,
+.holo-guide-detail .text-slate-500,
+.holo-guide-publish .text-slate-600,
+.holo-guide-publish .text-slate-500,
+.holo-plan-detail .text-slate-600,
+.holo-plan-detail .text-slate-500,
+.holo-about .text-slate-600,
+.holo-about .text-slate-500 {
+  color: var(--theme-muted) !important;
+}
+
+.holo-guide-detail .text-brand-600,
+.holo-guide-detail .text-brand-700,
+.holo-guide-publish .text-brand-600,
+.holo-plan-detail .text-brand-600,
+.holo-plan-detail .text-brand-700 {
+  color: var(--theme-accent) !important;
+}
+
+.holo-guide-detail .bg-brand-50,
+.holo-plan-detail .bg-brand-50 {
+  background: color-mix(in srgb, var(--theme-accent) 10%, var(--theme-surface)) !important;
+}
+
+.holo-guide-detail .bg-brand-600,
+.holo-guide-publish .bg-brand-600,
+.holo-plan-detail .bg-brand-600 {
+  background: var(--theme-accent) !important;
+}
+
+.holo-guide-detail .hover\:bg-brand-700:hover,
+.holo-guide-publish .hover\:bg-brand-700:hover,
+.holo-plan-detail .hover\:bg-brand-700:hover {
+  filter: brightness(1.05);
+}
+
+/* 行程页：地图区尽量全宽、周边米白 */
+.holo-plan-detail [data-plan-map],
+.holo-plan-detail .mapboxgl-map {
+  border-radius: 12px;
+  border: 1.5px solid var(--theme-line);
+}
+
+.holo-plan-detail section,
+.holo-plan-detail article,
+.holo-plan-detail .holo-home__plan-block,
+.holo-plan-detail .holo-home__plan-sheet-body {
+  opacity: 1 !important;
+  transform: none !important;
+}
+
+.holo-plan-detail__guide {
+  margin: 0;
+  padding: 16px 18px;
+  border: 1px solid var(--theme-line);
+  border-radius: 16px;
+  background: var(--theme-surface);
+  opacity: 1;
+}
+
+.holo-plan-detail__guide-title {
+  margin: 0 0 12px;
+  color: var(--theme-accent);
+  font-size: 16px;
+  font-weight: 700;
+}
+
+.holo-plan-detail__guide-body {
+  margin: 0;
+  white-space: pre-wrap;
+  overflow-wrap: anywhere;
+  color: var(--theme-ink, #2c6b58);
+  font-family: inherit;
+  font-size: 14px;
+  line-height: 1.7;
+}
+
+.holo-plan-share {
+  display: flex;
+  flex-direction: column;
+  gap: 18px;
+  padding: 18px 20px 20px;
+  border: 1px solid var(--theme-line);
+  border-radius: 16px;
+  background: var(--theme-surface);
+}
+
+.holo-plan-share__block {
+  margin: 0;
+}
+
+.holo-plan-share__title {
+  margin: 0 0 8px;
+  color: var(--theme-accent);
+  font-size: 15px;
+  font-weight: 700;
+}
+
+.holo-plan-share__budget {
+  margin: 0;
+  color: var(--theme-ink, #2c6b58);
+  font-size: 14px;
+  line-height: 1.55;
+}
+
+.holo-plan-share__days,
+.holo-plan-share__tips {
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+.holo-plan-share__day {
+  display: grid;
+  grid-template-columns: 36px minmax(0, 1fr);
+  gap: 10px;
+  padding: 10px 0;
+  border-top: 1px solid color-mix(in srgb, var(--theme-line) 70%, transparent);
+}
+
+.holo-plan-share__day:first-child {
+  padding-top: 2px;
+  border-top: 0;
+}
+
+.holo-plan-share__day-index {
+  color: var(--theme-accent);
+  font-size: 13px;
+  font-weight: 700;
+  line-height: 1.5;
+}
+
+.holo-plan-share__day-title {
+  margin: 0;
+  color: var(--theme-ink, #222c28);
+  font-size: 14px;
+  font-weight: 650;
+}
+
+.holo-plan-share__day-meta,
+.holo-plan-share__tips li {
+  margin: 2px 0 0;
+  color: var(--theme-muted);
+  font-size: 13px;
+  line-height: 1.5;
+}
+
+.holo-plan-share__list {
+  margin: 6px 0 0;
+  padding: 0;
+  list-style: none;
+}
+
+.holo-plan-share__list li {
+  margin: 0;
+  color: var(--theme-muted);
+  font-size: 13px;
+  line-height: 1.55;
+}
+
+.holo-plan-share__list li + li {
+  margin-top: 4px;
+}
+
+.holo-plan-share__list strong {
+  color: var(--theme-ink, #222c28);
+  font-weight: 650;
+}
+
+.holo-plan-share__tips li + li {
+  margin-top: 6px;
+}
+
+.holo-plan-detail .holo-home__plan-sheet-inner,
+.holo-plan-detail .holo-home__plan-sheet-inner--split {
+  display: flex;
+  max-height: none;
+  min-height: 0;
+  height: auto;
+  overflow: visible;
+  padding: 0;
+}
+
+.holo-plan-detail .holo-home__plan-sheet-inner--split {
+  align-items: flex-start;
+}
+
+.holo-plan-detail .holo-home__plan-sheet-inner--split .holo-home__plan-sheet-main,
+.holo-plan-detail .holo-home__plan-sheet-inner--split .holo-home__plan-aside {
+  overflow: visible;
+  max-height: none;
+  height: auto;
+}
+
+.holo-plan-detail .holo-home__plan-sheet-body,
+.holo-plan-detail .holo-home__plan-block {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+
+.holo-plan-detail__loading {
+  display: flex;
+  flex-direction: column;
+  align-items: stretch;
+  gap: 12px;
+  padding: 8px 0 4px;
+  color: var(--theme-muted);
+  font-size: 13px;
+}
+
+.holo-plan-detail__loading > span {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.holo-plan-detail__skeleton {
+  display: grid;
+  gap: 10px;
+}
+
+.holo-plan-detail__skeleton-card {
+  min-height: 88px;
+  border: 1px dashed var(--theme-line);
+  border-radius: 16px;
+  background: color-mix(in srgb, var(--theme-surface) 80%, #e8efe9);
+}
+
+.holo-plan-detail__skeleton-card--title {
+  min-height: 108px;
+}
+
+.holo-plan-share-menu .holo-plan-share-option {
+  display: flex;
+  width: 100%;
+  min-height: 44px;
+  align-items: center;
+  gap: 10px;
+  padding: 10px 12px;
+  border: 1px solid var(--theme-line, #b7cdc4);
+  border-radius: 12px;
+  background: var(--theme-surface, #fffef6);
+  color: var(--theme-accent, #2c6b58);
+  font: inherit;
+  font-size: 14px;
+  font-weight: 650;
+  cursor: pointer;
+}
+
+.holo-plan-share-menu .holo-plan-share-option:hover,
+.holo-plan-share-menu .holo-plan-share-option:focus-visible {
+  border-color: var(--theme-accent, #2c6b58);
+  outline: none;
+}
+
+.holo-plan-detail .holo-home__plan-block-title,
+.holo-plan-detail .holo-home__plan-day-title {
+  margin: 0 0 6px;
+  color: var(--theme-accent);
+  font-size: 15px;
+  font-weight: 700;
+}
+
+.holo-plan-detail .holo-home__plan-label {
+  margin: 0 0 4px;
+  color: var(--theme-muted);
+  font-size: 12px;
+  font-weight: 650;
+}
+
+.holo-plan-detail .holo-home__plan-muted {
+  margin: 0;
+  color: var(--theme-muted);
+  font-size: 13px;
+  line-height: 1.5;
+}
+
+.holo-plan-detail .holo-home__plan-budget-grid,
+.holo-plan-detail .holo-home__plan-days {
+  display: grid;
+  grid-template-columns: 1fr;
+  gap: 10px;
+}
+
+.holo-plan-detail .holo-home__plan-budget-card,
+.holo-plan-detail .holo-home__plan-day-card {
+  border: 1px solid var(--theme-line);
+  border-radius: 12px;
+  background: var(--theme-surface);
+}
+
+.holo-plan-detail .holo-home__plan-budget-card {
+  padding: 6px 10px;
+}
+
+.holo-plan-detail .holo-home__plan-day-card {
+  padding: 8px 10px;
+  overflow: visible;
+}
+
+.holo-plan-detail .holo-home__plan-day-photo,
+.holo-plan-detail .holo-home__plan-spot-highlight {
+  overflow: visible;
+}
+
+.holo-plan-detail .holo-home__plan-budget-name {
+  margin: 0;
+  color: var(--theme-muted);
+  font-size: 12px;
+}
+
+.holo-plan-detail .holo-home__plan-budget-num {
+  margin: 1px 0 0;
+  color: var(--theme-accent);
+  font-size: 16px;
+  font-weight: 700;
+}
+
+.holo-plan-detail .holo-home__plan-day-section ul,
+.holo-plan-detail .holo-home__plan-tips {
+  margin: 0;
+  padding-left: 1.1em;
+  color: var(--theme-ink, #2c6b58);
+  font-size: 13px;
+  line-height: 1.6;
+}
+
+.holo-plan-detail .holo-home__plan-day-section {
+  margin-top: 10px;
+}
+
+@media (min-width: 840px) {
+  .holo-plan-detail .holo-home__plan-budget-grid {
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+  }
+
+  .holo-plan-detail .holo-home__plan-days {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+}
+
+@media (max-width: 767px) {
+  .holo-plan-detail .holo-home__plan-sheet-inner--split {
+    flex-direction: column;
+  }
+
+  .holo-plan-detail .holo-home__plan-sheet-inner--split .holo-home__plan-sheet-main,
+  .holo-plan-detail .holo-home__plan-sheet-inner--split .holo-home__plan-aside {
+    width: 100%;
+    flex-basis: auto;
+  }
+}
+
+/* 关于蜗牛 + 迭代规划：上下堆叠、限高、紧凑行距（文案自首页迁移） */
+.holo-about__brand-stack {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  width: 100%;
+}
+
+.holo-about__brand-card {
+  margin: 0;
+  padding: 10px 12px 8px;
+  max-height: 200px;
+  overflow: auto;
+  border: 1px solid color-mix(in srgb, var(--color-sand, #d9c8b4) 40%, var(--theme-line));
+  border-radius: 14px;
+  background: color-mix(in srgb, var(--theme-bg, #f9f7eb) 55%, var(--theme-surface, #fffef6));
+  box-sizing: border-box;
+}
+
+.holo-about__brand-card-title {
+  margin: 0 0 4px;
+  color: var(--theme-accent);
+  font-size: 13px;
+  font-weight: 700;
+  letter-spacing: 0.06em;
+}
+
+.holo-about__brand-card-body {
+  margin: 0;
+  color: var(--theme-muted);
+  font-size: 12px;
+  line-height: 1.4;
+}
+
+.holo-about__brand-card-values {
+  margin: 6px 0 0;
+  padding: 0;
+  list-style: none;
+  display: grid;
+  gap: 2px;
+}
+
+.holo-about__brand-card-values li {
+  color: var(--theme-muted);
+  font-size: 11px;
+  line-height: 1.35;
+}
+
+.holo-about__brand-card-values strong {
+  color: var(--theme-accent);
+  font-weight: 600;
+}
+
+.holo-about__brand-rollout-list {
+  margin: 0;
+  padding: 0;
+  list-style: none;
+  display: grid;
+  gap: 3px;
+}
+
+.holo-about__brand-rollout-list li {
+  margin: 0;
+  color: var(--theme-muted);
+  font-size: 11px;
+  line-height: 1.35;
+  letter-spacing: 0.01em;
+}
+
+@media (max-width: 1023px) {
+  .holo-about__brand-card {
+    max-height: 160px;
+    padding: 8px 10px 6px;
+  }
+
+  .holo-about__brand-card-title {
+    font-size: 12px;
+    margin-bottom: 3px;
+  }
+
+  .holo-about__brand-card-body {
+    font-size: 11px;
+    line-height: 1.35;
+  }
+
+  .holo-about__brand-card-values li,
+  .holo-about__brand-rollout-list li {
+    font-size: 10px;
+    line-height: 1.3;
+  }
+}
+
+.holo-about__footer {
+  color: var(--theme-muted);
+}
+
+.holo-about__footer .site-compliance__link {
+  color: var(--theme-accent);
+  text-decoration: none;
+}
+
+.holo-about__footer .site-compliance__link:hover {
+  text-decoration: underline;
+}
+

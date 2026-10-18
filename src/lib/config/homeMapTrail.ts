@@ -10,7 +10,7 @@ export const HOME_MAP_TRAIL_SEARCH_EXAMPLES = [
   '西安 三天 1500',
   '扬州 三天 600元',
   '济南 美食 四天',
-  '大理 摄影 穷游 2000',
+  '大理 摄影 漫行 2000',
   '成都 火锅 三天 1200',
 ] as const;
 

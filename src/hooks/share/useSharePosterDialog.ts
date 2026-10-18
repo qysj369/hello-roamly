@@ -1,13 +1,19 @@
 import { useCallback, useEffect, useMemo, useState } from 'react';
 import { trackShareEvent } from '@/lib/share/analytics/trackShareEvent';
-import { downloadBlob, downloadBlobsSequential } from '@/lib/share';
-import { xhsSlideDownloadFilename } from '@/lib/share/chinaPosterVariants';
-import { fetchBlobFromObjectUrl } from '@/lib/share/fetchPosterBlob';
+import { copyImageBlobToClipboard } from '@/lib/share/copyImageBlob';
+import {
+  shareChannelFromPosterVariant,
+  xhsSlideDownloadFilename,
+} from '@/lib/share/chinaPosterVariants';
 import { generatePosterBlobs } from '@/lib/share/generatePosterBlobs';
 import { createObjectUrlsFromBlobs, revokeObjectUrls } from '@/lib/share/objectUrl';
 import { resolveSharePosterVariants } from '@/lib/share/resolveSharePosterVariants';
+import { saveImageBlob } from '@/lib/share/saveImageBlob';
+import { blobToShareFile, canShareImageFiles, shareImageFiles } from '@/lib/share/shareImageFiles';
 import { getSharePosterHint } from '@/lib/share/sharePosterHint';
-import { copyXhsNoteToClipboard } from '@/lib/share/xhsNoteCopy';
+import { cannotProgrammaticDownload, isIosDevice, posterImageActionLabel } from '@/lib/share/deviceShare';
+import { isWechatDesktopBrowser, isWechatInAppBrowser } from '@/lib/share/wechat';
+import { copyXhsNoteToClipboard, formatXhsNoteForClipboard } from '@/lib/share/xhsNoteCopy';
 import type { SharePosterVariant } from '@/lib/share/xhsPosterTypes';
 import type { ShareTrackingContext } from '@/types/domain/shareAnalytics';
 
@@ -19,6 +25,8 @@ export type UseSharePosterDialogOptions = {
   posterVariants?: SharePosterVariant[];
   shareTrackContext?: ShareTrackingContext;
   onSystemShare?: () => Promise<'shared' | 'copied' | 'cancelled' | 'failed' | void>;
+  /** Native dialog top-layer 下 clipboard API 常失败，由调用方提供 textarea 回退 */
+  copyPlainText?: (text: string) => Promise<boolean>;
 };
 
 export function useSharePosterDialog({
@@ -29,6 +37,7 @@ export function useSharePosterDialog({
   posterVariants,
   shareTrackContext,
   onSystemShare,
+  copyPlainText,
 }: UseSharePosterDialogOptions) {
   const variants = useMemo(
     () =>
@@ -44,14 +53,18 @@ export function useSharePosterDialog({
   const activeVariant = variants.find((item) => item.id === activeVariantId) ?? variants[0];
 
   const [posterUrls, setPosterUrls] = useState<string[]>([]);
+  const [posterBlobs, setPosterBlobs] = useState<Blob[]>([]);
   const [slideIndex, setSlideIndex] = useState(0);
   const [isGenerating, setIsGenerating] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [copyFeedback, setCopyFeedback] = useState<string | null>(null);
+  const [assistHint, setAssistHint] = useState<string | null>(null);
 
   const slideCount = posterUrls.length;
   const activePosterUrl = posterUrls[slideIndex] ?? null;
   const isXhs = activeVariantId === 'xhs';
+  const isDouyin = activeVariantId === 'douyin';
+  const activeChannel = shareChannelFromPosterVariant(activeVariantId);
   const isMultiSlide = isXhs && slideCount > 1;
   const hint = useMemo(
     () => getSharePosterHint(activeVariant, slideCount),
@@ -59,12 +72,17 @@ export function useSharePosterDialog({
   );
   const baseFilename = activeVariant?.downloadFilename ?? downloadFilename;
   const showVariantTabs = variants.length > 1;
-  const canCopyXhs = isXhs && Boolean(activeVariant?.getXhsCopyText);
+  const canCopyXhs = (isXhs || isDouyin) && Boolean(activeVariant?.getXhsCopyText);
 
   const showCopyFeedback = useCallback((message: string, durationMs = 2000) => {
     setCopyFeedback(message);
     window.setTimeout(() => setCopyFeedback(null), durationMs);
   }, []);
+
+  const showAssistHint = useCallback((message: string) => {
+    setAssistHint(message);
+    showCopyFeedback(message, 8000);
+  }, [showCopyFeedback]);
 
   useEffect(() => {
     if (variants[0]) {
@@ -85,12 +103,14 @@ export function useSharePosterDialog({
         throw new Error('未生成任何图片');
       }
       const urls = createObjectUrlsFromBlobs(blobs);
+      setPosterBlobs(blobs);
       setPosterUrls((prev) => {
         revokeObjectUrls(prev);
         return urls;
       });
     } catch (reason) {
       setError(reason instanceof Error ? reason.message : '生成海报失败');
+      setPosterBlobs([]);
       setPosterUrls((prev) => {
         revokeObjectUrls(prev);
         return [];
@@ -118,6 +138,7 @@ export function useSharePosterDialog({
     }
     void runGenerate();
     return () => {
+      setPosterBlobs([]);
       setPosterUrls((prev) => {
         revokeObjectUrls(prev);
         return [];
@@ -132,7 +153,7 @@ export function useSharePosterDialog({
     trackShareEvent({
       ...shareTrackContext,
       action: 'poster_variant_view',
-      channel: activeVariant.id === 'xhs' ? 'xhs' : 'wechat',
+      channel: shareChannelFromPosterVariant(activeVariant.id),
       shareUrl,
     });
   }, [activeVariantId, open, shareTrackContext, activeVariant, shareUrl]);
@@ -143,58 +164,141 @@ export function useSharePosterDialog({
     }
   }, [slideIndex, slideCount]);
 
+  const copyPosterHint = useCallback(
+    (copied: boolean) => {
+      if (copied) {
+        return isWechatDesktopBrowser()
+          ? '图片已复制，到微信聊天里粘贴即可'
+          : isWechatInAppBrowser()
+            ? '图片已复制；也可长按上方图片发给好友'
+            : '图片已复制，可粘贴到微信 / 小红书 / 抖音';
+      }
+      if (isWechatDesktopBrowser()) {
+        return '请把上方图片拖进微信聊天，不要点下载';
+      }
+      if (isWechatInAppBrowser() || isIosDevice()) {
+        return '请长按上方大图，保存到相册或发给好友';
+      }
+      return '请右键上方图片另存，或拖进微信聊天';
+    },
+    [],
+  );
+
   const handleDownloadCurrent = useCallback(async () => {
-    if (!activePosterUrl || !activeVariant) {
+    if (!activeVariant) {
       return;
     }
-    const blob = await fetchBlobFromObjectUrl(activePosterUrl);
+    const blob = posterBlobs[isMultiSlide ? slideIndex : 0];
+    if (!blob) {
+      return;
+    }
     const name = isMultiSlide
       ? xhsSlideDownloadFilename(baseFilename, slideIndex)
       : activeVariant.downloadFilename;
-    downloadBlob(blob, name);
+    const result = await saveImageBlob(blob, name);
+    if (result === 'cancelled') {
+      return;
+    }
+    if (result === 'needs-long-press' || result === 'failed') {
+      const copied = await copyImageBlobToClipboard(blob);
+      showAssistHint(
+        copied
+          ? copyPosterHint(true)
+          : isMultiSlide
+            ? `请长按上方第 ${slideIndex + 1} 张图片保存到相册`
+            : '请长按上方图片保存到相册',
+      );
+      return;
+    }
+    showCopyFeedback('已保存到你选择的文件夹');
     if (shareTrackContext) {
       trackShareEvent({
         ...shareTrackContext,
         action: 'poster_download',
-        channel: isXhs ? 'xhs' : 'wechat',
+        channel: activeChannel,
         shareUrl,
         slideCount: isMultiSlide ? slideCount : 1,
         meta: isMultiSlide ? { slide: String(slideIndex + 1) } : undefined,
       });
     }
   }, [
-    activePosterUrl,
     activeVariant,
     baseFilename,
+    copyPosterHint,
     isMultiSlide,
-    isXhs,
+    activeChannel,
+    posterBlobs,
     shareTrackContext,
     shareUrl,
+    showAssistHint,
+    showCopyFeedback,
     slideCount,
     slideIndex,
   ]);
 
   const handleDownloadAll = useCallback(async () => {
-    if (posterUrls.length === 0) {
+    if (posterBlobs.length === 0) {
       return;
     }
-    const blobs = await Promise.all(posterUrls.map((url) => fetchBlobFromObjectUrl(url)));
-    await downloadBlobsSequential(blobs, (index) => xhsSlideDownloadFilename(baseFilename, index));
-    showCopyFeedback(`已保存 ${blobs.length} 张图片`, 2500);
+    const allFiles = posterBlobs.map((blob, index) =>
+      blobToShareFile(blob, xhsSlideDownloadFilename(baseFilename, index)),
+    );
+    if (canShareImageFiles(allFiles)) {
+      const shared = await shareImageFiles({
+        files: allFiles,
+        title: '行程分享图',
+      });
+      if (shared === 'shared') {
+        showCopyFeedback(`已打开系统分享（${allFiles.length} 张）`);
+        return;
+      }
+      if (shared === 'cancelled') {
+        return;
+      }
+    }
+    if (cannotProgrammaticDownload() || isWechatInAppBrowser()) {
+      showAssistHint('左右滑动查看全部图片，分别长按保存到相册');
+      return;
+    }
+    let saved = 0;
+    for (const [index, blob] of posterBlobs.entries()) {
+      const result = await saveImageBlob(blob, xhsSlideDownloadFilename(baseFilename, index));
+      if (result === 'cancelled') {
+        break;
+      }
+      if (result === 'saved') {
+        saved += 1;
+      }
+    }
+    if (saved === 0) {
+      showCopyFeedback('保存失败，请右键图片另存');
+      return;
+    }
+    showCopyFeedback(`已保存 ${saved} 张图片`, 2500);
     if (shareTrackContext) {
       trackShareEvent({
         ...shareTrackContext,
         action: 'poster_download_all',
         channel: 'xhs',
         shareUrl,
-        slideCount: blobs.length,
+        slideCount: saved,
       });
     }
-  }, [baseFilename, posterUrls, shareTrackContext, shareUrl, showCopyFeedback]);
+  }, [
+    baseFilename,
+    posterBlobs,
+    shareTrackContext,
+    shareUrl,
+    showAssistHint,
+    showCopyFeedback,
+  ]);
 
   const handleCopyLink = useCallback(async () => {
     try {
-      await navigator.clipboard.writeText(shareUrl);
+      const ok = copyPlainText
+        ? await copyPlainText(shareUrl)
+        : await navigator.clipboard.writeText(shareUrl).then(() => true);
+      if (!ok) throw new Error('copy failed');
       showCopyFeedback('链接已复制');
       if (shareTrackContext) {
         trackShareEvent({
@@ -207,24 +311,26 @@ export function useSharePosterDialog({
     } catch {
       showCopyFeedback('复制失败');
     }
-  }, [shareTrackContext, shareUrl, showCopyFeedback]);
+  }, [copyPlainText, shareTrackContext, shareUrl, showCopyFeedback]);
 
   const handleCopyXhsText = useCallback(async () => {
     const text = activeVariant?.getXhsCopyText?.();
     if (!text) {
       return;
     }
-    const ok = await copyXhsNoteToClipboard(text);
+    const ok = copyPlainText
+      ? await copyPlainText(formatXhsNoteForClipboard(text))
+      : await copyXhsNoteToClipboard(text);
     showCopyFeedback(ok ? '标题与正文已复制' : '复制失败');
     if (ok && shareTrackContext) {
       trackShareEvent({
         ...shareTrackContext,
         action: 'share_copy_xhs_text',
-        channel: 'xhs',
+        channel: activeChannel,
         shareUrl,
       });
     }
-  }, [activeVariant, shareTrackContext, shareUrl, showCopyFeedback]);
+  }, [activeChannel, activeVariant, copyPlainText, shareTrackContext, shareUrl, showCopyFeedback]);
 
   const handleSystemShare = useCallback(async () => {
     if (!onSystemShare) {
@@ -235,6 +341,86 @@ export function useSharePosterDialog({
       showCopyFeedback(result === 'shared' ? '已分享' : '已复制分享文案');
     }
   }, [onSystemShare, showCopyFeedback]);
+
+  /** 分享当前海报图：手机走系统分享，电脑/微信复制图片，绝不回退成下载 */
+  const handleShareImage = useCallback(async () => {
+    if (!activeVariant || posterBlobs.length === 0) {
+      return;
+    }
+    const blobsToShare = isMultiSlide ? posterBlobs : [posterBlobs[0]!];
+    const files = blobsToShare.map((blob, index) => {
+      const name = isMultiSlide
+        ? xhsSlideDownloadFilename(baseFilename, index)
+        : activeVariant.downloadFilename;
+      return blobToShareFile(blob, name);
+    });
+
+    let toShare = files;
+    if (files.length > 1 && !canShareImageFiles(files)) {
+      const current = files[slideIndex];
+      toShare = current && canShareImageFiles([current]) ? [current] : [];
+    } else if (files.length === 1 && !canShareImageFiles(files)) {
+      toShare = [];
+    }
+
+    if (toShare.length > 0) {
+      const result = await shareImageFiles({
+        files: toShare,
+        title: activeVariant.label,
+        text: shareUrl,
+        url: shareUrl,
+      });
+      if (result === 'shared') {
+        showCopyFeedback('已打开系统分享');
+        if (shareTrackContext) {
+          trackShareEvent({
+            ...shareTrackContext,
+            action: 'share_native',
+            channel: activeChannel,
+            shareUrl,
+            slideCount: toShare.length,
+          });
+        }
+        return;
+      }
+      if (result === 'cancelled') {
+        return;
+      }
+    }
+
+    const blob = blobsToShare[slideIndex] ?? blobsToShare[0];
+    if (blob) {
+      const copied = await copyImageBlobToClipboard(blob);
+      if (copied) {
+        showCopyFeedback(copyPosterHint(true));
+        if (shareTrackContext) {
+          trackShareEvent({
+            ...shareTrackContext,
+            action: 'share_native',
+            channel: activeChannel,
+            shareUrl,
+            slideCount: 1,
+            meta: { via: 'clipboard' },
+          });
+        }
+        return;
+      }
+    }
+
+    showAssistHint(copyPosterHint(false));
+  }, [
+    activeVariant,
+    baseFilename,
+    copyPosterHint,
+    isMultiSlide,
+    activeChannel,
+    posterBlobs,
+    shareTrackContext,
+    shareUrl,
+    showAssistHint,
+    showCopyFeedback,
+    slideIndex,
+  ]);
 
   const goPrevSlide = useCallback(() => {
     setSlideIndex((value) => Math.max(0, value - 1));
@@ -260,8 +446,10 @@ export function useSharePosterDialog({
     isGenerating,
     error,
     copyFeedback,
+    assistHint,
     hint,
     isXhs,
+    isDouyin,
     isMultiSlide,
     showVariantTabs,
     canCopyXhs,
@@ -271,9 +459,12 @@ export function useSharePosterDialog({
     handleCopyLink,
     handleCopyXhsText,
     handleSystemShare,
+    handleShareImage,
     goPrevSlide,
     goNextSlide,
     goToSlide,
     hasSystemShare: Boolean(onSystemShare),
+    showDownload: true,
+    shareImageLabel: posterImageActionLabel(),
   };
 }

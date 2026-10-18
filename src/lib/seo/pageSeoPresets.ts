@@ -15,8 +15,37 @@ function titled(pageLabel: string, description: string, path: string, ogType?: P
 export const homePageSeo = (): PageSeo =>
   page(
     APP_TITLE_SUFFIX,
-    `${BRAND_FUNCTION_DESC}。HelloRoamly（helloroamly.com）— 搜索城市与预算，浏览结构化穷游攻略；支持 AI 生成与发布。`,
+    `${BRAND_FUNCTION_DESC}。覆盖城市周末漫游、单人短途旅行灵感、亲子出游思路；搜索城市即可生成结构化漫行攻略，不从事组团预订。`,
     paths.home,
+  );
+
+export const citiesPageSeo = (): PageSeo =>
+  titled(
+    '热门城市周末漫游',
+    '按城市看近郊慢游灵感：周末漫游、单人短途、亲子出游思路。点城市即可生成漫行攻略，仅作游玩参考。',
+    paths.cities,
+  );
+
+export const budgetPageSeo = (): PageSeo =>
+  titled(
+    '精打细算 · 出行预算测算',
+    '按天数、人数与节奏估算交通、餐饮、住宿与门票参考区间。适合周末漫游与单人短途，仅作出行规划参考。',
+    paths.budget,
+  );
+
+export const mpToolPageSeo = (): PageSeo =>
+  titled(
+    '公众号行程工具',
+    '微信里也能搜城市、选周末漫游或亲子出游思路，生成免费漫行攻略。不从事旅行社组团与票务预订。',
+    paths.mp,
+  );
+
+export const inspirePageSeo = (): PageSeo =>
+  titled(
+    '慢行灵感知识库',
+    '城市周末漫游、单人短途旅行灵感、亲子出游思路的结构化参考。覆盖热门城市周末漫游长尾，仅作游玩灵感。',
+    paths.inspire,
+    'article',
   );
 
 export const discoverPageSeo = (): PageSeo =>
@@ -29,28 +58,28 @@ export const discoverPageSeo = (): PageSeo =>
 export const guidesPageSeo = (): PageSeo =>
   titled(
     '黏液轨迹库',
-    '浏览蜗友留下的结构化穷游攻略：花费清单、行程流水账与蜗牛启示，支持关键词筛选。',
+    '浏览蜗友留下的结构化漫行攻略：花费清单、行程流水账与蜗牛启示，支持关键词筛选。',
     paths.guides,
   );
 
 export const mapPageSeo = (): PageSeo =>
   titled(
     '地图',
-    `${BRAND_FUNCTION_DESC}。地图一键规划穷游方案。`,
+    `${BRAND_FUNCTION_DESC}。地图一键规划漫行方案。`,
     paths.home,
   );
 
 export const aiChatPageSeo = (): PageSeo =>
   titled(
     'AI 旅行顾问',
-    '与 AI 对话生成穷游行程、预算拆分与目的地建议，支持导出旅行计划。',
+    '与 AI 对话生成漫行行程、预算拆分与目的地建议，支持导出旅行计划。',
     paths.ai,
   );
 
 export const aiSnailGuidePageSeo = (): PageSeo =>
   titled(
     'AI生成攻略',
-    `${BRAND_FUNCTION_DESC}。AI蜗牛 分步引导目的地、天数、预算与偏好，生成结构化穷游攻略。`,
+    `${BRAND_FUNCTION_DESC}。AI蜗牛 分步引导目的地、天数、预算与偏好，生成结构化漫行攻略。`,
     paths.aiSnail,
   );
 
@@ -91,7 +120,7 @@ export function guideDetailPageSeo(
   const detail = [extras?.budget, extras?.days].filter(Boolean).join(' · ');
   return {
     title: `${city} · ${title} — ${APP_TITLE_SUFFIX}`,
-    description: `${city}穷游攻略：${title}${detail ? `（${detail}）` : ''}。查看路线、预算与玩法建议。`,
+    description: `${city}漫行攻略：${title}${detail ? `（${detail}）` : ''}。查看路线、预算与玩法建议。`,
     path: `${paths.guides}/${encodeURIComponent(guideId)}`,
     ogType: 'article',
   };

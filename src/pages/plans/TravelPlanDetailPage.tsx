@@ -53,7 +53,7 @@ export default function TravelPlanDetailPage() {
   useShareLandingTracking({ contentKind: 'travel_plan', contentId: planId });
 
   return (
-    <MotionPage className="flex flex-col gap-4">
+    <MotionPage className="holo-plan-detail flex flex-col gap-4">
       <MotionBlock>
         <button
           type="button"

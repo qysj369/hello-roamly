@@ -29,6 +29,8 @@ export type AiChatContext = {
   travelParams?: AiTravelParams;
   /** 当前顾问会话 ID（与 user_ai_sessions 对齐） */
   sessionId?: string;
+  /** 首页新搜索标记：变化时必须开全新会话 */
+  searchNonce?: number;
   /** 来源：首页地图 / 方案追问 / 直接进入 */
   source?: 'home_map' | 'plan_result' | 'direct' | 'capsule_one';
   /** 地图侧关联的 plan session（从方案页跳入顾问时） */

@@ -8,7 +8,7 @@ export function detectFollowUpIntent(message: string): FollowUpIntent {
   if (/轻松|不要太累|少赶|慢点|休息|躺平|减.*天/.test(text)) {
     return 'pace';
   }
-  if (/免费|不花钱|0元|穷游|省钱景点/.test(text)) {
+  if (/免费|不花钱|0元|穷游|漫行|省钱景点/.test(text)) {
     return 'free_spots';
   }
   if (/交通|地铁|公交|高铁|飞机|大巴|用车/.test(text)) {

@@ -51,7 +51,7 @@ const SPEECH_CORRECTION_RULES: SpeechCorrectionRule[] = [
   { pattern: /研学/g, replace: '研学' },
   { pattern: /采摘/g, replace: '采摘' },
   // 意图词
-  { pattern: /穷游规划|旅游规划|旅行规划/g, replace: '穷游规划' },
+  { pattern: /漫行规划|穷游规划|旅游规划|旅行规划/g, replace: '漫行规划' },
   { pattern: /帮我规划|给我规划|帮忙规划/g, replace: '规划' },
   { pattern: /从(.+?)出发/g, replace: '从$1出发' },
 ];

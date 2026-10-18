@@ -26,15 +26,17 @@ const SHARE_SHEET = readFileSync(
 
 describe('阶段1+2验收：微信/抖音保留，小红书三图追加', () => {
   it('share sheet keeps WeChat and Douyin, then adds Xiaohongshu without extra apps', () => {
-    expect(SHARE_SHEET).toContain('HoloSearchPlanDouyinReel');
-    expect(SHARE_SHEET).toContain('全屏录屏卡');
-    expect(SHARE_SHEET).toContain('showWechatQr');
+    expect(SHARE_SHEET).toContain("id: 'wechat'");
+    expect(SHARE_SHEET).toContain("id: 'douyin'");
+    expect(SHARE_SHEET).toContain("id: 'xhs'");
+    expect(SHARE_SHEET).toContain('扫码打开这趟行程');
     expect(SHARE_SHEET).toContain('tryMobileShare');
-    expect(SHARE_SHEET).toContain('下载微信海报并复制文案');
-    expect(SHARE_SHEET).toContain('下载抖音海报并复制口播');
-    expect(SHARE_SHEET).toContain('下载3张小红书海报并复制种草文案');
-    expect(SHARE_SHEET.indexOf('aria-label="微信"')).toBeLessThan(SHARE_SHEET.indexOf('aria-label="抖音"'));
-    expect(SHARE_SHEET.indexOf('aria-label="抖音"')).toBeLessThan(SHARE_SHEET.indexOf('aria-label="小红书"'));
+    expect(SHARE_SHEET).toContain('复制文案');
+    expect(SHARE_SHEET).toContain('下载海报');
+    expect(SHARE_SHEET).toContain('renderItinerarySummaryPoster');
+    expect(SHARE_SHEET).not.toContain('复制口播');
+    expect(SHARE_SHEET.indexOf("id: 'wechat'")).toBeLessThan(SHARE_SHEET.indexOf("id: 'douyin'"));
+    expect(SHARE_SHEET.indexOf("id: 'douyin'")).toBeLessThan(SHARE_SHEET.indexOf("id: 'xhs'"));
     expect(SHARE_SHEET).not.toContain('openSocialApp(');
     expect(SHARE_SHEET).not.toContain('weixin://');
     expect(SHARE_SHEET).not.toContain('snssdk1128');

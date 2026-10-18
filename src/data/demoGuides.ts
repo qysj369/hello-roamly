@@ -22,7 +22,7 @@ export const demoGuides: Guide[] = [
   {
     id: 'xiamen',
     city: '厦门',
-    title: '鼓浪屿轮渡穷游半日',
+    title: '鼓浪屿轮渡漫行半日',
     budget: '约 ¥60',
     days: '半天',
     tags: ['海岛', '摄影'],

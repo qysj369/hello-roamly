@@ -1,3 +1,4 @@
+import { captionById, DEFAULT_CAPTION_PACK, regionCueAt } from '@/lib/snail-flight/captionPacks';
 import {
   getSnailFlightCity,
   SNAIL_FLIGHT_DEFAULT_DEST_ID,
@@ -11,8 +12,9 @@ import {
   smoothstep,
 } from '@/lib/snail-flight/geo';
 
-export const SNAIL_FLIGHT_CRUISE_HEIGHT_M = 1650;
-export const SNAIL_FLIGHT_DURATION_MS = 52_000;
+export const SNAIL_FLIGHT_TAKEOFF_HEIGHT_M = 1400;
+export const SNAIL_FLIGHT_CRUISE_HEIGHT_M = 3200;
+export const SNAIL_FLIGHT_DURATION_MS = 600_000;
 export const SNAIL_FLIGHT_FAST_DURATION_MS = 10_000;
 
 export type SnailFlightNarration = {
@@ -38,47 +40,15 @@ export type SnailFlightRoute = {
   narrations: readonly SnailFlightNarration[];
 };
 
-const DEMO_NARRATIONS: readonly SnailFlightNarration[] = [
-  {
-    id: 'takeoff',
-    title: '起飞｜济南历下',
-    at: 0,
-    lines: [
-      '登机完毕，蜗牛号缓缓离地。',
-      '脚下是历下的街巷与河湖，我们向东启程，开启一场低空山河漫游。',
-    ],
-  },
-  {
-    id: 'zhangqiu',
-    title: '途经章丘',
-    at: 0.16,
-    lines: ['向前飞行，掠过章丘。', '平坦的田野铺向远方，村落散落大地，山河画卷缓缓展开。'],
-  },
-  {
-    id: 'zibo',
-    title: '途经淄博',
-    at: 0.34,
-    lines: ['前方抵达淄博上空。', '城镇连绵铺开，土地厚重，藏着烟火与故事。'],
-  },
-  {
-    id: 'weifang',
-    title: '途经潍坊',
-    at: 0.55,
-    lines: ['飞越潍坊，一望无垠的原野在眼底延伸。', '风穿过机舱，大地一路向东，离海岸越来越近。'],
-  },
-  {
-    id: 'qingdao-coast',
-    title: '抵达青岛近海',
-    at: 0.78,
-    lines: ['海岸线出现在眼前，蔚蓝的大海映入视野。', '红瓦、海岸与碧海交织，青岛就在前方。'],
-  },
-  {
-    id: 'landing',
-    title: '落地前收尾字幕',
-    at: 0.92,
-    lines: ['蜗牛号即将平稳落地。', '看完沿途山河，AI正在为你生成好友结伴旅行攻略。'],
-  },
-];
+function demoNarrations(): SnailFlightNarration[] {
+  return ['takeoff', 'lakes', 'zhangqiu', 'zibo', 'weifang', 'laizhou', 'qingdao-land'].map((id) => {
+    const beat = captionById(DEFAULT_CAPTION_PACK, id);
+    if (!beat) {
+      throw new Error(`missing demo caption ${id}`);
+    }
+    return beat;
+  });
+}
 
 function withDistanceProgress(
   points: readonly { id: string; label: string; lon: number; lat: number }[],
@@ -118,7 +88,7 @@ function buildDemoRoute(): SnailFlightRoute | null {
     origin,
     dest,
     waypoints,
-    narrations: DEMO_NARRATIONS,
+    narrations: demoNarrations(),
   };
 }
 
@@ -188,6 +158,10 @@ export function defaultSnailFlightRoute(): SnailFlightRoute {
 
 export function narrationAt(route: SnailFlightRoute, progress: number): SnailFlightNarration {
   const t = Math.min(1, Math.max(0, progress));
+  if (route.id === 'jinan-lixia-qingdao') {
+    const cue = regionCueAt(t);
+    return captionById(DEFAULT_CAPTION_PACK, cue.id) ?? route.narrations[0]!;
+  }
   return route.narrations.reduce(
     (current, beat) => (t + 1e-6 >= beat.at ? beat : current),
     route.narrations[0]!,
@@ -217,7 +191,7 @@ export function sampleFlightPose(route: SnailFlightRoute, progress: number): Sam
   const takeoff = smoothstep(0, 0.08, t);
   const landing = 1 - smoothstep(0.88, 1, t);
   const envelope = Math.min(takeoff, landing);
-  const height = 90 + (SNAIL_FLIGHT_CRUISE_HEIGHT_M - 90) * envelope;
+  const height = SNAIL_FLIGHT_TAKEOFF_HEIGHT_M + (SNAIL_FLIGHT_CRUISE_HEIGHT_M - SNAIL_FLIGHT_TAKEOFF_HEIGHT_M) * envelope;
   return {
     lon: pos.lon,
     lat: pos.lat,

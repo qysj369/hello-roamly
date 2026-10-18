@@ -1,6 +1,7 @@
-import { useEffect } from 'react';
+import { useEffect, useMemo } from 'react';
 import { NavLink } from 'react-router-dom';
 import PrimaryNavIcon from '@/components/layout/PrimaryNavIcon';
+import { useI18n } from '@/i18n/useI18n';
 import { useSiteChatStore } from '@/stores/siteChat/store';
 import { PAGE_CONTAINER_MAX_WIDTH } from '@/lib/layout/pageLayout';
 import { cn } from '@/utils/cn';
@@ -8,6 +9,7 @@ import { getRoutePrefetchHandlers } from '@/router/routePrefetch';
 import { bottomNavItems, paths } from '@/router/paths';
 
 export default function BottomNav() {
+  const { messages: t } = useI18n();
   const hydrate = useSiteChatStore((state) => state.hydrate);
   const unreadTotal = useSiteChatStore((state) => state.getTotalUnread());
 
@@ -15,9 +17,19 @@ export default function BottomNav() {
     hydrate();
   }, [hydrate]);
 
+  const labelByPath = useMemo(
+    () =>
+      ({
+        [paths.home]: t.tabs.home,
+        [paths.ai]: t.tabs.advisor,
+        [paths.profile]: t.tabs.me,
+      }) as Record<string, string>,
+    [t],
+  );
+
   return (
     <nav
-      aria-label="底部导航"
+      aria-label={t.heroExtra.bottomNav}
       className="fixed inset-x-0 bottom-0 z-40 border-t border-slate-200 bg-white/95 pb-[env(safe-area-inset-bottom)] backdrop-blur-md lg:hidden"
     >
       <div
@@ -50,7 +62,7 @@ export default function BottomNav() {
                   </span>
                 )}
               </span>
-              <span className="truncate">{item.label}</span>
+              <span className="truncate">{labelByPath[item.to] ?? item.label}</span>
             </NavLink>
           );
         })}

@@ -23,12 +23,12 @@ export default function AboutSentrySection() {
 
   return (
     <MotionSection
-      className="rounded-2xl border border-violet-200/90 bg-gradient-to-br from-violet-50/70 via-white to-white p-6 shadow-sm"
+      className="rounded-2xl border border-[#b7cdc4] bg-gradient-to-br from-emerald-50/70 via-[#fffef6] to-[#fffef6] p-6 shadow-sm"
       delay={0.18}
     >
       <div className="flex flex-wrap items-start justify-between gap-3">
         <div className="flex items-center gap-2">
-          <span className="flex h-9 w-9 items-center justify-center rounded-xl bg-violet-600/10 text-violet-700">
+          <span className="flex h-9 w-9 items-center justify-center rounded-xl bg-emerald-50 text-[#2c6b58]">
             <Bug className="h-5 w-5" aria-hidden />
           </span>
           <div>

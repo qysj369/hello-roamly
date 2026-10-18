@@ -9,9 +9,16 @@ export type AdvisorSpeechConfig = {
 };
 
 let cachedConfig: AdvisorSpeechConfig | null = null;
+let cachedAt = 0;
+const CACHE_TTL_MS = 15_000;
+
+export function clearAdvisorSpeechConfigCache(): void {
+  cachedConfig = null;
+  cachedAt = 0;
+}
 
 export async function fetchAdvisorSpeechConfig(): Promise<AdvisorSpeechConfig> {
-  if (cachedConfig) {
+  if (cachedConfig && Date.now() - cachedAt < CACHE_TTL_MS) {
     return cachedConfig;
   }
 
@@ -21,6 +28,7 @@ export async function fetchAdvisorSpeechConfig(): Promise<AdvisorSpeechConfig> {
   }
 
   cachedConfig = (await response.json()) as AdvisorSpeechConfig;
+  cachedAt = Date.now();
   return cachedConfig;
 }
 

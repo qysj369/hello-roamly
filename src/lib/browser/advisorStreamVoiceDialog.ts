@@ -7,7 +7,8 @@ import { measurePeakAmplitude } from '@/lib/browser/advisorPcmRecorder';
 const TARGET_SAMPLE_RATE = 16_000;
 const PCM_CHUNK_BYTES = 1280;
 const MIN_INPUT_PEAK = 0.001;
-const LOW_INPUT_WARN_MS = 4_000;
+const LOW_INPUT_WARN_MS = 2_800;
+const DEAD_MIC_STOP_MS = 5_500;
 const LEVEL_POLL_MS = 50;
 
 export type AdvisorStreamVoiceDialogCallbacks = {
@@ -20,6 +21,23 @@ export type AdvisorStreamVoiceDialogCallbacks = {
   onInputLevel?: (peak: number) => void;
   microphoneDeviceId?: string | null;
   useAutoGain?: boolean;
+};
+
+type AudioDataLike = {
+  numberOfFrames: number;
+  numberOfChannels: number;
+  sampleRate: number;
+  format?: string;
+  allocationSize?: (options: { planeIndex: number; format?: string }) => number;
+  copyTo: (
+    destination: BufferSource,
+    options: { planeIndex: number; format?: string },
+  ) => void;
+  close: () => void;
+};
+
+type TrackProcessorLike = {
+  readable: ReadableStream<AudioDataLike>;
 };
 
 function downsampleTo16k(input: Float32Array, sourceRate: number): Float32Array {
@@ -45,12 +63,34 @@ function floatToInt16(samples: Float32Array): Int16Array {
   return int16;
 }
 
+function int16ToBase64(int16: Int16Array): string {
+  const bytes = new Uint8Array(int16.buffer, int16.byteOffset, int16.byteLength);
+  let binary = '';
+  const step = 0x8000;
+  for (let offset = 0; offset < bytes.length; offset += step) {
+    const slice = bytes.subarray(offset, Math.min(bytes.length, offset + step));
+    binary += String.fromCharCode(...slice);
+  }
+  return btoa(binary);
+}
+
 function buildSpeechStreamUrl(): string {
   const protocol = window.location.protocol === 'https:' ? 'wss:' : 'ws:';
   return `${protocol}//${window.location.host}/api/ai/speech-stream`;
 }
 
-/** 讯飞流式语音对话：连续听写，静音自动断句发送 */
+function getMediaStreamTrackProcessorCtor():
+  | (new (init: { track: MediaStreamTrack }) => TrackProcessorLike)
+  | null {
+  const ctor = (
+    window as Window & {
+      MediaStreamTrackProcessor?: new (init: { track: MediaStreamTrack }) => TrackProcessorLike;
+    }
+  ).MediaStreamTrackProcessor;
+  return ctor ?? null;
+}
+
+/** 讯飞流式语音对话：连续听写，静音自动断句；也可点「说完了」强制断句 */
 export class AdvisorStreamVoiceDialogSession {
   private stream: MediaStream | null = null;
 
@@ -78,6 +118,9 @@ export class AdvisorStreamVoiceDialogSession {
 
   private sessionPeak = 0;
 
+  /** 仅由真实送入讯飞的 PCM 更新，用于判断 ScriptProcessor 是否在工作 */
+  private capturePeak = 0;
+
   private pcmPending: number[] = [];
 
   private keepAliveTimer: number | null = null;
@@ -86,11 +129,17 @@ export class AdvisorStreamVoiceDialogSession {
 
   private lowInputTimer: number | null = null;
 
+  private deadMicTimer: number | null = null;
+
   private lowInputWarned = false;
 
   private microphoneDeviceId: string | null = null;
 
   private useAutoGain = false;
+
+  private trackReader: ReadableStreamDefaultReader<AudioDataLike> | null = null;
+
+  private trackPumpActive = false;
 
   private callbacks: AdvisorStreamVoiceDialogCallbacks;
 
@@ -112,7 +161,7 @@ export class AdvisorStreamVoiceDialogSession {
     if (this.paused) {
       return;
     }
-    this.callbacks.onStatus?.('请大声说话，观察下方音量条是否跳动');
+    this.callbacks.onStatus?.('请大声说话，说完停顿约 2 秒，或点「说完了」');
   }
 
   private async ensureAudioCaptureActive(): Promise<void> {
@@ -148,6 +197,10 @@ export class AdvisorStreamVoiceDialogSession {
       window.clearTimeout(this.lowInputTimer);
       this.lowInputTimer = null;
     }
+    if (this.deadMicTimer !== null) {
+      window.clearTimeout(this.deadMicTimer);
+      this.deadMicTimer = null;
+    }
     if (this.visibilityHandler) {
       document.removeEventListener('visibilitychange', this.visibilityHandler);
       this.visibilityHandler = null;
@@ -158,31 +211,46 @@ export class AdvisorStreamVoiceDialogSession {
     if (this.lowInputTimer !== null) {
       window.clearTimeout(this.lowInputTimer);
     }
+    if (this.deadMicTimer !== null) {
+      window.clearTimeout(this.deadMicTimer);
+    }
+
     this.lowInputTimer = window.setTimeout(() => {
       this.lowInputTimer = null;
       if (!this.running || this.paused || this.lowInputWarned) {
         return;
       }
-      if (this.sessionPeak < MIN_INPUT_PEAK) {
+      if (this.sessionPeak < 0.01) {
         this.lowInputWarned = true;
-        const deviceHint = describeMicrophoneTrack(this.stream!);
-        if (this.sessionPeak <= 0.00005) {
-          this.callbacks.onError?.(
-            `未收到麦克风信号（${deviceHint}）：请在下拉框切换到 Realtek 麦克风后点「重新检测」`,
-          );
-        } else {
-          this.callbacks.onStatus?.(
-            `音量偏低（${deviceHint}）：请靠近麦克风大声说话，观察音量条是否跳动`,
-          );
-        }
+        const deviceHint = this.stream ? describeMicrophoneTrack(this.stream) : '默认麦克风';
+        this.callbacks.onError?.(
+          `麦克风几乎无声（${deviceHint} · ${Math.round(this.sessionPeak * 1000) / 10}%）。请先打字搜索；或插入麦克风后，在 Win+I → 声音 → 输入 改选 Realtek（不要用 Philips）`,
+        );
       }
     }, LOW_INPUT_WARN_MS);
+
+    this.deadMicTimer = window.setTimeout(() => {
+      this.deadMicTimer = null;
+      if (!this.running || this.paused) {
+        return;
+      }
+      if (this.sessionPeak < 0.01) {
+        const deviceHint = this.stream ? describeMicrophoneTrack(this.stream) : '默认麦克风';
+        this.callbacks.onFatalError?.(
+          `当前麦克风无可用信号（${deviceHint}）。请直接打字输入目的地；本机需插入麦克风才可用语音`,
+        );
+        this.stop();
+      }
+    }, DEAD_MIC_STOP_MS);
   }
 
   private processAudioSamples(samples: Float32Array, sampleRate: number): void {
     const chunkPeak = measurePeakAmplitude(samples);
     if (chunkPeak > this.sessionPeak) {
       this.sessionPeak = chunkPeak;
+    }
+    if (chunkPeak > this.capturePeak) {
+      this.capturePeak = chunkPeak;
     }
     if (chunkPeak >= MIN_INPUT_PEAK) {
       this.lowInputWarned = false;
@@ -218,7 +286,7 @@ export class AdvisorStreamVoiceDialogSession {
     if (peak >= MIN_INPUT_PEAK) {
       this.lowInputWarned = false;
       if (peak >= 0.008 && !this.paused) {
-        this.callbacks.onStatus?.('请说话，停顿约 2 秒自动发送');
+        this.callbacks.onStatus?.('请说话，停顿约 2 秒或点「说完了」');
       }
     }
     this.callbacks.onInputLevel?.(peak);
@@ -247,11 +315,19 @@ export class AdvisorStreamVoiceDialogSession {
       return;
     }
     this.levelTimer = window.setInterval(() => {
-      if (!this.running || !this.analyser) {
+      if (!this.running || !this.analyser || !this.audioContext) {
         return;
       }
       void this.ensureAudioCaptureActive();
-      this.reportInputLevel(this.readAnalyserPeak());
+      const peak = this.readAnalyserPeak();
+      this.reportInputLevel(peak);
+
+      // ScriptProcessor 偶发不回调时，用 Analyser 时域数据补送 PCM，避免只听不识别
+      if (this.capturing && !this.paused && peak >= 0.01 && this.capturePeak < 0.002) {
+        const floats = new Float32Array(this.analyser.fftSize);
+        this.analyser.getFloatTimeDomainData(floats);
+        this.processAudioSamples(floats, this.audioContext.sampleRate);
+      }
     }, LEVEL_POLL_MS);
   }
 
@@ -273,13 +349,8 @@ export class AdvisorStreamVoiceDialogSession {
         ? this.pcmPending.length
         : Math.min(this.pcmPending.length, PCM_CHUNK_BYTES / 2);
       const chunk = this.pcmPending.splice(0, sampleCount);
-      const buffer = new ArrayBuffer(chunk.length * 2);
-      const view = new DataView(buffer);
-      for (let index = 0; index < chunk.length; index += 1) {
-        view.setInt16(index * 2, chunk[index] ?? 0, true);
-      }
-      const base64 = btoa(String.fromCharCode(...new Uint8Array(buffer)));
-      ws.send(JSON.stringify({ type: 'audio', data: base64 }));
+      const int16 = Int16Array.from(chunk);
+      ws.send(JSON.stringify({ type: 'audio', data: int16ToBase64(int16) }));
     }
   }
 
@@ -301,7 +372,8 @@ export class AdvisorStreamVoiceDialogSession {
     }
 
     if (payload.type === 'partial' && payload.text?.trim()) {
-      this.callbacks.onPreview?.(`听到：${payload.text.trim()}`);
+      this.callbacks.onPreview?.(payload.text.trim());
+      this.callbacks.onStatus?.(`听到：${payload.text.trim()}`);
       return;
     }
 
@@ -351,10 +423,124 @@ export class AdvisorStreamVoiceDialogSession {
 
       ws.onclose = () => {
         if (this.running) {
-          this.callbacks.onError?.('语音连接已断开，请重新开启语音对话');
+          this.callbacks.onError?.('语音连接已断开，请重新开启语音');
         }
       };
     });
+  }
+
+  private async pumpTrackReader(): Promise<void> {
+    const reader = this.trackReader;
+    if (!reader || this.trackPumpActive) {
+      return;
+    }
+    this.trackPumpActive = true;
+    let copiedFrames = 0;
+    let failedFrames = 0;
+    try {
+      while (this.running && this.trackReader === reader) {
+        const result = await reader.read();
+        if (result.done) {
+          break;
+        }
+        const audio = result.value as AudioDataLike & {
+          format?: string;
+          allocationSize?: (options: { planeIndex: number; format?: string }) => number;
+        };
+        if (!audio) {
+          continue;
+        }
+        try {
+          if (!this.paused && this.capturing) {
+            const samples = this.copyAudioDataToFloat32(audio);
+            if (samples) {
+              copiedFrames += 1;
+              this.processAudioSamples(samples, audio.sampleRate);
+            } else {
+              failedFrames += 1;
+            }
+          }
+        } catch {
+          failedFrames += 1;
+        } finally {
+          try {
+            audio.close();
+          } catch {
+            // ignore
+          }
+        }
+
+        // TrackProcessor 拷贝连续失败时切回 ScriptProcessor，避免只听不识别
+        if (failedFrames >= 8 && copiedFrames === 0 && this.audioContext && this.source && !this.processor) {
+          this.callbacks.onStatus?.('切换兼容采音模式…');
+          try {
+            void this.trackReader?.cancel();
+          } catch {
+            // ignore
+          }
+          this.trackReader = null;
+          this.startScriptProcessorCapture(this.audioContext, this.source);
+          break;
+        }
+      }
+    } catch {
+      // reader cancelled on stop
+    } finally {
+      this.trackPumpActive = false;
+    }
+  }
+
+  private copyAudioDataToFloat32(
+    audio: AudioDataLike & {
+      format?: string;
+      allocationSize?: (options: { planeIndex: number; format?: string }) => number;
+    },
+  ): Float32Array | null {
+    const formats = ['f32-planar', 'f32', audio.format].filter(
+      (item, index, arr): item is string => Boolean(item) && arr.indexOf(item) === index,
+    );
+
+    for (const format of formats) {
+      try {
+        const byteLength =
+          typeof audio.allocationSize === 'function'
+            ? audio.allocationSize({ planeIndex: 0, format })
+            : audio.numberOfFrames * 4;
+        const buffer = new ArrayBuffer(Math.max(byteLength, audio.numberOfFrames * 4));
+        audio.copyTo(new Uint8Array(buffer), { planeIndex: 0, format });
+        const samples = new Float32Array(buffer, 0, audio.numberOfFrames);
+        return samples;
+      } catch {
+        // try next format
+      }
+    }
+
+    // 最后尝试：不指定 format，按源格式拷到足够大的缓冲
+    try {
+      const buffer = new ArrayBuffer(audio.numberOfFrames * audio.numberOfChannels * 4);
+      audio.copyTo(new Uint8Array(buffer), { planeIndex: 0 });
+      return new Float32Array(buffer, 0, audio.numberOfFrames);
+    } catch {
+      return null;
+    }
+  }
+
+  private startScriptProcessorCapture(audioContext: AudioContext, source: MediaStreamAudioSourceNode): void {
+    const processor = audioContext.createScriptProcessor(4096, 1, 1);
+    const muteGain = audioContext.createGain();
+    muteGain.gain.value = 0;
+    processor.onaudioprocess = (event) => {
+      if (!this.running) {
+        return;
+      }
+      const channel = event.inputBuffer.getChannelData(0);
+      this.processAudioSamples(new Float32Array(channel), audioContext.sampleRate);
+    };
+    source.connect(processor);
+    processor.connect(muteGain);
+    muteGain.connect(audioContext.destination);
+    this.processor = processor;
+    this.muteGain = muteGain;
   }
 
   async start(): Promise<void> {
@@ -363,6 +549,7 @@ export class AdvisorStreamVoiceDialogSession {
     this.paused = false;
     this.capturing = false;
     this.sessionPeak = 0;
+    this.capturePeak = 0;
     this.pcmPending = [];
     this.callbacks.onStatus?.('正在连接语音服务…');
 
@@ -377,7 +564,10 @@ export class AdvisorStreamVoiceDialogSession {
       });
 
       const track = this.stream.getAudioTracks()[0];
-      if (track?.muted) {
+      if (!track) {
+        throw new Error('未找到麦克风轨道');
+      }
+      if (track.muted) {
         throw new Error('麦克风被系统静音，请在 Windows 声音设置中取消静音');
       }
 
@@ -395,29 +585,14 @@ export class AdvisorStreamVoiceDialogSession {
       const source = audioContext.createMediaStreamSource(this.stream);
       const analyser = audioContext.createAnalyser();
       analyser.fftSize = 2048;
-      const processor = audioContext.createScriptProcessor(4096, 1, 1);
-      const muteGain = audioContext.createGain();
-      muteGain.gain.value = 0;
-
-      processor.onaudioprocess = (event) => {
-        if (!this.running) {
-          return;
-        }
-        const channel = event.inputBuffer.getChannelData(0);
-        this.processAudioSamples(new Float32Array(channel), audioContext.sampleRate);
-      };
-
       source.connect(analyser);
-      source.connect(processor);
-      analyser.connect(muteGain);
-      processor.connect(muteGain);
-      muteGain.connect(audioContext.destination);
 
       this.audioContext = audioContext;
       this.source = source;
       this.analyser = analyser;
-      this.processor = processor;
-      this.muteGain = muteGain;
+
+      // 主路径 ScriptProcessor；Analyser 在 level 轮询里作静音补送
+      this.startScriptProcessorCapture(audioContext, source);
 
       await this.connectWebSocket();
 
@@ -426,6 +601,7 @@ export class AdvisorStreamVoiceDialogSession {
       });
       await this.ensureAudioCaptureActive();
       this.capturing = true;
+      this.capturePeak = 0;
       this.startLevelPolling();
       this.startCaptureKeepAlive();
       this.scheduleLowInputCheck();
@@ -440,10 +616,25 @@ export class AdvisorStreamVoiceDialogSession {
     }
   }
 
+  /** 强制断句：推给讯飞 end 帧，等待 final */
+  forceFinishUtterance(): void {
+    if (!this.running || !this.ws || this.ws.readyState !== WebSocket.OPEN) {
+      this.callbacks.onError?.('语音未就绪，请关闭后重新开启');
+      return;
+    }
+    this.flushPcmChunks(true);
+    this.callbacks.onStatus?.('收到，正在识别…');
+    try {
+      this.ws.send(JSON.stringify({ type: 'stop' }));
+    } catch {
+      this.callbacks.onError?.('发送断句失败，请重试');
+    }
+  }
+
   pause(): void {
     this.paused = true;
     this.setRecording(false);
-    this.callbacks.onStatus?.('顾问回复中…语音对话已暂停');
+    this.callbacks.onStatus?.('已暂停收音');
   }
 
   isRunning(): boolean {
@@ -471,9 +662,18 @@ export class AdvisorStreamVoiceDialogSession {
     this.running = false;
     this.paused = false;
     this.capturing = false;
+
+    if (this.trackReader) {
+      try {
+        void this.trackReader.cancel();
+      } catch {
+        // ignore
+      }
+      this.trackReader = null;
+    }
+
     this.flushPcmChunks(true);
     try {
-      this.ws?.send(JSON.stringify({ type: 'stop' }));
       this.ws?.close();
     } catch {
       // ignore

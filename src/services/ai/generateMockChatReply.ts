@@ -61,7 +61,7 @@ function buildReply(userText: string, context?: AiChatContext): string {
 机动金 = 总预算 × 10%（应急与临时加价）
 \`\`\`
 
-穷游优先 **公交 + 步行环线**；需要的话我可以按你的天数生成「每日花费上限」表。`;
+漫行优先 **公交 + 步行环线**；需要的话我可以按你的天数生成「每日花费上限」表。`;
   }
 
   if (/美食|吃|小吃|餐厅/.test(text)) {
@@ -85,7 +85,7 @@ function buildReply(userText: string, context?: AiChatContext): string {
   if (/攻略|推荐|景点|行程|规划|路线/.test(text) || lower.includes('plan')) {
     const dest = context?.destination?.trim() ?? '目的地';
     const header = contextLine ? `> ${contextLine}\n\n` : '';
-    return `${header}### ${dest} · 穷游行程草案
+    return `${header}### ${dest} · 漫行行程草案
 
 1. **上午** — 免费/低价地标（1–2 个）
 2. **午后** — 美食或拍照街区

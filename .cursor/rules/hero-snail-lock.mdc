@@ -1,15 +1,28 @@
 ---
-description: 首页蜗牛拖地球插画已锁定，禁止再改线条与造型
-globs: src/assets/snail-drag-earth*.png,src/components/home/holo/HeroSnailGraphic.tsx,scripts/thin_snail.py
+description: 首页蜗牛拖地球 PNG 与 Hero 动效已定稿封存
+globs: src/assets/snail-drag-earth*.png,src/components/home/holo/HeroSnailGraphic.tsx,src/hooks/home/useHoloHeroSoftMotion.ts,src/styles/holo-home.css,scripts/thin_snail.py
 alwaysApply: false
 ---
 
-# 首页蜗牛插画锁定
+# 首页蜗牛插画 · Hero 动效定稿
 
-用户已确认最终稿，禁止再改来改去。
+## 素材封存
+- 素材：`src/assets/snail-drag-earth.png`、`public/assets/snail-drag-earth.png`
+- 备份：`src/assets/snail-drag-earth.source.png`
+- 入口：`HeroSnailGraphic.tsx` — **仅 PNG**，禁止换 SVG / 拆图 / 重绘 / 再改像素
 
-- 锁定文件：`src/assets/snail-drag-earth.png`、`public/assets/snail-drag-earth.png`
-- 源备份：`src/assets/snail-drag-earth.source.png`
-- 禁止重绘、临摹、细化脚本覆盖、换成另一套 SVG 造型
-- 只可改外层布局尺寸、位置、边距与 CSS 动画
-- 入口组件：`HeroSnailGraphic.tsx`
+## 本期已固化（可保留，勿再推翻）
+1. 外层 `.snail-earth-container` 淡入 + 轻柔上下浮动（`translateY` / `snailSoftFloat`）
+2. 氛围层经纬线慢旋 + 轨道线流动 + 主视觉柔光呼吸（不改 PNG）
+3. hover 时浮动 / 经纬 / 柔光轻微加速
+4. 驾驶舱胶囊按钮 hover 上浮与背景变化
+5. 低端机 / 省流 / `prefers-reduced-motion` / 移动端简化 → 静态或降级（`useHoloHeroSoftMotion` + `.is-hero-static`）
+
+## 禁止（本期与后续默认）
+- 拆解 PNG 做内部元素动画
+- 触角摆动、蜗牛壳独立旋转、地球本体真实自转
+- 换主视觉造型或再跑细化脚本覆盖
+
+## 二期待办（本期不实现）
+- [ ] 蜗牛触角摆动（需分层素材）
+- [ ] 地球本体真实自转（需分层素材）

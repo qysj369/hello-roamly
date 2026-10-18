@@ -15,7 +15,7 @@ export default function DiscoverPlansSection({ plans, sortHint }: DiscoverPlansS
     <DiscoverGridSection
       id="discover-grid-plans"
       title="旅行计划"
-      subtitle="AI 穷游行程 · 预算与路线一目了然"
+      subtitle="AI 漫行行程 · 预算与路线一目了然"
       icon={MapPinned}
       href={paths.guides}
       count={plans.length}

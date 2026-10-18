@@ -85,7 +85,9 @@ export function parseTravelAgentIntent(text: string, hasPlan: boolean): TravelAg
   if (/回退|上一版|回到上一|撤销修改/.test(raw)) return { type: 'rollback' };
   if (/重置偏好|清空偏好|忘掉我的习惯/.test(raw)) return { type: 'reset_preference' };
   if (/保存行程|帮我保存|一句话保存|存一下|收藏这|保存这份/.test(raw)) return { type: 'save' };
-  if (/生成海报|分享海报|出海报|做海报/.test(raw)) return { type: 'poster' };
+  if (/生成海报|分享海报|出海报|做海报|生成图文|图文资产包|确认行程|攻略卡片/.test(raw)) {
+    return { type: 'poster' };
+  }
   if (/复制链接|分享链接|拷贝链接|复制分享链接/.test(raw)) return { type: 'copy_link' };
   if (/复制种草|复制文案|复制标签|种草短句|话题标签/.test(raw)) return { type: 'copy_share' };
   if (/发给朋友|发给微信|发微信|打开分享|一键分享|分享行程|发给群/.test(raw)) return { type: 'share' };

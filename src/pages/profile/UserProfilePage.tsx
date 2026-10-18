@@ -24,6 +24,7 @@ import { ensureBuddyConversation } from '@/utils/siteChat';
 import type { GuidesPageState } from '@/types/router-state';
 import { getTravelPlanCompanionPath } from '@/utils/travelPlanCompanionNavigation';
 import { getCountryLabel } from '@/utils/userProfileView';
+import '@/styles/holo-inner.css';
 
 export default function UserProfilePage() {
   const navigate = useNavigate();
@@ -94,12 +95,12 @@ export default function UserProfilePage() {
   }, [navigate, user]);
 
   return (
-    <MotionPage className="flex flex-col gap-4">
+    <MotionPage className="holo-profile flex flex-col gap-4">
       <MotionBlock>
         <button
           type="button"
           onClick={() => navigate(-1)}
-          className="inline-flex items-center gap-1 text-sm font-medium text-brand-600 hover:text-brand-700"
+          className="holo-profile__back inline-flex items-center gap-1 text-sm font-medium"
         >
           <ArrowLeft className="h-4 w-4" aria-hidden />
           返回
@@ -154,16 +155,16 @@ export default function UserProfilePage() {
 
           {!isOwnProfile && (
             <MotionBlock>
-              <section className="rounded-2xl border border-violet-200/80 bg-gradient-to-r from-violet-50 to-fuchsia-50 p-5 shadow-sm">
-                <h2 className="text-sm font-semibold text-slate-900">寻找旅伴</h2>
-                <p className="mt-1 text-sm text-slate-600">
+              <section className="holo-profile__panel rounded-xl border border-[#b7cdc4] bg-[#fffef6] p-5 shadow-none">
+                <h2 className="text-sm font-semibold text-[#2c6b58]">寻找旅伴</h2>
+                <p className="mt-1 text-sm text-[#54786c]">
                   与 {user.username} 兴趣相近？前往攻略页看看同目的地灵感。
                 </p>
                 <div className="mt-4 flex flex-wrap gap-2">
                   <button
                     type="button"
                     onClick={handleMessage}
-                    className="inline-flex items-center gap-1.5 rounded-xl bg-violet-600 px-4 py-2.5 text-sm font-semibold text-white hover:bg-violet-700"
+                    className="inline-flex items-center gap-1.5 rounded-xl bg-[#2c6b58] px-4 py-2.5 text-sm font-semibold text-[#f9f7eb] hover:brightness-105"
                   >
                     <MessageCircle className="h-4 w-4" aria-hidden />
                     发消息
@@ -171,7 +172,7 @@ export default function UserProfilePage() {
                   <button
                     type="button"
                     onClick={handleFindCompanion}
-                    className="inline-flex rounded-xl border border-violet-200 bg-white px-4 py-2.5 text-sm font-semibold text-violet-700 hover:bg-violet-50"
+                    className="inline-flex rounded-xl border border-[#b7cdc4] bg-white px-4 py-2.5 text-sm font-semibold text-[#2c6b58] hover:bg-emerald-50"
                   >
                     寻找旅伴
                   </button>

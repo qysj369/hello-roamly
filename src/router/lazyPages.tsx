@@ -2,7 +2,6 @@ import { lazy, type ComponentType } from 'react';
 import { withRouteSuspense } from '@/router/withRouteSuspense';
 
 /** 与路由懒加载共用的动态 import，供 prefetch 复用 */
-// eslint-disable-next-line react-refresh/only-export-components -- loaders are shared with prefetch
 export const routeLoaders = {
   discover: () => import('@/pages/discover/DiscoverPage'),
   ai: () => import('@/pages/ai/AiChatPage'),
@@ -19,6 +18,14 @@ export const routeLoaders = {
   travelBuddyNew: () => import('@/pages/travel-buddy/TravelBuddyNewPage'),
   about: () => import('@/pages/about/AboutPage'),
   snailCulture: () => import('@/pages/community/SnailCulturePage'),
+  cities: () => import('@/pages/cities/CitiesPage'),
+  privacy: () => import('@/pages/legal/PrivacyPage'),
+  terms: () => import('@/pages/legal/TermsPage'),
+  contact: () => import('@/pages/legal/ContactPage'),
+  feedback: () => import('@/pages/legal/FeedbackPage'),
+  budget: () => import('@/pages/tools/BudgetEstimatePage'),
+  mp: () => import('@/pages/tools/WechatToolPage'),
+  inspire: () => import('@/pages/inspire/TravelInspirePage'),
   drivePanorama: () => import('@/pages/drive/DrivePanoramaPage'),
   snailFlight: () => import('@/pages/snail-flight/SnailFlightPage'),
   notFound: () => import('@/pages/error/NotFoundPage'),
@@ -48,6 +55,14 @@ export const TravelBuddiesPage = lazyPage(routeLoaders.travelBuddies);
 export const TravelBuddyNewPage = lazyPage(routeLoaders.travelBuddyNew);
 export const AboutPage = lazyPage(routeLoaders.about);
 export const SnailCulturePage = lazyPage(routeLoaders.snailCulture);
+export const CitiesPage = lazyPage(routeLoaders.cities);
+export const PrivacyPage = lazyPage(routeLoaders.privacy);
+export const TermsPage = lazyPage(routeLoaders.terms);
+export const ContactPage = lazyPage(routeLoaders.contact);
+export const FeedbackPage = lazyPage(routeLoaders.feedback);
+export const BudgetEstimatePage = lazyPage(routeLoaders.budget);
+export const WechatToolPage = lazyPage(routeLoaders.mp);
+export const TravelInspirePage = lazyPage(routeLoaders.inspire);
 export const DrivePanoramaPage = lazyPage(routeLoaders.drivePanorama);
 export const SnailFlightPage = lazyPage(routeLoaders.snailFlight);
 export const NotFoundPage = lazyPage(routeLoaders.notFound);

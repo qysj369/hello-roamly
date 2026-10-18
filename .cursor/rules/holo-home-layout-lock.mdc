@@ -1,0 +1,42 @@
+---
+description: 首页大结构已定稿锁定；后续仅配色/间距/字体微调，禁止私自增删大模块
+globs: src/components/home/holo/**,src/styles/holo-home.css,src/data/holoDream*.ts,src/data/holoTravelTools.ts,src/data/holoCityPreviewContent.ts,src/data/holoInspireScenes.ts,src/data/holoHomeSideRails.ts,src/i18n/messages.ts
+alwaysApply: true
+---
+
+# 首页排版锁定（2026-08-05 定稿）
+
+技术栈以仓库为准：**React 18 + Vite + TS + Zustand/RQ + Three.js**，禁止改写成 Vue/Pinia。  
+禁止改动穷游攻略底层（`server/lib/mapPlanStreamPipeline*`、`src/lib/plan/*`）。
+
+## 固定结构（顺序不可私自调整）
+
+1. **导航**：LOGO + slogan；右上角仅语音 / 中英（PC·移动一致）
+2. **Hero**：主副标题 + slogan 下方大搜索框 + 蜗牛主视觉（PNG 锁定）；CTA 以现网为准
+3. **热门城市**：最多 8 预览横滑 +「更多」→ `/cities`；种草弹窗；浅米灰外层容器；CTA「去规划攻略」→ AI 顾问（`launchHoloPlanSearch`）
+4. **漫游灵感**：六场景种草弹窗 + 轻量标签（近郊轻游 / 人文慢逛 / 亲子时光）；浅米灰外层容器；CTA「规划这个行程」→ 同上 AI 穷游生成
+5. **慢行工具箱**：宫格站内功能入口（含精打细算 → `/budget`）；浅米灰外层容器；品牌绿按钮对比度
+6. **蜗友在路上**：仅浏览导流，不放发布/招募业务按钮
+7. **页脚**：标语 + 关于/隐私/协议/联系/反馈 + 备案 + 版权
+
+## 宽屏双侧
+
+- 左右留白保留；侧栏配置 `holoHomeSideRails` 默认关闭
+- 禁止私自铺满全屏或塞硬广
+
+## 业务职责
+
+- 首屏搜索 / 语音 / 城市·灵感 CTA：统一 `navigateHoloPlanSearch` → `/ai`（带出发地定位 + 目的地，复用既有 handoff）
+- **禁止**改 `mapPlanStreamPipeline*` / `src/lib/plan/*`
+- 工具箱：各类站内功能入口；驾驶舱仍走选城 picker
+
+## 后续只允许
+
+- 配色、间距、字体、hover、兼容、无障碍、文案微调
+- 用户明确点名的增减；侧栏按配置开启
+
+## 禁止
+
+- 私自增删大模块、重做 IA、Hero 加第二业务按钮
+- 弹窗内直接生成攻略 / 直开驾驶舱业务链路
+- 改蜗牛 PNG 像素（见 `hero-snail-lock`）

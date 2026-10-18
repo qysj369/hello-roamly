@@ -57,7 +57,7 @@ export default function UserProfilePublicSavedPlansSection({
         )}
       >
         <MapPin className="mx-auto h-8 w-8 text-slate-300" aria-hidden />
-        <p className="mt-3 text-sm font-medium text-slate-700">暂无公开穷游方案</p>
+        <p className="mt-3 text-sm font-medium text-slate-700">暂无公开漫行方案</p>
         <p className="mt-1 text-xs text-slate-500">TA 还没有公开分享的地图 AI 方案</p>
       </div>
     );
@@ -66,7 +66,7 @@ export default function UserProfilePublicSavedPlansSection({
   return (
     <section className={cn('space-y-3', className)}>
       <div>
-        <h3 className="text-sm font-semibold text-slate-900">公开穷游方案</h3>
+        <h3 className="text-sm font-semibold text-slate-900">公开漫行方案</h3>
         <p className="mt-0.5 text-xs text-slate-500">TA 在地图 AI 生成并公开分享的方案</p>
       </div>
       <ul className="space-y-2">

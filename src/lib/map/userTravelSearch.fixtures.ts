@@ -43,7 +43,7 @@ export const USER_TRAVEL_SEARCH_FIXTURES: UserTravelSearchFixture[] = [
   { input: '去大理', primaryPlace: '大理' },
   { input: '想去厦门', primaryPlace: '厦门' },
   {
-    input: '大理 摄影 穷游 2000',
+    input: '大理 摄影 漫行 2000',
     primaryPlace: '大理',
     preferences: ['摄影打卡', '省钱优先'],
   },

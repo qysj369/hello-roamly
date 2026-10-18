@@ -4,6 +4,8 @@ import {
 
   advisorSpeechSetupHint,
 
+  clearAdvisorSpeechConfigCache,
+
   fetchAdvisorSpeechConfig,
 
   type AdvisorSpeechConfig,
@@ -131,6 +133,7 @@ export function useAdvisorVoiceDialog({
 
     let cancelled = false;
 
+    clearAdvisorSpeechConfigCache();
     void fetchAdvisorSpeechConfig()
 
       .then((next) => {
@@ -377,6 +380,7 @@ export function useAdvisorVoiceDialog({
 
     const preferIflytek =
       !forceWhisperRef.current &&
+      config?.provider === 'iflytek' &&
       config?.voiceDialogMode === 'iflytek-stream' &&
       config?.voiceDialogReady;
 
@@ -435,12 +439,9 @@ export function useAdvisorVoiceDialog({
         if (!iflytekSession.isRunning()) {
           iflytekSession.stop();
           sessionRef.current = null;
-          if (isEdgeBrowser() && AdvisorContinuousSpeechSession.isSupported()) {
-            setError(null);
-            setStatus('讯飞连接失败，切换 Edge 识别…');
-          } else {
-            return;
-          }
+          // 无讯飞/连接失败：勿卡在空听；优先落到下方 Whisper「说完了」
+          setError(null);
+          setStatus('流式识别不可用，切换本地录音…');
         } else {
           activeRef.current = true;
           setActive(true);
@@ -460,8 +461,10 @@ export function useAdvisorVoiceDialog({
       }
     }
 
+    // local-whisper 场景下 Edge Web Speech 常只显示「麦克风已连接」却无结果，直接走录音+Whisper
     const preferEdge =
       !forceWhisperRef.current &&
+      config?.provider !== 'local-whisper' &&
       isEdgeBrowser() &&
       AdvisorContinuousSpeechSession.isSupported();
 
@@ -906,23 +909,24 @@ export function useAdvisorVoiceDialog({
 
     probeMicrophones,
 
-    requiresManualFinish: voiceBackend === 'whisper',
+    requiresManualFinish: voiceBackend === 'whisper' || voiceBackend === 'iflytek',
 
     toggle,
 
     finishUtterance: () => {
       const session = sessionRef.current;
       if (!session) {
-        setError('语音未就绪，请关闭绿色波形后重新开启');
+        setError('语音未就绪，请关闭后重新开启');
         return;
       }
-      if (voiceBackend !== 'whisper' || !('forceFinishUtterance' in session)) {
-        setError('讯飞/Edge 自动识别：大声说话，停顿约 2 秒即可，无需点「说完了」');
+      if ('forceFinishUtterance' in session && typeof session.forceFinishUtterance === 'function') {
+        setError(null);
+        setStatus('收到，正在识别…');
+        setProcessing(true);
+        session.forceFinishUtterance();
         return;
       }
-      setError(null);
-      setStatus('收到，正在处理录音…');
-      session.forceFinishUtterance();
+      setError('大声说话，停顿约 2 秒即可自动发送');
     },
 
     stop: stopSession,

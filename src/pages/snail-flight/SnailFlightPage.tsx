@@ -7,6 +7,7 @@ import {
   SNAIL_FLIGHT_DEFAULT_DEST_ID,
   SNAIL_FLIGHT_DEFAULT_ORIGIN_ID,
 } from '@/lib/snail-flight/cities';
+import { useFlightButlerStore } from '@/lib/snail-flight/flightButlerStore';
 import { buildSnailFlightRoute } from '@/lib/snail-flight/routes';
 import { paths } from '@/router/paths';
 import '@/styles/snail-flight.css';
@@ -21,11 +22,13 @@ export default function SnailFlightPage() {
   const fast = params.get('fast') === '1';
   const route = useMemo(() => buildSnailFlightRoute(fromId, toId), [fromId, toId]);
   const [landed, setLanded] = useState(false);
+  const [guideReady, setGuideReady] = useState(false);
   const [needForm, setNeedForm] = useState(!route);
 
   useEffect(() => {
     const root = document.documentElement;
     root.classList.add('snail-flight-active');
+    useFlightButlerStore.getState().reset();
     return () => root.classList.remove('snail-flight-active');
   }, []);
 
@@ -37,14 +40,19 @@ export default function SnailFlightPage() {
     setLanded(true);
   }, []);
 
+  const onGuideReady = useCallback(() => {
+    setGuideReady(true);
+  }, []);
+
   return (
-    <div className="snail-flight">
+    <div className={guideReady ? 'snail-flight is-guide-ready' : 'snail-flight'}>
       {needForm || !route ? (
         <SnailFlightBookingDialog
           onCancel={exitHome}
           onConfirm={(nextFrom, nextTo) => {
             setNeedForm(false);
             setLanded(false);
+            setGuideReady(false);
             setParams({ from: nextFrom, to: nextTo }, { replace: true });
           }}
         />
@@ -53,8 +61,10 @@ export default function SnailFlightPage() {
           <SnailFlightViewer route={route} fast={fast} onExit={exitHome} onLanded={onLanded} />
         </Suspense>
       )}
-      {landed && route ? <SnailFlightLandingPanel route={route} /> : null}
-      {landed ? <TravelAgentHost /> : null}
+      {landed && route ? (
+        <SnailFlightLandingPanel route={route} onReady={onGuideReady} />
+      ) : null}
+      {needForm || !route ? null : <TravelAgentHost variant="flight" />}
     </div>
   );
 }

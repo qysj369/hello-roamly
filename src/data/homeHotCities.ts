@@ -15,7 +15,7 @@ export const homeHotCities: readonly HomeHotCity[] = [
     query: '西安 三天 1500',
     days: '3 天',
     budget: '约 ¥1480',
-    tags: ['兵马俑', '城墙', '硬壳穷游'],
+    tags: ['兵马俑', '城墙', '硬壳漫行'],
   },
   {
     id: 'chengdu',

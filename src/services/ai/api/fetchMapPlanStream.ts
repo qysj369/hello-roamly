@@ -2,9 +2,11 @@ import {
   finalizeMapPlanContent,
   isMapPlanDeliverable,
 } from '@/lib/plan/mapPlanCompleteness';
+import { scrubPlanDisplayMarkup } from '@/lib/home/scrubPlanDisplayMarkup';
+import { polishClarifyPlanForDisplay } from '@/lib/home/planDestinationDriftGuard';
 import { sanitizePlanContentForDisplay } from '@/lib/plan/sanitizePlanContent';
 import { parseSseStream } from '@/services/ai/api/parseSseStream';
-import { fetchMapPlanFromApi, GenerateMapPlanApiError } from '@/services/ai/api/generateMapPlan';
+import { GenerateMapPlanApiError } from '@/services/ai/api/generateMapPlan';
 import { AI_API } from '@/services/ai/paths';
 import type {
   GenerateMapPlanRequest,
@@ -41,15 +43,19 @@ export async function fetchMapPlanWithStream(
 
   if (!response.ok && !contentType.includes('text/event-stream')) {
     let message = `流式规划失败 (${response.status})`;
+    let code: string | undefined;
     try {
-      const json = (await response.json()) as { error?: string };
+      const json = (await response.json()) as { error?: string; code?: string };
       if (json.error) {
         message = json.error;
+      }
+      if (json.code) {
+        code = json.code;
       }
     } catch {
       /* ignore */
     }
-    throw new GenerateMapPlanApiError(message);
+    throw new GenerateMapPlanApiError(message, { status: response.status, code });
   }
 
   if (!response.body) {
@@ -98,12 +104,7 @@ export async function fetchMapPlanWithStream(
             locationName = payload.locationName.trim();
           }
           if (payload.content?.trim()) {
-            accumulated = finalizeMapPlanContent(
-              payload.content.trim(),
-              locationName,
-              options.params.originName,
-              options.params.searchQuery ?? options.params.initialQuery ?? options.params.query,
-            );
+            accumulated = payload.content.trim();
             options.onSync?.(accumulated);
             doneFromServer = true;
           }
@@ -126,20 +127,26 @@ export async function fetchMapPlanWithStream(
   );
 
   if (unconfigured) {
-    return fetchMapPlanFromApi(options.params, { signal: options.signal });
+    throw new GenerateMapPlanApiError('DeepSeek 未配置，无法调用大模型生成攻略', {
+      code: 'deepseek_unconfigured',
+    });
   }
 
   if (options.signal?.aborted) {
     throw new GenerateMapPlanApiError('已停止生成', { code: 'aborted' });
   }
 
-  let content = sanitizePlanContentForDisplay(accumulated.trim());
+  let content = polishClarifyPlanForDisplay(
+    scrubPlanDisplayMarkup(sanitizePlanContentForDisplay(accumulated.trim())),
+  );
   if (!doneFromServer) {
-    content = finalizeMapPlanContent(
-      content,
-      locationName,
-      options.params.originName,
-      options.params.searchQuery ?? options.params.initialQuery ?? options.params.query,
+    content = polishClarifyPlanForDisplay(
+      finalizeMapPlanContent(
+        content,
+        locationName,
+        options.params.originName,
+        options.params.searchQuery ?? options.params.initialQuery ?? options.params.query,
+      ),
     );
   }
 

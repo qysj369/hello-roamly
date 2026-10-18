@@ -71,7 +71,7 @@ export function resolveHotPickPreview(item: RecommendedDiscoverItem): DiscoverHo
     return {
       item,
       title: plan.title,
-      subtitle: plan.tags.slice(0, 2).join(' · ') || 'AI 穷游计划',
+      subtitle: plan.tags.slice(0, 2).join(' · ') || 'AI 漫行计划',
       coverUrl: getPlanCoverImage(plan),
       badge: '精选计划',
       destinationHint: getPlanDestination(plan).split(/[·•]/)[0]?.trim(),
@@ -84,7 +84,7 @@ export function resolveHotPickPreview(item: RecommendedDiscoverItem): DiscoverHo
       title: item.title,
       subtitle: `${item.locationName} · 蜗友公开方案`,
       coverUrl: getSavedUserPlanCoverUrl(item.userPlanId, item.locationName),
-      badge: '穷游方案',
+      badge: '漫行方案',
       destinationHint: item.locationName,
     };
   }

@@ -21,19 +21,23 @@ describe('snail-flight demo route', () => {
     ]);
   });
 
-  it('switches narration by progress', () => {
-    expect(narrationAt(route, 0).title).toContain('济南历下');
-    expect(narrationAt(route, 0.22).title).toContain('章丘');
-    expect(narrationAt(route, 0.45).title).toContain('淄博');
-    expect(narrationAt(route, 0.65).title).toContain('潍坊');
-    expect(narrationAt(route, 0.88).title).toContain('青岛');
-    expect(narrationAt(route, 0.95).title).toContain('落地');
+  it('switches narration by fixed progress bands', () => {
+    expect(narrationAt(route, 0).title).toBe('【起飞｜济南历下】');
+    expect(narrationAt(route, 0.13).title).toBe('【掠过湖泽】');
+    expect(narrationAt(route, 0.16).title).toBe('【飞越章丘】');
+    expect(narrationAt(route, 0.36).title).toBe('【途经淄博】');
+    expect(narrationAt(route, 0.36).lines[0]).toBe('前方抵达淄博上空。');
+    expect(narrationAt(route, 0.62).title).toContain('潍坊');
+    expect(narrationAt(route, 0.77).title).toContain('莱州湾');
+    expect(narrationAt(route, 0.95).title).toBe('【抵达青岛｜降落阶段】');
   });
 
   it('keeps a low sightseeing altitude over Shandong', () => {
+    const takeoff = sampleFlightPose(route, 0);
     const mid = sampleFlightPose(route, 0.5);
-    expect(mid.height).toBeGreaterThan(800);
-    expect(mid.height).toBeLessThan(2000);
+    expect(takeoff.height).toBeGreaterThan(1200);
+    expect(mid.height).toBeGreaterThan(2000);
+    expect(mid.height).toBeLessThan(3600);
     expect(mid.lon).toBeGreaterThan(117);
     expect(mid.lon).toBeLessThan(121);
   });

@@ -3,10 +3,10 @@ import { type FormEvent, useState } from 'react';
 import { cn } from '@/utils/cn';
 
 const QUICK_PROMPTS = [
-  { id: 'budget', label: '压预算', text: '把总预算再压 200 元，花费表和流水账要对齐' },
-  { id: 'pace', label: '轻松点', text: '行程轻松一点，每天少排 1 个景点，留机动时间' },
-  { id: 'free', label: '多免费', text: '多加免费景点和本地小吃，少门票' },
-  { id: 'traffic', label: '省交通', text: '市内交通尽量地铁公交，写清上车站和换乘车' },
+  { id: 'budget', label: '降低预算', text: '把总预算再压 200 元，花费表和流水账要对齐' },
+  { id: 'pace', label: '节奏更松弛', text: '行程轻松一点，每天少排 1 个景点，留机动时间' },
+  { id: 'free', label: '多免费景点', text: '多加免费景点和本地小吃，少门票' },
+  { id: 'traffic', label: '节省路费', text: '市内交通尽量地铁公交，写清上车站和换乘车' },
 ] as const;
 
 type PlanResultFollowUpBarProps = {

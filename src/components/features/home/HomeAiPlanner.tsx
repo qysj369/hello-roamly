@@ -56,7 +56,7 @@ export default function HomeAiPlanner() {
             <Bot className="h-3.5 w-3.5" aria-hidden />
             AI Trip Engine
           </p>
-          <h3 className="mt-2 text-base font-semibold">一键 AI 穷游行程</h3>
+          <h3 className="mt-2 text-base font-semibold">一键 AI 漫行行程</h3>
           <p className="mt-1 text-xs text-indigo-100/80">
             {aiProvider === 'deepseek'
               ? '填写目的地与预算，一键生成 AI 旅行计划（上线模式）。'
@@ -146,7 +146,7 @@ export default function HomeAiPlanner() {
             ) : (
               <Sparkles className="h-4 w-4" aria-hidden />
             )}
-            {isGenerating ? '正在生成计划…' : '生成穷游方案'}
+            {isGenerating ? '正在生成计划…' : '生成漫行方案'}
           </button>
         </div>
       </section>

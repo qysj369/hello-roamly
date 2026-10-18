@@ -10,11 +10,14 @@ export type SharePosterPreviewProps = {
   slideIndex: number;
   slideCount: number;
   isXhs: boolean;
+  isDouyin?: boolean;
   isMultiSlide: boolean;
   onRetry: () => void;
   onPrevSlide: () => void;
   onNextSlide: () => void;
   onGoToSlide: (index: number) => void;
+  expanded?: boolean;
+  tone?: 'default' | 'brand';
 };
 
 export default function SharePosterPreview({
@@ -26,19 +29,34 @@ export default function SharePosterPreview({
   slideIndex,
   slideCount,
   isXhs,
+  isDouyin = false,
   isMultiSlide,
   onRetry,
   onPrevSlide,
   onNextSlide,
   onGoToSlide,
+  expanded = false,
+  tone = 'default',
 }: SharePosterPreviewProps) {
   return (
     <div className="relative overflow-hidden rounded-2xl border border-slate-200 bg-slate-50">
-      <div className="relative flex min-h-[280px] items-center justify-center">
+      <div
+        className={cn(
+          'relative flex items-center justify-center',
+          expanded ? 'min-h-[280px]' : 'min-h-[180px]',
+        )}
+      >
         {isGenerating && (
           <div className="flex flex-col items-center gap-2 py-16 text-sm text-slate-500">
             <Loader2
-              className={cn('h-8 w-8 animate-spin', isXhs ? 'text-rose-500' : 'text-violet-600')}
+              className={cn(
+                'h-8 w-8 animate-spin',
+                tone === 'brand'
+                  ? 'text-[var(--color-main)]'
+                  : isXhs || isDouyin
+                    ? 'text-rose-500'
+                    : 'text-violet-600',
+              )}
               aria-hidden
             />
             正在生成{generatingLabel}…
@@ -60,7 +78,11 @@ export default function SharePosterPreview({
           <img
             src={activePosterUrl}
             alt={`${posterAlt} ${slideIndex + 1}/${slideCount}`}
-            className="max-h-[min(52vh,28rem)] w-full object-contain"
+            draggable
+            className={cn(
+              'mx-auto h-auto w-auto object-contain',
+              expanded ? 'max-h-[min(72vh,40rem)]' : 'max-h-[min(36vh,20rem)]',
+            )}
           />
         )}
       </div>

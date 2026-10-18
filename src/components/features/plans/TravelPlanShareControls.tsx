@@ -73,11 +73,11 @@ export default function TravelPlanShareControls({
           className={cn(
             buttonBase,
             isPrimary
-              ? 'bg-brand-600 text-white hover:bg-brand-700'
-              : 'text-slate-600 hover:bg-slate-100',
+              ? 'border border-[#b7cdc4] bg-[#fffef6] text-[#2c6b58] hover:bg-emerald-50 shadow-none'
+              : 'text-[#54786c] hover:bg-emerald-50',
             (feedback === 'shared' || feedback === 'copied') &&
               isPrimary &&
-              'bg-emerald-600 hover:bg-emerald-700',
+              'border-[#2c6b58] bg-emerald-50 text-[#2c6b58]',
           )}
           aria-label="分享旅行计划"
         >
@@ -92,8 +92,8 @@ export default function TravelPlanShareControls({
             className={cn(
               buttonBase,
               isPrimary
-                ? 'border border-violet-200 bg-violet-50 text-violet-800 hover:bg-violet-100'
-                : 'text-violet-700 hover:bg-violet-50',
+                ? 'border border-[#b7cdc4] bg-emerald-50 text-[#2c6b58] hover:bg-emerald-50'
+                : 'text-[#2c6b58] hover:bg-emerald-50',
             )}
             aria-label="生成微信分享海报"
           >

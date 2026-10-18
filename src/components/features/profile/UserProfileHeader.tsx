@@ -57,7 +57,7 @@ export default function UserProfileHeader({
     <>
       <header
         className={cn(
-          'overflow-hidden rounded-2xl border border-slate-200/90 bg-gradient-to-br from-violet-50 via-white to-cyan-50 shadow-sm',
+          'overflow-hidden rounded-xl border border-[#b7cdc4] bg-[#fffef6] shadow-none',
           className,
         )}
       >
@@ -101,7 +101,7 @@ export default function UserProfileHeader({
                     <button
                       type="button"
                       onClick={handleEditOpen}
-                      className="inline-flex shrink-0 items-center gap-1.5 rounded-xl border border-brand-200 bg-white px-3.5 py-2 text-sm font-semibold text-brand-700 shadow-sm transition hover:border-brand-300 hover:bg-brand-50"
+                      className="inline-flex shrink-0 items-center gap-1.5 rounded-xl border border-[#b7cdc4] bg-[#fffef6] px-3.5 py-2 text-sm font-semibold text-[#2c6b58] shadow-none transition hover:border-[#2c6b58] hover:bg-emerald-50"
                     >
                       <Pencil className="h-4 w-4" aria-hidden />
                       编辑资料
