@@ -1,0 +1,70 @@
+# 无人值守自动部署：push 到 main → 自动构建 Holo 生产包 → 自动上传腾讯云测试服务器 → 自动上线
+# 需要先在 GitHub 仓库配置 Secrets：
+#   HOLO_SSH_KEY（必配）：本机 ~/.ssh/id_ed25519_holo 私钥全文
+#   VITE_AMAP_KEY / VITE_AMAP_SECURITY_CODE（建议配）：高德地图 Key，缺失时地图功能降级但构建仍成功
+name: Deploy to Tencent Test Server
+
+on:
+  push:
+    branches: [main]
+  workflow_dispatch:
+
+concurrency:
+  group: tencent-deploy
+  cancel-in-progress: false
+
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: pnpm/action-setup@v4
+        with:
+          version: 9.15.0
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 20
+          cache: pnpm
+
+      - name: Install dependencies
+        run: pnpm install --frozen-lockfile
+
+      - name: Build Holo production bundle
+        run: pnpm run build:deploy:holo
+        env:
+          VITE_AMAP_KEY: ${{ secrets.VITE_AMAP_KEY }}
+          VITE_AMAP_SECURITY_CODE: ${{ secrets.VITE_AMAP_SECURITY_CODE }}
+          VITE_BAIDU_MAP_AK: ${{ secrets.VITE_BAIDU_MAP_AK }}
+
+      - name: Package dist and sync expected hashes
+        run: |
+          set -eu
+          cd dist-new-build
+          zip -qr ../site-motion.zip .
+          cd ..
+          JS=$(grep -oE 'index-[A-Za-z0-9_-]+\.js' dist-new-build/index.html | head -1)
+          CSS=$(grep -oE 'assets/[A-Za-z0-9_./-]+\.css' dist-new-build/index.html | head -1)
+          echo "JS=$JS" >> "$GITHUB_ENV"
+          echo "CSS=$CSS" >> "$GITHUB_ENV"
+          sed -i "s|^EXPECTED_JS=.*|EXPECTED_JS=\"\${EXPECTED_JS:-${JS}}\"|" deploy/deploy-holo-now.sh
+          if [ -n "$CSS" ]; then
+            sed -i "s|^EXPECTED_CSS=.*|EXPECTED_CSS=\"\${EXPECTED_CSS:-${CSS}}\"|" deploy/deploy-holo-now.sh
+          fi
+          sed -i 's/\r$//' deploy/deploy-holo-now.sh
+          echo "JS=$JS CSS=$CSS"
+          ls -la site-motion.zip
+
+      - name: Setup SSH agent
+        uses: webfactory/ssh-agent@v0.9.0
+        with:
+          ssh-private-key: ${{ secrets.HOLO_SSH_KEY }}
+
+      - name: Upload and deploy to Tencent server
+        run: |
+          set -eu
+          SSHHOST=root@49.232.221.38
+          scp -o StrictHostKeyChecking=accept-new -o ConnectTimeout=20 site-motion.zip "$SSHHOST:/root/NEW-HOME.zip"
+          scp -o StrictHostKeyChecking=accept-new -o ConnectTimeout=20 deploy/deploy-holo-now.sh "$SSHHOST:/root/deploy-holo-now.sh"
+          ssh -o StrictHostKeyChecking=accept-new -o ConnectTimeout=20 "$SSHHOST" 'bash /root/deploy-holo-now.sh'
