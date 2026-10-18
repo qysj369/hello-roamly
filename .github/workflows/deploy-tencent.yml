@@ -60,8 +60,8 @@ jobs:
         run: |
           set -eu
           mkdir -p ~/.ssh
-          # 写入私钥，清洗 CRLF/尾随空白（GitHub Secret 粘贴多行内容时可能出现）
-          printf '%s\n' "${{ secrets.HOLO_SSH_KEY }}" | tr -d '\r' > ~/.ssh/id_ed25519_holo
+          # HOLO_SSH_KEY 为 base64 编码的单行私钥（避免多行粘贴格式问题）
+          echo "${{ secrets.HOLO_SSH_KEY }}" | tr -d ' \t\r\n' | base64 -d > ~/.ssh/id_ed25519_holo
           chmod 600 ~/.ssh/id_ed25519_holo
           # 自校验：格式合法才继续，避免把坏密钥传到服务器
           ssh-keygen -y -f ~/.ssh/id_ed25519_holo > /dev/null
