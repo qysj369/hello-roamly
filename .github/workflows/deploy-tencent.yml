@@ -1,12 +1,10 @@
-# 无人值守自动部署：push 到 main → 自动构建 Holo 生产包 → 自动上传腾讯云测试服务器 → 自动上线
+# 腾讯云测试服务器部署：仅手动触发（按钮），避免每次 push 都上传大包消耗服务器流量
 # 需要先在 GitHub 仓库配置 Secrets：
-#   HOLO_SSH_KEY（必配）：本机 ~/.ssh/id_ed25519_holo 私钥全文
+#   HOLO_SSH_KEY（必配）：本机 ~/.ssh/id_ed25519_holo 私钥全文（base64）
 #   VITE_AMAP_KEY / VITE_AMAP_SECURITY_CODE（建议配）：高德地图 Key，缺失时地图功能降级但构建仍成功
 name: Deploy to Tencent Test Server
 
 on:
-  push:
-    branches: [main]
   workflow_dispatch:
 
 concurrency:
