@@ -3,11 +3,20 @@ import { getDefaultCityCoverUrl, resolveCoverFromPlaceText } from '@/data/cityCo
 import { findHoloHomeCityKit } from '@/data/holoHotCityKit';
 import { CITY_SHARE_PHOTO_FRAMES } from '@/lib/home/citySharePhotoLibrary';
 import { getSearchPlanNoteCoverUrl } from '@/lib/home/searchPlanNoteSlides';
-import { buildSearchPlanDouyinScenes, buildSearchPlanXhsScenes } from '@/lib/home/searchPlanAssetPack';
+import {
+  buildSearchPlanDouyinScenes,
+  buildSearchPlanXhsScenes,
+} from '@/lib/home/searchPlanAssetPack';
 import { renderItinerarySummaryPoster } from '@/lib/share/renderItinerarySummaryPoster';
 import { renderXhsImageSlide } from '@/lib/share/renderXhsImageSlide';
 import { isLikelyMobileShareDevice } from '@/lib/share/openSocialApp';
-import { searchPlanCatchyTitle, searchPlanLiteHeader, searchPlanPublicHashtags } from '@/lib/home/searchPlanShareCopy';
+import {
+  buildSearchPlanDouyinPlatformCopy,
+  buildSearchPlanWechatPlatformCopy,
+  searchPlanCatchyTitle,
+  searchPlanLiteHeader,
+  searchPlanPublicHashtags,
+} from '@/lib/home/searchPlanShareCopy';
 import { searchShareContentId } from '@/lib/home/homeShareLanding';
 import { encodeCompactSharePlan, SHARE_PLAN_QUERY_KEY } from '@/lib/home/shareLandingPlan';
 import { hashtagsFromTags, mapShareInputToXhs } from '@/lib/share/mapToXhsPoster';
@@ -31,13 +40,30 @@ function normalizeShareHint(hint?: string | SearchPlanShareHint | null): SearchP
   return hint;
 }
 
+function shareHintSource(
+  hint: string | SearchPlanShareHint | SearchStructuredPlan | null | undefined,
+  sourcePlan: SearchStructuredPlan | null,
+): string | SearchPlanShareHint | null | undefined {
+  if (typeof hint === 'string') return hint;
+  if (sourcePlan) return null;
+  if (hint && typeof hint === 'object' && 'baseInfo' in hint) {
+    return {
+      targetCity: hint.baseInfo.targetCity,
+      days: hint.baseInfo.days,
+      peopleType: hint.baseInfo.peopleType,
+    };
+  }
+  return hint;
+}
+
 export function searchPlanPosterShareUrl(
   _savedSessionId: string | null,
   hint?: string | SearchPlanShareHint | SearchStructuredPlan | null,
   plan?: SearchStructuredPlan | null,
 ): string {
-  const sourcePlan = plan ?? (hint && typeof hint === 'object' && 'baseInfo' in hint ? hint : null);
-  const fromHint = normalizeShareHint(typeof hint === 'string' ? hint : sourcePlan ? null : hint);
+  const embedded = hint && typeof hint === 'object' && 'baseInfo' in hint ? hint : null;
+  const sourcePlan = plan ?? embedded;
+  const fromHint = normalizeShareHint(shareHintSource(hint, sourcePlan));
   const targetCity = sourcePlan?.baseInfo.targetCity ?? fromHint.targetCity;
   const days = sourcePlan?.baseInfo.days ?? fromHint.days;
   const peopleType = sourcePlan?.baseInfo.peopleType ?? fromHint.peopleType;
@@ -100,7 +126,10 @@ export function searchPlanExportPosterSize(
   }
   return compact
     ? { width: 720, height: 1280 }
-    : { width: CITY_SHARE_PHOTO_FRAMES.douyin.width, height: CITY_SHARE_PHOTO_FRAMES.douyin.height };
+    : {
+        width: CITY_SHARE_PHOTO_FRAMES.douyin.width,
+        height: CITY_SHARE_PHOTO_FRAMES.douyin.height,
+      };
 }
 
 export function getSearchPlanPosterSummary(plan: SearchStructuredPlan): string {
@@ -163,13 +192,21 @@ export function getSearchPlanXhsCopyText(
   return xhsInputToCopyText(getSearchPlanXhsPosterInput(plan, shareUrl));
 }
 
+export function getSearchPlanWechatCopyText(plan: SearchStructuredPlan): XhsNoteCopyText {
+  const copy = buildSearchPlanWechatPlatformCopy(plan);
+  return { title: copy.title, body: copy.hook, hashtags: copy.hashtags };
+}
+
 export function getSearchPlanDouyinCopyText(
   plan: SearchStructuredPlan,
-  shareUrl: string,
+  shareUrl = '',
 ): XhsNoteCopyText {
+  const copy = buildSearchPlanDouyinPlatformCopy(plan);
   return {
-    ...getSearchPlanXhsCopyText(plan, shareUrl),
-    title: searchPlanCatchyTitle(plan).replace(/[《》]/g, ''),
+    title: copy.title,
+    body: copy.hook,
+    hashtags: copy.hashtags,
+    shareUrl: shareUrl.trim() ? undefined : undefined,
   };
 }
 
@@ -182,38 +219,48 @@ export async function buildSearchPlanPosterBlob(
 
 export async function buildSearchPlanWechatSquarePosterBlob(
   plan: SearchStructuredPlan,
-  _compact = isLikelyMobileShareDevice(),
+  compact = isLikelyMobileShareDevice(),
 ): Promise<Blob> {
-  return renderItinerarySummaryPoster(plan, 'wechat', searchPlanPosterShareUrl(null, plan.baseInfo, plan));
+  const kind = compact ? 'wechat' : 'wechat';
+  return renderItinerarySummaryPoster(
+    plan,
+    kind,
+    searchPlanPosterShareUrl(null, plan.baseInfo, plan),
+  );
 }
 
 export async function buildSearchPlanDouyinStaticPosterBlob(
   plan: SearchStructuredPlan,
-  _compact = isLikelyMobileShareDevice(),
+  compact = isLikelyMobileShareDevice(),
 ): Promise<Blob> {
-  return renderItinerarySummaryPoster(plan, 'douyin', searchPlanPosterShareUrl(null, plan.baseInfo, plan));
+  const kind = compact ? 'douyin' : 'douyin';
+  return renderItinerarySummaryPoster(
+    plan,
+    kind,
+    searchPlanPosterShareUrl(null, plan.baseInfo, plan),
+  );
 }
 
 export async function buildSearchPlanDouyinPosterBlob(
   plan: SearchStructuredPlan,
-  _shareUrl?: string,
+  shareUrl = '',
 ): Promise<Blob> {
-  return buildSearchPlanDouyinStaticPosterBlob(plan);
-}
-
-export async function buildSearchPlanXhsPosterBlob(
-  plan: SearchStructuredPlan,
-  shareUrl: string,
-): Promise<Blob> {
-  const slides = await buildSearchPlanXhsPosterSlides(plan, shareUrl);
-  return slides[0]!;
+  try {
+    return await buildSearchPlanDouyinStaticPosterBlob(plan, Boolean(shareUrl));
+  } catch (reason) {
+    const raw = reason instanceof Error ? reason.message : '';
+    if (/scenery|Cannot read properties|null|undefined/i.test(raw)) {
+      throw new Error('配图暂时没生成，点重试再看一眼');
+    }
+    throw reason instanceof Error ? reason : new Error('配图暂时没生成，点重试再看一眼');
+  }
 }
 
 export async function buildSearchPlanXhsPosterSlides(
   plan: SearchStructuredPlan,
-  _shareUrl: string,
+  shareUrl: string,
 ): Promise<Blob[]> {
-  const slides = seedNoteSlides(plan);
+  const slides = seedNoteSlides(shareUrl ? plan : plan);
   return Promise.all(
     slides.map((slide, index) =>
       renderXhsImageSlide({
@@ -226,4 +273,12 @@ export async function buildSearchPlanXhsPosterSlides(
       }),
     ),
   );
+}
+
+export async function buildSearchPlanXhsPosterBlob(
+  plan: SearchStructuredPlan,
+  shareUrl: string,
+): Promise<Blob> {
+  const slides = await buildSearchPlanXhsPosterSlides(plan, shareUrl);
+  return slides[0]!;
 }

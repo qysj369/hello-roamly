@@ -1,5 +1,8 @@
 import { describe, expect, it } from 'vitest';
 import {
+  buildSearchPlanDouyinPlatformCopy,
+  buildSearchPlanWechatPlatformCopy,
+  formatSearchPlanPlatformClipboard,
   searchPlanCatchyTitle,
   searchPlanHeaderLine,
   searchPlanPublicHashtags,
@@ -45,9 +48,55 @@ describe('searchPlanShareCopy', () => {
 
   it('builds platform hashtags and a forwardable hook', () => {
     expect(searchPlanShareHashtags(plan)).toEqual(['上海好友旅行', '上海老城慢游', '上海平价探店']);
-    expect(searchPlanPublicHashtags(plan)).toEqual(['上海好友旅行', '上海老城慢游', '上海街巷漫游']);
+    expect(searchPlanPublicHashtags(plan)).toEqual([
+      '上海好友旅行',
+      '上海老城慢游',
+      '上海街巷漫游',
+    ]);
     expect(searchPlanShareHook(plan)).toBe(
       '这条路线躲开网红扎堆点位，节奏松弛，适合好友慢悠悠逛吃上海',
     );
+  });
+
+  it('writes distinct wechat and douyin copy for the same seaside route', () => {
+    const qingdao: SearchStructuredPlan = {
+      baseInfo: {
+        startCity: '济南',
+        targetCity: '青岛',
+        days: 3,
+        peopleType: '情侣',
+        budget: null,
+        theme: null,
+      },
+      budgetList: [],
+      globalTips: [],
+      dayList: [
+        {
+          day: 1,
+          title: '八大关看海',
+          hotelArea: '',
+          tips: '错峰看日落',
+          traffic: [],
+          spots: [{ name: '八大关', intro: '海边日落，人少' }],
+          foods: [],
+        },
+      ],
+    };
+    const wechat = buildSearchPlanWechatPlatformCopy(qingdao);
+    const douyin = buildSearchPlanDouyinPlatformCopy(qingdao);
+    expect(wechat).toEqual({
+      title: '青岛3天丨和情侣错峰看日落的八大关路线',
+      hook: '沿着海边慢慢逛，在八大关等待一场橘色落日，人少安静，适合两个人慢悠悠放空。',
+      hashtags: ['青岛旅行', '八大关', '海边日落'],
+    });
+    expect(douyin).toEqual({
+      title: '青岛小众看海路线！八大关落日真的美哭✨',
+      hook: '错峰出行避开人潮，在海边等一场浪漫日落。',
+      hashtags: ['青岛旅游', '八大关日落', '山东旅游'],
+    });
+    expect(formatSearchPlanPlatformClipboard(wechat)).toBe(
+      '青岛3天丨和情侣错峰看日落的八大关路线\n沿着海边慢慢逛，在八大关等待一场橘色落日，人少安静，适合两个人慢悠悠放空。\n#青岛旅行 #八大关 #海边日落',
+    );
+    expect(wechat.title).not.toBe(douyin.title);
   });
 });

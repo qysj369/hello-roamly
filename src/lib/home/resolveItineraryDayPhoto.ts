@@ -1,5 +1,12 @@
-import { resolvePlanCoverImage, resolvePlanSpotImage, type PlanSceneImageRef } from '@/data/planSceneImages';
-import { PLAN_ASIDE_SCENERY_PLACEHOLDER, getPlanCityAtmosphere } from '@/lib/home/planCityAtmosphere';
+import {
+  resolvePlanCoverImage,
+  resolvePlanSpotImage,
+  type PlanSceneImageRef,
+} from '@/data/planSceneImages';
+import {
+  PLAN_ASIDE_SCENERY_PLACEHOLDER,
+  getPlanCityAtmosphere,
+} from '@/lib/home/planCityAtmosphere';
 import { matchShanghaiSharePhoto } from '@/lib/home/shanghaiSharePhotoMatch';
 import type { SearchPlanDay, SearchStructuredPlan } from '@/types/domain/searchStructuredPlan';
 
@@ -19,18 +26,24 @@ export function resolveItineraryDayPhoto(
 ): PlanSceneImageRef {
   const city = plan.baseInfo.targetCity.trim();
   const context = `${city}\n${day.title}\n${day.spots.map((spot) => spot.name).join(' ')}`;
-  const names = [day.spots[0]?.name, day.title, ...day.spots.slice(1).map((spot) => spot.name)].filter(
-    (name): name is string => Boolean(name?.trim()),
-  );
+  const names = [
+    day.spots[0]?.name,
+    day.title,
+    ...day.spots.slice(1).map((spot) => spot.name),
+  ].filter((name): name is string => Boolean(name?.trim()));
 
-  for (const name of names) {
+  let namedHit: PlanSceneImageRef | null = null;
+  names.some((name) => {
     const kit = resolvePlanSpotImage(name, {
       dayLabel: `D${day.day}`,
       context,
       usedIds: used,
     });
-    if (kit) return kit;
-  }
+    if (!kit) return false;
+    namedHit = kit;
+    return true;
+  });
+  if (namedHit) return namedHit;
 
   if (/上海/.test(city)) {
     const needle = names[0] || context;
@@ -40,7 +53,8 @@ export function resolveItineraryDayPhoto(
   }
 
   const atmosphere = getPlanCityAtmosphere(city, plan);
-  const scene = atmosphere?.scenery[Math.max(0, day.day - 1)] ?? atmosphere?.scenery[0];
+  const scenery = Array.isArray(atmosphere?.scenery) ? atmosphere.scenery : [];
+  const scene = scenery[Math.max(0, day.day - 1)] ?? scenery[0] ?? null;
   const sceneHit = scene ? asRef(scene.photoPath, `${city}${scene.name}实拍`) : null;
   if (sceneHit && !used.has(sceneHit.src)) {
     used.add(sceneHit.src);

@@ -18,6 +18,7 @@ export function createChinaPosterVariants(options: {
   buildXhs: () => Promise<Blob>;
   buildXhsSlides?: () => Promise<Blob[]>;
   buildDouyin?: () => Promise<Blob>;
+  getWechatCopyText?: () => XhsNoteCopyText;
   getXhsCopyText?: () => XhsNoteCopyText;
   getDouyinCopyText?: () => XhsNoteCopyText;
 }): SharePosterVariant[] {
@@ -31,6 +32,7 @@ export function createChinaPosterVariants(options: {
       hint: getWechatShareHint(),
       downloadFilename: `${safe}-微信海报.png`,
       generatePoster: options.buildWechat,
+      getXhsCopyText: options.getWechatCopyText,
     },
     {
       id: 'xhs',
@@ -53,9 +55,7 @@ export function createChinaPosterVariants(options: {
 }
 
 export function xhsSlideDownloadFilename(base: string, index: number): string {
-  const stem = base
-    .replace(/\.png$/i, '')
-    .replace(/-(微信海报|小红书[^/]*|抖音封面)$/u, '');
+  const stem = base.replace(/\.png$/i, '').replace(/-(微信海报|小红书[^/]*|抖音封面)$/u, '');
   const safe = stem.replace(/[\\/:*?"<>|]/g, '_').slice(0, 32);
   return `${safe}-小红书-${index + 1}.png`;
 }

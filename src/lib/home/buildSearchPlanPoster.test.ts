@@ -72,9 +72,10 @@ describe('buildSearchPlanPoster', () => {
 
   it('builds douyin copy with a short cover title', () => {
     const copy = getSearchPlanDouyinCopyText(plan, 'https://helloroamly.com/');
-    expect(copy.title).toContain('杭州3天｜和好友避开人流的湖边松弛路线');
-    expect(copy.hashtags).toEqual(expect.arrayContaining(['杭州好友旅行', '杭州湖边慢游', '杭州街巷漫游']));
-    expect(copy.shareUrl).toBe('https://helloroamly.com/');
+    expect(copy.title).toBe('杭州小众湖边路线！西湖真的美哭✨');
+    expect(copy.body).toContain('错峰出行避开人潮');
+    expect(copy.hashtags).toEqual(['杭州旅游', '西湖慢游', '浙江旅游']);
+    expect(copy.shareUrl).toBeUndefined();
   });
 
   it('builds xhs copy with city hashtags', () => {
@@ -82,7 +83,9 @@ describe('buildSearchPlanPoster', () => {
     expect(copy.title).toContain('杭州3天｜和好友避开人流的湖边松弛路线');
     expect(copy.hashtags).toEqual(expect.arrayContaining(['杭州好友旅行', '杭州湖边慢游']));
     expect(copy.shareUrl).toBe('https://helloroamly.com/');
-    expect(getSearchPlanXhsPosterInput(plan, 'https://helloroamly.com/').noteSlides).toHaveLength(3);
+    expect(getSearchPlanXhsPosterInput(plan, 'https://helloroamly.com/').noteSlides).toHaveLength(
+      3,
+    );
   });
 
   it('keeps summary short', () => {

@@ -11,11 +11,23 @@ import { resolveSharePosterVariants } from '@/lib/share/resolveSharePosterVarian
 import { saveImageBlob } from '@/lib/share/saveImageBlob';
 import { blobToShareFile, canShareImageFiles, shareImageFiles } from '@/lib/share/shareImageFiles';
 import { getSharePosterHint } from '@/lib/share/sharePosterHint';
-import { cannotProgrammaticDownload, isIosDevice, posterImageActionLabel } from '@/lib/share/deviceShare';
+import {
+  cannotProgrammaticDownload,
+  isIosDevice,
+  posterImageActionLabel,
+} from '@/lib/share/deviceShare';
 import { isWechatDesktopBrowser, isWechatInAppBrowser } from '@/lib/share/wechat';
 import { copyXhsNoteToClipboard, formatXhsNoteForClipboard } from '@/lib/share/xhsNoteCopy';
 import type { SharePosterVariant } from '@/lib/share/xhsPosterTypes';
 import type { ShareTrackingContext } from '@/types/domain/shareAnalytics';
+
+function friendlyGenerateError(reason: unknown): string {
+  const raw = reason instanceof Error ? reason.message : '';
+  if (!raw || /scenery|Cannot read properties|is not a function|undefined|null/i.test(raw)) {
+    return '配图暂时没生成，点重试再看一眼';
+  }
+  return raw;
+}
 
 export type UseSharePosterDialogOptions = {
   open: boolean;
@@ -72,17 +84,20 @@ export function useSharePosterDialog({
   );
   const baseFilename = activeVariant?.downloadFilename ?? downloadFilename;
   const showVariantTabs = variants.length > 1;
-  const canCopyXhs = (isXhs || isDouyin) && Boolean(activeVariant?.getXhsCopyText);
+  const canCopyXhs = Boolean(activeVariant?.getXhsCopyText);
 
   const showCopyFeedback = useCallback((message: string, durationMs = 2000) => {
     setCopyFeedback(message);
     window.setTimeout(() => setCopyFeedback(null), durationMs);
   }, []);
 
-  const showAssistHint = useCallback((message: string) => {
-    setAssistHint(message);
-    showCopyFeedback(message, 8000);
-  }, [showCopyFeedback]);
+  const showAssistHint = useCallback(
+    (message: string) => {
+      setAssistHint(message);
+      showCopyFeedback(message, 8000);
+    },
+    [showCopyFeedback],
+  );
 
   useEffect(() => {
     if (variants[0]) {
@@ -109,7 +124,7 @@ export function useSharePosterDialog({
         return urls;
       });
     } catch (reason) {
-      setError(reason instanceof Error ? reason.message : '生成海报失败');
+      setError(friendlyGenerateError(reason));
       setPosterBlobs([]);
       setPosterUrls((prev) => {
         revokeObjectUrls(prev);
@@ -136,7 +151,7 @@ export function useSharePosterDialog({
     if (!open) {
       return undefined;
     }
-    void runGenerate();
+    runGenerate().catch(() => undefined);
     return () => {
       setPosterBlobs([]);
       setPosterUrls((prev) => {
@@ -164,25 +179,18 @@ export function useSharePosterDialog({
     }
   }, [slideIndex, slideCount]);
 
-  const copyPosterHint = useCallback(
-    (copied: boolean) => {
-      if (copied) {
-        return isWechatDesktopBrowser()
-          ? '图片已复制，到微信聊天里粘贴即可'
-          : isWechatInAppBrowser()
-            ? '图片已复制；也可长按上方图片发给好友'
-            : '图片已复制，可粘贴到微信 / 小红书 / 抖音';
-      }
-      if (isWechatDesktopBrowser()) {
-        return '请把上方图片拖进微信聊天，不要点下载';
-      }
-      if (isWechatInAppBrowser() || isIosDevice()) {
-        return '请长按上方大图，保存到相册或发给好友';
-      }
-      return '请右键上方图片另存，或拖进微信聊天';
-    },
-    [],
-  );
+  const copyPosterHint = useCallback((copied: boolean) => {
+    if (copied && isWechatDesktopBrowser()) return '图片已复制，到微信聊天里粘贴即可';
+    if (copied && isWechatInAppBrowser()) return '图片已复制；也可长按上方图片发给好友';
+    if (copied) return '图片已复制，可粘贴到微信 / 小红书 / 抖音';
+    if (isWechatDesktopBrowser()) {
+      return '请把上方图片拖进微信聊天，不要点下载';
+    }
+    if (isWechatInAppBrowser() || isIosDevice()) {
+      return '请长按上方大图，保存到相册或发给好友';
+    }
+    return '请右键上方图片另存，或拖进微信聊天';
+  }, []);
 
   const handleDownloadCurrent = useCallback(async () => {
     if (!activeVariant) {
@@ -201,13 +209,10 @@ export function useSharePosterDialog({
     }
     if (result === 'needs-long-press' || result === 'failed') {
       const copied = await copyImageBlobToClipboard(blob);
-      showAssistHint(
-        copied
-          ? copyPosterHint(true)
-          : isMultiSlide
-            ? `请长按上方第 ${slideIndex + 1} 张图片保存到相册`
-            : '请长按上方图片保存到相册',
-      );
+      let assist = '请长按上方图片保存到相册';
+      if (copied) assist = copyPosterHint(true);
+      else if (isMultiSlide) assist = `请长按上方第 ${slideIndex + 1} 张图片保存到相册`;
+      showAssistHint(assist);
       return;
     }
     showCopyFeedback('已保存到你选择的文件夹');
@@ -260,16 +265,18 @@ export function useSharePosterDialog({
       showAssistHint('左右滑动查看全部图片，分别长按保存到相册');
       return;
     }
-    let saved = 0;
-    for (const [index, blob] of posterBlobs.entries()) {
-      const result = await saveImageBlob(blob, xhsSlideDownloadFilename(baseFilename, index));
-      if (result === 'cancelled') {
-        break;
-      }
-      if (result === 'saved') {
-        saved += 1;
-      }
-    }
+    const savedState = await posterBlobs.reduce(
+      async (previous, blob, index) => {
+        const state = await previous;
+        if (state.stopped) return state;
+        const result = await saveImageBlob(blob, xhsSlideDownloadFilename(baseFilename, index));
+        if (result === 'cancelled') return { count: state.count, stopped: true };
+        if (result === 'saved') return { count: state.count + 1, stopped: false };
+        return state;
+      },
+      Promise.resolve({ count: 0, stopped: false }),
+    );
+    const saved = savedState.count;
     if (saved === 0) {
       showCopyFeedback('保存失败，请右键图片另存');
       return;
@@ -284,14 +291,7 @@ export function useSharePosterDialog({
         slideCount: saved,
       });
     }
-  }, [
-    baseFilename,
-    posterBlobs,
-    shareTrackContext,
-    shareUrl,
-    showAssistHint,
-    showCopyFeedback,
-  ]);
+  }, [baseFilename, posterBlobs, shareTrackContext, shareUrl, showAssistHint, showCopyFeedback]);
 
   const handleCopyLink = useCallback(async () => {
     try {
@@ -314,14 +314,20 @@ export function useSharePosterDialog({
   }, [copyPlainText, shareTrackContext, shareUrl, showCopyFeedback]);
 
   const handleCopyXhsText = useCallback(async () => {
-    const text = activeVariant?.getXhsCopyText?.();
+    let text: ReturnType<NonNullable<SharePosterVariant['getXhsCopyText']>> | undefined;
+    try {
+      text = activeVariant?.getXhsCopyText?.();
+    } catch {
+      showCopyFeedback('文案暂时没准备好，请重试');
+      return;
+    }
     if (!text) {
       return;
     }
     const ok = copyPlainText
       ? await copyPlainText(formatXhsNoteForClipboard(text))
       : await copyXhsNoteToClipboard(text);
-    showCopyFeedback(ok ? '标题与正文已复制' : '复制失败');
+    showCopyFeedback(ok ? '复制成功' : '复制失败');
     if (ok && shareTrackContext) {
       trackShareEvent({
         ...shareTrackContext,

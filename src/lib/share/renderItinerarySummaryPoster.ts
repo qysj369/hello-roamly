@@ -23,7 +23,11 @@ const SIZES: Record<SummaryPosterKind, { width: number; height: number }> = {
 };
 
 function dayLine(day: SearchStructuredPlan['dayList'][number]): string {
-  const spots = day.spots.map((spot) => spot.name.trim()).filter(Boolean).slice(0, 2).join(' · ');
+  const spots = day.spots
+    .map((spot) => spot.name.trim())
+    .filter(Boolean)
+    .slice(0, 2)
+    .join(' · ');
   const food = day.foods[0];
   const foodBit = food ? `｜${food.shop}` : '';
   return sanitizePosterOverlayText(`D${day.day} ${spots || day.title}${foodBit}`).slice(0, 28);
@@ -31,7 +35,11 @@ function dayLine(day: SearchStructuredPlan['dayList'][number]): string {
 
 function highlightLine(plan: SearchStructuredPlan): string {
   const spot = plan.dayList.flatMap((day) => day.spots).find((item) => item.intro.trim());
-  const intro = spot?.intro.replace(/必体验[:：]?\s*/u, '').split(/[。；;]/u)[0]?.trim() ?? '';
+  const intro =
+    spot?.intro
+      .replace(/必体验[:：]?\s*/u, '')
+      .split(/[。；;]/u)[0]
+      ?.trim() ?? '';
   return sanitizePosterOverlayText(intro || '按自己的节奏慢慢逛').slice(0, 22);
 }
 
@@ -51,16 +59,26 @@ export async function renderItinerarySummaryPoster(
   const city = searchPlanShareCityName(plan);
   const used = new Set<string>();
   const kit = findHoloHomeCityKit(city);
-  const sharePhotos = listSearchPlanSharePhotos(plan);
+  let sharePhotos: ReturnType<typeof listSearchPlanSharePhotos> = [];
+  try {
+    sharePhotos = listSearchPlanSharePhotos(plan);
+  } catch {
+    sharePhotos = [];
+  }
   const cover =
     sharePhotos[0]?.photoPath ||
-    kit?.spots.find((spot) => spot.photoPath)?.photoPath ||
+    kit?.spots?.find((spot) => spot.photoPath)?.photoPath ||
     kit?.coverPath ||
     '';
   const days = plan.dayList.slice(0, 3);
-  const thumbs = sharePhotos.slice(1, 4).length
-    ? sharePhotos.slice(1, 4).map((item) => ({ src: item.photoPath, alt: item.name }))
-    : days.map((day) => resolveItineraryDayPhoto(plan, day, used));
+  let thumbs: Array<{ src: string; alt: string }> = [];
+  try {
+    thumbs = sharePhotos.slice(1, 4).length
+      ? sharePhotos.slice(1, 4).map((item) => ({ src: item.photoPath, alt: item.name }))
+      : days.map((day) => resolveItineraryDayPhoto(plan, day, used));
+  } catch {
+    thumbs = [];
+  }
   const qrTarget = shareUrl || 'https://helloroamly.com/';
 
   ctx.fillStyle = '#f4f0e6';
@@ -96,7 +114,8 @@ export async function renderItinerarySummaryPoster(
   y += Math.round(h * 0.03);
   const thumbW = Math.round((w - pad * 2 - 24) / 3);
   const thumbH = Math.round(thumbW * 0.72);
-  for (let index = 0; index < 3; index += 1) {
+  await [0, 1, 2].reduce(async (previous, index) => {
+    await previous;
     const x = pad + index * (thumbW + 12);
     roundRect(ctx, x, y, thumbW, thumbH, 16);
     ctx.fillStyle = '#e8e6e0';
@@ -106,16 +125,18 @@ export async function renderItinerarySummaryPoster(
     ctx.fillStyle = '#222c28';
     ctx.font = `700 ${Math.round(w * 0.022)}px system-ui, sans-serif`;
     ctx.fillText(`D${index + 1}`, x + 10, y + thumbH - 12);
-  }
+  }, Promise.resolve());
 
   y += thumbH + Math.round(h * 0.028);
   ctx.fillStyle = '#222c28';
   ctx.font = `600 ${Math.round(w * 0.03)}px system-ui, sans-serif`;
   days.forEach((day) => {
-    wrapTextLines(ctx, dayLine(day), w - pad * 2 - (kind === 'wechat' ? 200 : 0), 1).forEach((line) => {
-      ctx.fillText(line, pad, y);
-      y += Math.round(h * 0.038);
-    });
+    wrapTextLines(ctx, dayLine(day), w - pad * 2 - (kind === 'wechat' ? 200 : 0), 1).forEach(
+      (line) => {
+        ctx.fillText(line, pad, y);
+        y += Math.round(h * 0.038);
+      },
+    );
   });
 
   const qrSize = kind === 'wechat' ? 168 : 188;

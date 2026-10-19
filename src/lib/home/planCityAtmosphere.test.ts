@@ -67,12 +67,8 @@ describe('getPlanCityAtmosphere', () => {
     expect(guangzhou?.foods.find((item) => item.name === '早茶点心')?.photoPath).toContain(
       'dimsum',
     );
-    expect(guangzhou?.foods.find((item) => item.name === '肠粉')?.photoPath).toContain(
-      'cheungfun',
-    );
-    expect(guangzhou?.foods.find((item) => item.name === '糖水')?.photoPath).toContain(
-      'tongshui',
-    );
+    expect(guangzhou?.foods.find((item) => item.name === '肠粉')?.photoPath).toContain('cheungfun');
+    expect(guangzhou?.foods.find((item) => item.name === '糖水')?.photoPath).toContain('tongshui');
     expect(guangzhou?.foods.every((item) => !isPlanAsidePlaceholder(item.photoPath))).toBe(true);
     expect(chengdu?.scenery.every((item) => !isPlanAsideFoodPhoto(item.photoPath))).toBe(true);
   });
@@ -80,6 +76,18 @@ describe('getPlanCityAtmosphere', () => {
   it('returns null for cities outside the kit', () => {
     expect(getPlanCityAtmosphere('不存在的城')).toBeNull();
     expect(getPlanCityAtmosphere('')).toBeNull();
+    expect(getPlanCityAtmosphere('青岛')).toBeNull();
+  });
+
+  it('does not throw when scenery is missing', () => {
+    expect(listPlanAsidePreviewCards(null)).toEqual([]);
+    expect(
+      listPlanAsidePreviewCards({
+        cityName: '青岛',
+        scenery: null as unknown as [],
+        foods: null as unknown as [],
+      }),
+    ).toEqual([]);
   });
 
   it('gives Shanghai couple itinerary at least 6 unique aside photos', () => {

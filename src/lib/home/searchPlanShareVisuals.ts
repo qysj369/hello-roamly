@@ -27,21 +27,26 @@ function compactCaption(text: string, max = 18): string {
 }
 
 function captionForCard(plan: SearchStructuredPlan, card: PlanAsidePreviewCard): string {
-  for (const day of plan.dayList) {
-    const spot = day.spots.find(
-      (item) => item.name && (card.name.includes(item.name) || item.name.includes(card.name)),
-    );
-    if (spot?.intro.trim()) return compactCaption(spot.intro);
-    const food = day.foods.find((item) => {
-      const hay = `${item.shop}${item.dish}${card.name}`;
-      return Boolean(
-        (item.shop && card.name.includes(item.shop.replace(/（[^）]*）$/u, '').trim())) ||
-          (item.dish && hay.includes(item.dish.split(/[、,，]/u)[0] ?? '')),
+  const matched = plan.dayList
+    .map((day) => {
+      const spot = day.spots.find(
+        (item) => item.name && (card.name.includes(item.name) || item.name.includes(card.name)),
       );
-    });
-    if (food) return compactCaption(food.dish || food.shop);
-  }
-  return card.variant === 'food' ? '本地人爱吃的一口' : '适合慢慢逛的一角';
+      if (spot?.intro.trim()) return compactCaption(spot.intro);
+      const food = day.foods.find((item) => {
+        const hay = `${item.shop}${item.dish}${card.name}`;
+        return Boolean(
+          (item.shop && card.name.includes(item.shop.replace(/（[^）]*）$/u, '').trim())) ||
+          (item.dish && hay.includes(item.dish.split(/[、,，]/u)[0] ?? '')),
+        );
+      });
+      if (food) return compactCaption(food.dish || food.shop);
+      return '';
+    })
+    .find((line) => line);
+  if (matched) return matched;
+  if (card.variant === 'food') return '本地人爱吃的一口';
+  return '适合慢慢逛的一角';
 }
 
 function fallbackDayPhotos(plan: SearchStructuredPlan): SearchPlanSharePhoto[] {
@@ -61,32 +66,39 @@ function fallbackDayPhotos(plan: SearchStructuredPlan): SearchPlanSharePhoto[] {
 
 /** 从行程右侧「美景与美食」侧栏取材，景点/美食穿插，默认 6 张实拍 */
 export function listSearchPlanSharePhotos(plan: SearchStructuredPlan): SearchPlanSharePhoto[] {
-  const atmosphere = getPlanCityAtmosphere(plan.baseInfo.targetCity, plan);
-  const cards = atmosphere
-    ? listPlanAsidePreviewCards(atmosphere).filter(
-        (item) => item.photoPath && !item.photoPath.startsWith('data:'),
-      )
-    : [];
+  let atmosphere: ReturnType<typeof getPlanCityAtmosphere> = null;
+  try {
+    atmosphere = getPlanCityAtmosphere(plan.baseInfo.targetCity, plan);
+  } catch {
+    atmosphere = null;
+  }
+  const cards = listPlanAsidePreviewCards(atmosphere).filter(
+    (item) => item.photoPath && !item.photoPath.startsWith('data:'),
+  );
   const picked: SearchPlanSharePhoto[] = [];
   const used = new Set<string>();
-  for (const card of cards) {
-    if (picked.length >= SEARCH_PLAN_SHARE_PHOTO_COUNT) break;
-    if (used.has(card.photoPath)) continue;
-    used.add(card.photoPath);
-    picked.push({
-      name: card.name,
-      photoPath: card.photoPath,
-      variant: card.variant,
-      caption: captionForCard(plan, card),
-    });
-  }
-  if (picked.length < SEARCH_PLAN_SHARE_PHOTO_COUNT) {
-    for (const extra of fallbackDayPhotos(plan)) {
-      if (picked.length >= SEARCH_PLAN_SHARE_PHOTO_COUNT) break;
-      if (used.has(extra.photoPath)) continue;
-      used.add(extra.photoPath);
-      picked.push(extra);
+  cards.some((card) => {
+    if (picked.length >= SEARCH_PLAN_SHARE_PHOTO_COUNT) return true;
+    if (!used.has(card.photoPath)) {
+      used.add(card.photoPath);
+      picked.push({
+        name: card.name,
+        photoPath: card.photoPath,
+        variant: card.variant,
+        caption: captionForCard(plan, card),
+      });
     }
+    return false;
+  });
+  if (picked.length < SEARCH_PLAN_SHARE_PHOTO_COUNT) {
+    fallbackDayPhotos(plan).some((extra) => {
+      if (picked.length >= SEARCH_PLAN_SHARE_PHOTO_COUNT) return true;
+      if (!used.has(extra.photoPath)) {
+        used.add(extra.photoPath);
+        picked.push(extra);
+      }
+      return false;
+    });
   }
   return picked;
 }

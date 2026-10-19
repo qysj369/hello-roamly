@@ -55,7 +55,8 @@ const CITY_FOOD_PHOTOS: Record<string, readonly CityFoodPhoto[]> = {
   ],
 };
 
-const FOOD_SRC_HINT = /food|dimsum|dumpling|noodle|hotpot|mapo|cantonese|shengjian|xiaolong|benbang|cafe|shendacheng/i;
+const FOOD_SRC_HINT =
+  /food|dimsum|dumpling|noodle|hotpot|mapo|cantonese|shengjian|xiaolong|benbang|cafe|shendacheng/i;
 
 function moodPlaceholder(kind: 'scenery' | 'food'): string {
   const [c0, c1] =
@@ -90,8 +91,8 @@ export function isPlanAsidePlaceholder(src: string): boolean {
 function foodPlaceHint(cityName: string, dish: string): string | undefined {
   const panelFood = getHoloCityPreviewPanel(cityName)?.foods.find((item) => item.name === dish);
   if (!panelFood) return undefined;
-  const bits = [panelFood.shop, panelFood.area, panelFood.note].filter(
-    (bit): bit is string => Boolean(bit?.trim()),
+  const bits = [panelFood.shop, panelFood.area, panelFood.note].filter((bit): bit is string =>
+    Boolean(bit?.trim()),
   );
   return bits.length > 0 ? bits.join(' · ') : undefined;
 }
@@ -160,21 +161,43 @@ export type PlanAsidePreviewCard = {
   photoPath: string;
 };
 
-function padAtmospherePhotos(cityName: string, atmosphere: PlanCityAtmosphere): PlanCityAtmosphere {
-  const used = new Set(
-    [...atmosphere.scenery, ...atmosphere.foods].map((item) => item.photoPath).filter(Boolean),
-  );
-  const scenery = [...atmosphere.scenery];
-  for (const extra of CITY_ASIDE_PAD_SCENERY[cityName] ?? []) {
-    if (used.size >= MIN_ASIDE_PREVIEW_CARDS) break;
-    if (!extra.photoPath || used.has(extra.photoPath) || isPlanAsideFoodPhoto(extra.photoPath)) continue;
-    used.add(extra.photoPath);
-    scenery.push(extra);
-  }
-  return { ...atmosphere, scenery };
+function sceneryCards(atmosphere: PlanCityAtmosphere | null | undefined): PlanCitySceneryCard[] {
+  if (!atmosphere || !Array.isArray(atmosphere.scenery)) return [];
+  return atmosphere.scenery.filter((item) => Boolean(item?.name && item.photoPath));
 }
 
-export function listPlanAsidePreviewCards(atmosphere: PlanCityAtmosphere): PlanAsidePreviewCard[] {
+function foodCards(atmosphere: PlanCityAtmosphere | null | undefined): PlanCityFoodCard[] {
+  if (!atmosphere || !Array.isArray(atmosphere.foods)) return [];
+  return atmosphere.foods.filter((item) => Boolean(item?.name && item.photoPath));
+}
+
+function padAtmospherePhotos(
+  cityName: string,
+  atmosphere: PlanCityAtmosphere | null | undefined,
+): PlanCityAtmosphere {
+  const scenery = sceneryCards(atmosphere);
+  const foods = foodCards(atmosphere);
+  const used = new Set([...scenery, ...foods].map((item) => item.photoPath).filter(Boolean));
+  (CITY_ASIDE_PAD_SCENERY[cityName] ?? []).some((extra) => {
+    if (used.size >= MIN_ASIDE_PREVIEW_CARDS) return true;
+    if (extra.photoPath && !used.has(extra.photoPath) && !isPlanAsideFoodPhoto(extra.photoPath)) {
+      used.add(extra.photoPath);
+      scenery.push(extra);
+    }
+    return false;
+  });
+  return {
+    cityName: atmosphere?.cityName || cityName,
+    foods: Array.isArray(atmosphere?.foods) ? atmosphere.foods : foods,
+    scenery,
+  };
+}
+
+export function listPlanAsidePreviewCards(
+  atmosphere: PlanCityAtmosphere | null | undefined,
+): PlanAsidePreviewCard[] {
+  const scenery = sceneryCards(atmosphere);
+  const foods = foodCards(atmosphere);
   const used = new Set<string>();
   const cards: PlanAsidePreviewCard[] = [];
   const push = (variant: 'scenery' | 'food', name: string, photoPath: string) => {
@@ -183,18 +206,19 @@ export function listPlanAsidePreviewCards(atmosphere: PlanCityAtmosphere): PlanA
     used.add(src);
     cards.push({ key: `${variant}-${src}`, variant, name, photoPath: src });
   };
-  const max = Math.max(atmosphere.scenery.length, atmosphere.foods.length);
+  const max = Math.max(scenery.length, foods.length);
   for (let index = 0; index < max; index += 1) {
-    const spot = atmosphere.scenery[index];
+    const spot = scenery[index];
     if (spot) push('scenery', spot.name, spot.photoPath);
-    const food = atmosphere.foods[index];
+    const food = foods[index];
     if (food) push('food', food.name, food.photoPath);
   }
   if (cards.length < MIN_ASIDE_PREVIEW_CARDS) {
-    for (const extra of CITY_ASIDE_PAD_SCENERY[atmosphere.cityName] ?? []) {
-      if (cards.length >= MIN_ASIDE_PREVIEW_CARDS) break;
+    (CITY_ASIDE_PAD_SCENERY[atmosphere?.cityName ?? ''] ?? []).some((extra) => {
+      if (cards.length >= MIN_ASIDE_PREVIEW_CARDS) return true;
       push('scenery', extra.name, extra.photoPath);
-    }
+      return false;
+    });
   }
   return cards;
 }
@@ -202,7 +226,8 @@ export function listPlanAsidePreviewCards(atmosphere: PlanCityAtmosphere): PlanA
 function scoreAsideAsset(asset: PlanAsideAsset, hay: string, party: SearchPlanPartyFocus): number {
   const hayHit =
     Boolean(hay) &&
-    (hay.includes(asset.name) || asset.keys.some((key) => key.trim().length >= 2 && hay.includes(key.trim())));
+    (hay.includes(asset.name) ||
+      asset.keys.some((key) => key.trim().length >= 2 && hay.includes(key.trim())));
   const partyHit = party !== 'other' && asset.parties.includes(party);
   let score = 0;
   if (hayHit) score += 80;
@@ -231,13 +256,12 @@ function pickShanghaiAside(
     picked.push(asset);
   };
 
-  for (const row of ranked) {
-    if (row.score > 0) take(row.asset);
-  }
-  for (const row of ranked) {
-    if (picked.length >= MAX_ASIDE_CARDS) break;
+  ranked.filter((row) => row.score > 0).forEach((row) => take(row.asset));
+  ranked.some((row) => {
+    if (picked.length >= MAX_ASIDE_CARDS) return true;
     take(row.asset);
-  }
+    return false;
+  });
 
   const cards = picked.slice(0, MAX_ASIDE_CARDS);
   return {
@@ -270,14 +294,16 @@ function foodMatchesPlan(cityName: string, dish: string, hay: string): boolean {
   if (!hay) return false;
   if (hay.includes(dish)) return true;
   const place = foodPlaceHint(cityName, dish);
-  if (place && place.split(/[·/、\s]+/).some((bit) => bit.trim().length >= 2 && hay.includes(bit.trim()))) {
+  if (
+    place &&
+    place.split(/[·/、\s]+/).some((bit) => bit.trim().length >= 2 && hay.includes(bit.trim()))
+  ) {
     return true;
   }
   return false;
 }
 
-/** 按当前行程城市读热门城 kit；无该城则返回 null，禁止回退到杭州 */
-export function getPlanCityAtmosphere(
+function readPlanCityAtmosphere(
   cityOrText: string | null | undefined,
   plan?: PlanAsideHint | null,
 ): PlanCityAtmosphere | null {
@@ -286,35 +312,40 @@ export function getPlanCityAtmosphere(
 
   const hay = plan ? planAsideHaystack(plan) : '';
   const party = classifySearchPlanParty(plan?.baseInfo?.peopleType ?? '');
+  const spots = Array.isArray(kit.spots) ? kit.spots : [];
+  const kitFoods = Array.isArray(kit.foods) ? kit.foods : [];
 
   if (kit.name === '上海') {
     const picked = pickShanghaiAside(hay, party);
     return padAtmospherePhotos(kit.name, {
       cityName: kit.name,
-      scenery: picked.scenery,
-      foods: picked.foods,
+      scenery: picked?.scenery ?? [],
+      foods: picked?.foods ?? [],
     });
   }
 
   const usedFood = new Set<string>();
-  const sceneryMatched = hay ? kit.spots.filter((spot) => sceneryMatchesPlan(spot, hay)) : [];
+  const sceneryMatched = hay ? spots.filter((spot) => spot && sceneryMatchesPlan(spot, hay)) : [];
   const scenerySource: HoloCitySpotKit[] = [...sceneryMatched];
-  for (const spot of kit.spots) {
-    if (scenerySource.length >= MAX_ASIDE_CARDS) break;
-    if (!scenerySource.some((item) => item.photoPath === spot.photoPath)) {
+  spots.some((spot) => {
+    if (scenerySource.length >= MAX_ASIDE_CARDS) return true;
+    if (spot?.photoPath && !scenerySource.some((item) => item.photoPath === spot.photoPath)) {
       scenerySource.push(spot);
     }
-  }
-  const scenery = (scenerySource.length > 0 ? scenerySource : kit.spots).map((spot) => ({
-    name: spot.name,
-    photoPath: sceneryPhotoPath(spot.photoPath),
+    return false;
+  });
+  const scenery = (scenerySource.length > 0 ? scenerySource : spots).map((spot) => ({
+    name: spot?.name ?? kit.name,
+    photoPath: sceneryPhotoPath(spot?.photoPath ?? ''),
   }));
 
-  const foodNames = kit.foods.map((name) => name.trim()).filter(Boolean);
+  const foodNames = kitFoods.map((name) => name.trim()).filter(Boolean);
   const planHasFoods = (plan?.dayList ?? []).some((day) =>
     (day.foods ?? []).some((food) => Boolean(food.shop?.trim() || food.dish?.trim())),
   );
-  const matchedFoods = hay ? foodNames.filter((name) => foodMatchesPlan(kit.name, name, hay)) : foodNames;
+  const matchedFoods = hay
+    ? foodNames.filter((name) => foodMatchesPlan(kit.name, name, hay))
+    : foodNames;
   const foods = (hay && planHasFoods ? matchedFoods : foodNames).map((name) => ({
     name,
     photoPath: matchFoodPhoto(kit.name, name, usedFood),
@@ -326,4 +357,16 @@ export function getPlanCityAtmosphere(
     scenery,
     foods,
   });
+}
+
+/** 按当前行程城市读热门城 kit；无该城则返回 null，禁止回退到杭州 */
+export function getPlanCityAtmosphere(
+  cityOrText: string | null | undefined,
+  plan?: PlanAsideHint | null,
+): PlanCityAtmosphere | null {
+  try {
+    return readPlanCityAtmosphere(cityOrText, plan);
+  } catch {
+    return null;
+  }
 }
