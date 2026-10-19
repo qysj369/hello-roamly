@@ -64,7 +64,9 @@ const WELCOME = buildAgentWelcome(
   cached?.plan ?? null,
 );
 
-function persist(state: Pick<TravelAgentState, 'sessionId' | 'messages' | 'plan' | 'snapshots'>): void {
+function persist(
+  state: Pick<TravelAgentState, 'sessionId' | 'messages' | 'plan' | 'snapshots'>,
+): void {
   writeTravelAgentSession({
     sessionId: state.sessionId,
     messages: state.messages,
@@ -77,7 +79,9 @@ function persist(state: Pick<TravelAgentState, 'sessionId' | 'messages' | 'plan'
 export const useTravelAgentStore = create<TravelAgentState>((set, get) => ({
   open: false,
   busy: false,
-  messages: cached?.messages?.length ? cached.messages : [{ id: 'welcome', role: 'assistant', text: WELCOME }],
+  messages: cached?.messages?.length
+    ? cached.messages
+    : [{ id: 'welcome', role: 'assistant', text: WELCOME }],
   plan: cached?.plan ?? null,
   revision: 0,
   pendingExtract: null,
@@ -112,13 +116,13 @@ export const useTravelAgentStore = create<TravelAgentState>((set, get) => ({
     set((state) => {
       const user = userText.trim();
       const assistant = assistantText.trim();
-      if (!user || !assistant) return state;
+      if (!assistant) return state;
       const next = {
         ...state,
         open: true,
         messages: [
           ...state.messages,
-          { id: uid(), role: 'user' as const, text: user },
+          ...(user ? [{ id: uid(), role: 'user' as const, text: user }] : []),
           { id: uid(), role: 'assistant' as const, text: assistant },
         ],
       };
@@ -216,7 +220,10 @@ export const useTravelAgentStore = create<TravelAgentState>((set, get) => ({
           const next = {
             ...state,
             busy: false,
-            messages: [...state.messages, { id: uid(), role: 'assistant' as const, text: result.message }],
+            messages: [
+              ...state.messages,
+              { id: uid(), role: 'assistant' as const, text: result.message },
+            ],
           };
           persist(next);
           return next;
@@ -230,7 +237,10 @@ export const useTravelAgentStore = create<TravelAgentState>((set, get) => ({
             ...state,
             busy: false,
             pendingExtract: result.params,
-            messages: [...state.messages, { id: uid(), role: 'assistant' as const, text: result.message }],
+            messages: [
+              ...state.messages,
+              { id: uid(), role: 'assistant' as const, text: result.message },
+            ],
           };
           persist(next);
           return next;
@@ -244,7 +254,10 @@ export const useTravelAgentStore = create<TravelAgentState>((set, get) => ({
             ...state,
             busy: false,
             pendingExtract: result.kind === 'ask' ? null : state.pendingExtract,
-            messages: [...state.messages, { id: uid(), role: 'assistant' as const, text: result.message }],
+            messages: [
+              ...state.messages,
+              { id: uid(), role: 'assistant' as const, text: result.message },
+            ],
           };
           persist(next);
           return next;
@@ -276,7 +289,10 @@ export const useTravelAgentStore = create<TravelAgentState>((set, get) => ({
                 state.plan,
                 state.plan ? searchPlanHeaderLine(state.plan) : trimmed,
               ),
-          messages: [...state.messages, { id: uid(), role: 'assistant' as const, text: result.message }],
+          messages: [
+            ...state.messages,
+            { id: uid(), role: 'assistant' as const, text: result.message },
+          ],
         };
         persist(next);
         return next;
@@ -308,7 +324,10 @@ export const useTravelAgentStore = create<TravelAgentState>((set, get) => ({
           ...state,
           busy: false,
           open: true,
-          messages: [...state.messages, { id: uid(), role: 'assistant', text: '没有上一版可回退。' }],
+          messages: [
+            ...state.messages,
+            { id: uid(), role: 'assistant', text: '没有上一版可回退。' },
+          ],
         };
       }
       const next = {
@@ -341,7 +360,10 @@ export const useTravelAgentStore = create<TravelAgentState>((set, get) => ({
     if (!plan) {
       set((state) => ({
         busy: false,
-        messages: [...state.messages, { id: uid(), role: 'assistant', text: '还没有行程，先生成一份再操作。' }],
+        messages: [
+          ...state.messages,
+          { id: uid(), role: 'assistant', text: '还没有行程，先生成一份再操作。' },
+        ],
       }));
       return;
     }
@@ -363,7 +385,10 @@ export const useTravelAgentStore = create<TravelAgentState>((set, get) => ({
             result.plan && prev && !searchPlansLookEqual(prev, result.plan)
               ? pushPlanSnapshot(state.snapshots, prev, searchPlanHeaderLine(prev))
               : state.snapshots,
-          messages: [...state.messages, { id: uid(), role: 'assistant' as const, text: result.message }],
+          messages: [
+            ...state.messages,
+            { id: uid(), role: 'assistant' as const, text: result.message },
+          ],
         };
         persist(next);
         return next;
@@ -371,7 +396,10 @@ export const useTravelAgentStore = create<TravelAgentState>((set, get) => ({
     } catch {
       set((state) => ({
         busy: false,
-        messages: [...state.messages, { id: uid(), role: 'assistant', text: '站内操作没完成，请稍后再试。' }],
+        messages: [
+          ...state.messages,
+          { id: uid(), role: 'assistant', text: '站内操作没完成，请稍后再试。' },
+        ],
       }));
     }
   },

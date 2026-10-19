@@ -71,7 +71,13 @@ html.spiral-home-active body,
   inset: 0;
   background:
     radial-gradient(ellipse at 50% 48%, transparent 52%, rgba(8, 20, 40, 0.28) 100%),
-    linear-gradient(90deg, rgba(8, 20, 40, 0.22) 0%, transparent 24%, transparent 76%, rgba(8, 20, 40, 0.16) 100%);
+    linear-gradient(
+      90deg,
+      rgba(8, 20, 40, 0.22) 0%,
+      transparent 24%,
+      transparent 76%,
+      rgba(8, 20, 40, 0.16) 100%
+    );
 }
 
 .spiral-home__orbit {
@@ -455,7 +461,9 @@ html.spiral-home-active .spiral-home .travel-agent-host.travel-agent-host--spira
   isolation: isolate;
 }
 
-html.spiral-home-active .spiral-home .travel-agent-host.travel-agent-host--spiral.travel-agent-host--open {
+html.spiral-home-active
+  .spiral-home
+  .travel-agent-host.travel-agent-host--spiral.travel-agent-host--open {
   top: auto !important;
   left: auto !important;
   right: max(16px, env(safe-area-inset-right)) !important;
@@ -583,7 +591,8 @@ html.spiral-home-active .spiral-home .travel-agent-host--spiral .travel-agent-fa
     0 0 14px 4px rgba(54, 211, 153, 0.42);
 }
 
-.spiral-home .travel-agent-host--spiral .travel-agent-chip--next.is-flash {
+.spiral-home .travel-agent-host--spiral .travel-agent-chip--next.is-flash,
+.spiral-home .travel-agent-host--spiral .travel-agent-chip--next.is-active {
   transform: translateY(-2px);
   border-color: rgba(154, 247, 201, 0.9);
   background: rgba(18, 56, 48, 0.92);
@@ -710,17 +719,20 @@ html.spiral-home-active .spiral-home .travel-agent-host--spiral .travel-agent-fa
 
 .spiral-home__asset-modal {
   position: fixed;
-  inset: 0;
-  z-index: 245;
-  display: grid;
-  place-items: center;
-  padding: 1rem;
-  overflow: auto;
-  background: rgba(8, 20, 40, 0.45);
+  inset: auto max(12px, env(safe-area-inset-right)) max(12px, env(safe-area-inset-bottom)) auto;
+  z-index: 270;
+  display: block;
+  width: min(26rem, calc(100vw - 24px));
+  max-height: min(86vh, 42rem);
+  padding: 0;
+  overflow: visible;
+  background: transparent;
+  pointer-events: none;
 }
 
 .spiral-home__asset-card {
-  width: min(26rem, calc(100vw - 2rem));
+  pointer-events: auto;
+  width: 100%;
   max-height: min(86vh, 42rem);
   overflow: auto;
   padding: 14px 14px 12px;
@@ -869,7 +881,9 @@ html.spiral-home-active .spiral-home .travel-agent-host--spiral .travel-agent-fa
     height: 62px !important;
   }
 
-  html.spiral-home-active .spiral-home .travel-agent-host.travel-agent-host--spiral.travel-agent-host--open {
+  html.spiral-home-active
+    .spiral-home
+    .travel-agent-host.travel-agent-host--spiral.travel-agent-host--open {
     right: 12px !important;
     bottom: max(18px, env(safe-area-inset-bottom)) !important;
     width: min(380px, calc(100vw - 24px)) !important;

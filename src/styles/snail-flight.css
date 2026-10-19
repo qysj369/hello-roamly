@@ -184,13 +184,17 @@
   text-align: left;
   visibility: hidden;
   opacity: 0;
-  transition: opacity 0.56s ease, visibility 0s linear 0.56s;
+  transition:
+    opacity 0.56s ease,
+    visibility 0s linear 0.56s;
 }
 
 .snail-flight__captions.is-on {
   visibility: visible;
   opacity: 1;
-  transition: opacity 0.56s ease, visibility 0s;
+  transition:
+    opacity 0.56s ease,
+    visibility 0s;
 }
 
 .snail-flight.is-guide-ready .snail-flight__captions {
@@ -454,6 +458,22 @@ html.snail-flight-active body {
 
 html.snail-flight-active .travel-agent-host {
   z-index: 80;
+  pointer-events: none;
+  background: transparent;
+}
+
+html.snail-flight-active .travel-agent-host .travel-agent-panel,
+html.snail-flight-active .travel-agent-host .travel-agent-fab {
+  pointer-events: auto;
+}
+
+html.snail-flight-active .travel-agent-host--open {
+  inset: auto 12px 12px auto !important;
+  width: min(360px, calc(100vw - 24px)) !important;
+  height: auto !important;
+  max-height: min(72vh, 560px) !important;
+  padding: 0 !important;
+  background: transparent !important;
 }
 
 @media (prefers-reduced-motion: reduce) {

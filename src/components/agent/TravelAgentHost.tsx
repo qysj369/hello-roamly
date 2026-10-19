@@ -16,16 +16,21 @@ import {
   matchSnailFlightButler,
   SNAIL_FLIGHT_BUTLER_LEAD,
   SNAIL_FLIGHT_BUTLER_WELCOME,
-  SNAIL_FLIGHT_FAQ_CHIPS,
+  SNAIL_FLIGHT_SCENE_CHIPS,
 } from '@/lib/snail-flight/butlerCommands';
+import type { CaptionPackId } from '@/lib/snail-flight/captionPacks';
 import { useSnailFlightCaptionStore } from '@/lib/snail-flight/captionPackStore';
 import { useFlightButlerStore } from '@/lib/snail-flight/flightButlerStore';
 import { useTravelAgentStore } from '@/stores/travelAgent/store';
 import { copyTextToClipboard } from '@/utils/copyTextToClipboard';
 import '@/styles/travel-agent.css';
 
-const HoloSearchPlanPosterPanel = lazy(() => import('@/components/home/holo/HoloSearchPlanPosterPanel'));
-const HoloSearchPlanShareSheet = lazy(() => import('@/components/home/holo/HoloSearchPlanShareSheet'));
+const HoloSearchPlanPosterPanel = lazy(
+  () => import('@/components/home/holo/HoloSearchPlanPosterPanel'),
+);
+const HoloSearchPlanShareSheet = lazy(
+  () => import('@/components/home/holo/HoloSearchPlanShareSheet'),
+);
 
 const PLAN_QUICK_CHIPS = [
   { label: '补充景点详情', text: '补充景点详情' },
@@ -34,10 +39,33 @@ const PLAN_QUICK_CHIPS = [
 ] as const;
 
 const FLIGHT_QUICK_CHIPS = [
-  { label: '人文主版本', text: '切换为主版本文案' },
-  { label: '极简诗意', text: '切换极简诗意版' },
-  { label: '科普叙事', text: '切换科普叙事版' },
+  { label: '人文主版本', text: '切换为主版本文案', packId: 'story' as const },
+  { label: '极简诗意', text: '切换极简诗意版', packId: 'verse' as const },
+  { label: '科普叙事', text: '切换科普叙事版', packId: 'guide' as const },
 ] as const;
+
+const SPIRAL_ASSET_OPEN_COPY =
+  '已打开图文攻略预览。可滚动查看卡片，底部【保存图片】即可下载；文案仅作漫游灵感参考，不含订票、组团服务。';
+
+function panelLeadText(spiralMode: boolean, flightMode: boolean, hasPlan: boolean): string {
+  if (spiralMode) return '告诉我你想听什么，我陪你一路漫游';
+  if (flightMode) return SNAIL_FLIGHT_BUTLER_LEAD;
+  if (hasPlan) return '点下面改一处，或直接打字。';
+  return '说目的地和天数即可。';
+}
+
+function emptyLogText(spiralMode: boolean, flightMode: boolean): string {
+  if (spiralMode) return '可以直接说「青岛3天情侣」或「杭州周末闲逛」，我帮你排一版松弛慢游。';
+  if (flightMode) return SNAIL_FLIGHT_BUTLER_WELCOME;
+  return '点下面改一处，或直接打字。';
+}
+
+function composerPlaceholder(spiralMode: boolean, flightMode: boolean, hasPlan: boolean): string {
+  if (spiralMode) return '例如：青岛3天情侣';
+  if (flightMode) return '例如：切换极简诗意版';
+  if (hasPlan) return '改行程…';
+  return '例如：杭州3天亲子';
+}
 
 const SPIRAL_LOG_WINDOW = 24;
 const SPIRAL_PANEL_FADE_MS = 180;
@@ -72,14 +100,16 @@ export default function TravelAgentHost({
   const isPage = layout === 'page';
   const isEmbed = layout === 'embed';
   const spiralMode = variant === 'spiral';
-  const flightMode = variant === 'flight' || spiralMode;
+  const flightOnly = variant === 'flight';
+  const flightMode = flightOnly || spiralMode;
+  const captionPackId = useSnailFlightCaptionStore((state) => state.packId);
   const open = useTravelAgentStore((state) => state.open);
   const busy = useTravelAgentStore((state) => state.busy);
   const tripMessages = useTravelAgentStore((state) => state.messages);
   const flightMessages = useFlightButlerStore((state) => state.messages);
   const sendFlight = useFlightButlerStore((state) => state.send);
   const noteLocal = useTravelAgentStore((state) => state.noteLocal);
-  const messages = spiralMode ? tripMessages : flightMode ? flightMessages : tripMessages;
+  const messages = flightOnly ? flightMessages : tripMessages;
   const plan = useTravelAgentStore((state) => state.plan);
   const posterOpen = useTravelAgentStore((state) => state.posterOpen);
   const shareOpen = useTravelAgentStore((state) => state.shareOpen);
@@ -152,14 +182,25 @@ export default function TravelAgentHost({
     const trimmed = text.trim();
     if (!trimmed) return;
     const hit = matchSnailFlightButler(trimmed, useSnailFlightCaptionStore.getState().progress);
-    if (hit) {
+    if (hit?.packId) {
       sendFlight(trimmed);
-      const restyle =
-        hit.packId && plan ? `\n\n${formatSpiralPlanVoice(plan, hit.packId)}` : '';
+      const restyle = plan ? `\n\n${formatSpiralPlanVoice(plan, hit.packId)}` : '';
       noteLocal(trimmed, `${hit.message}${restyle}`);
       return;
     }
-    void send(trimmed);
+    send(trimmed).catch(() => undefined);
+  };
+
+  const dispatchChipText = (text: string) => {
+    if (spiralMode) {
+      sendSpiral(text);
+      return;
+    }
+    if (flightMode) {
+      sendFlight(text);
+      return;
+    }
+    send(text).catch(() => undefined);
   };
 
   const onSubmit = (event: FormEvent) => {
@@ -167,20 +208,17 @@ export default function TravelAgentHost({
     const text = draft.trim();
     if (!text || busy) return;
     setDraft('');
-    if (spiralMode) sendSpiral(text);
-    else if (flightMode) sendFlight(text);
-    else void send(text);
+    dispatchChipText(text);
   };
 
   const flashThenSend = (label: string, text: string) => {
-    if (spiralMode) {
-      setFlashChip(label);
-      window.setTimeout(() => setFlashChip((current) => (current === label ? null : current)), 420);
-      sendSpiral(text);
-      return;
-    }
-    if (flightMode) sendFlight(text);
-    else void send(text);
+    setFlashChip(label);
+    setDraft(text);
+    window.setTimeout(() => setFlashChip((current) => (current === label ? null : current)), 520);
+    window.setTimeout(() => {
+      setDraft('');
+      dispatchChipText(text);
+    }, 40);
   };
 
   const hostClass = [
@@ -190,17 +228,21 @@ export default function TravelAgentHost({
     railOpen && layout === 'fab' ? 'travel-agent-host--open' : '',
     isEmbed && railOpen ? 'travel-agent-host--embed-open' : '',
     spiralMode ? 'travel-agent-host--spiral' : '',
+    flightOnly ? 'travel-agent-host--flight' : '',
   ]
     .filter(Boolean)
     .join(' ');
-  const chips = spiralMode
-    ? FLIGHT_QUICK_CHIPS
-    : flightMode
-      ? [...FLIGHT_QUICK_CHIPS, ...SNAIL_FLIGHT_FAQ_CHIPS]
-      : PLAN_QUICK_CHIPS;
+  const chips = (() => {
+    if (spiralMode) return FLIGHT_QUICK_CHIPS;
+    if (flightOnly) return [...FLIGHT_QUICK_CHIPS, ...SNAIL_FLIGHT_SCENE_CHIPS];
+    return PLAN_QUICK_CHIPS;
+  })();
+  const chipsNeedPlan = !spiralMode && !flightOnly;
 
   const posterPanel = plan ? (
-    <Suspense fallback={<p className="travel-agent-msg travel-agent-msg--assistant">正在打开图文预览…</p>}>
+    <Suspense
+      fallback={<p className="travel-agent-msg travel-agent-msg--assistant">正在打开图文预览…</p>}
+    >
       <HoloSearchPlanPosterPanel
         plan={plan}
         savedSessionId={sessionId}
@@ -224,20 +266,19 @@ export default function TravelAgentHost({
                 {spiralMode ? '蜗牛管家已就位' : '蜗牛管家'}
               </h2>
               <p className="travel-agent-panel__lead">
-                {spiralMode
-                  ? '告诉我你想听什么，我陪你一路漫游'
-                  : flightMode
-                    ? SNAIL_FLIGHT_BUTLER_LEAD
-                    : plan
-                      ? '点下面改一处，或直接打字。'
-                      : '说目的地和天数即可。'}
+                {panelLeadText(spiralMode, flightMode, Boolean(plan))}
               </p>
               {!flightMode && !isEmbed && remembered ? (
                 <p className="travel-agent-panel__memory">{remembered}</p>
               ) : null}
             </div>
             {isPage ? null : (
-              <button type="button" className="travel-agent-panel__close" aria-label="关闭对话" onClick={closeChat}>
+              <button
+                type="button"
+                className="travel-agent-panel__close"
+                aria-label="关闭对话"
+                onClick={closeChat}
+              >
                 ×
               </button>
             )}
@@ -278,11 +319,7 @@ export default function TravelAgentHost({
               )
             ) : (
               <p className="travel-agent-msg travel-agent-msg--assistant">
-                {spiralMode
-                  ? '可以直接说「青岛3天情侣」或「杭州周末闲逛」，我帮你排一版松弛慢游。'
-                  : flightMode
-                    ? SNAIL_FLIGHT_BUTLER_WELCOME
-                    : '点下面改一处，或直接打字。'}
+                {emptyLogText(spiralMode, flightMode)}
               </p>
             )}
             {spiralMode && busy ? (
@@ -306,17 +343,22 @@ export default function TravelAgentHost({
           </div>
 
           <div className="travel-agent-chips travel-agent-chips--primary">
-            {chips.map((chip) => (
-              <button
-                key={chip.label}
-                type="button"
-                className={`travel-agent-chip travel-agent-chip--next${flashChip === chip.label ? ' is-flash' : ''}`}
-                disabled={busy || (!flightMode && !plan)}
-                onClick={() => flashThenSend(chip.label, chip.text)}
-              >
-                {chip.label}
-              </button>
-            ))}
+            {chips.map((chip) => {
+              const packId = 'packId' in chip ? (chip.packId as CaptionPackId) : null;
+              const isScene = SNAIL_FLIGHT_SCENE_CHIPS.some((item) => item.label === chip.label);
+              const isOn = packId != null && packId === captionPackId;
+              return (
+                <button
+                  key={chip.label}
+                  type="button"
+                  className={`travel-agent-chip travel-agent-chip--next${isScene ? ' travel-agent-chip--scene' : ''}${flashChip === chip.label ? ' is-flash' : ''}${isOn ? ' is-active' : ''}`}
+                  disabled={busy || (chipsNeedPlan && !plan)}
+                  onClick={() => flashThenSend(chip.label, chip.text)}
+                >
+                  {chip.label}
+                </button>
+              );
+            })}
             {onNarrate ? (
               <button type="button" className="travel-agent-chip" onClick={onNarrate}>
                 {narrating ? '停止朗读' : '朗读'}
@@ -336,10 +378,7 @@ export default function TravelAgentHost({
               disabled={busy}
               onClick={() => {
                 useTravelAgentStore.setState({ posterOpen: true, open: true });
-                noteLocal(
-                  '确认行程，生成图文资产包',
-                  '已打开图文攻略预览。可滚动查看卡片，底部「保存图片」即可下载；文案只做慢游灵感，不含订票组团。',
-                );
+                noteLocal('', SPIRAL_ASSET_OPEN_COPY);
               }}
             >
               确认行程，生成图文资产包
@@ -354,7 +393,11 @@ export default function TravelAgentHost({
 
           {spiralMode && posterOpen && plan
             ? createPortal(
-                <div className="spiral-home__asset-modal" role="dialog" aria-label="图文旅行攻略资产包">
+                <div
+                  className="spiral-home__asset-modal"
+                  role="dialog"
+                  aria-label="图文旅行攻略资产包"
+                >
                   <div className="spiral-home__asset-card">
                     <p className="spiral-home__asset-title">图文旅行攻略资产包</p>
                     <p className="spiral-home__asset-hint">
@@ -367,13 +410,17 @@ export default function TravelAgentHost({
               )
             : null}
 
-          {!flightMode && posterOpen && plan ? (
+          {!flightMode && !spiralMode && posterOpen && plan ? (
             <div className="travel-agent-poster">{posterPanel}</div>
           ) : null}
 
           {!flightMode && shareOpen && plan ? (
             <Suspense fallback={null}>
-              <HoloSearchPlanShareSheet plan={plan} savedSessionId={sessionId} onClose={closeShare} />
+              <HoloSearchPlanShareSheet
+                plan={plan}
+                savedSessionId={sessionId}
+                onClose={closeShare}
+              />
             </Suspense>
           ) : null}
 
@@ -382,15 +429,7 @@ export default function TravelAgentHost({
               value={draft}
               disabled={busy}
               onChange={(event) => setDraft(event.currentTarget.value)}
-              placeholder={
-                spiralMode
-                  ? '例如：青岛3天情侣'
-                  : flightMode
-                    ? '例如：切换极简诗意版'
-                    : plan
-                      ? '改行程…'
-                      : '例如：杭州3天亲子'
-              }
+              placeholder={composerPlaceholder(spiralMode, flightMode, Boolean(plan))}
               aria-label="对管家说"
             />
             <button type="submit" disabled={!canSend}>

@@ -34,11 +34,7 @@ const STORY: Record<string, SnailFlightNarration> = {
     id: 'lakes',
     at: 0.12,
     title: '【掠过湖泽】',
-    lines: [
-      '湖水静卧在齐鲁大地，',
-      '田畴阡陌向远方延展，',
-      '蜗牛号继续向东，奔赴群山与城镇。',
-    ],
+    lines: ['湖水静卧在齐鲁大地，', '田畴阡陌向远方延展，', '蜗牛号继续向东，奔赴群山与城镇。'],
   },
   zhangqiu: {
     id: 'zhangqiu',
@@ -73,10 +69,7 @@ const STORY: Record<string, SnailFlightNarration> = {
     id: 'laizhou',
     at: 0.75,
     title: '【近海初见｜莱州湾】',
-    lines: [
-      '前方望见海岸线，渤海湾就在眼前。',
-      '陆地到此收束，我们即将告别平原，奔赴海滨之城。',
-    ],
+    lines: ['前方望见海岸线，渤海湾就在眼前。', '陆地到此收束，我们即将告别平原，奔赴海滨之城。'],
   },
   'qingdao-land': {
     id: 'qingdao-land',
@@ -221,7 +214,9 @@ export function captionCueToFire(
   cues: readonly CaptionCue[] = SNAIL_FLIGHT_CAPTION_CUES,
 ): CaptionCue | null {
   const t = Math.min(1, Math.max(0, progress));
-  const due = cues.filter((cue) => t + 1e-6 >= cue.from && t <= cue.to + 1e-6 && !fired.has(cue.id));
+  const due = cues.filter(
+    (cue) => t + 1e-6 >= cue.from && t <= cue.to + 1e-6 && !fired.has(cue.id),
+  );
   if (!due.length) return null;
   return due.reduce((latest, cue) => (cue.from >= latest.from ? cue : latest));
 }
@@ -241,4 +236,30 @@ export function regionBriefAt(progress: number): string {
 
 export function routeSightsReply(): string {
   return '我可以为你梳理本次航线沿途的游玩点位，漫游结束后生成旅行灵感。沿途可看：济南历下的趵突泉与大明湖，章丘田野，淄博齐文化与老城烟火，潍坊风筝与平原，莱州湾海岸，以及青岛的红瓦碧海。';
+}
+
+const AHEAD_SIGHTS: Record<string, string> = {
+  lakes: '齐鲁湖泽与田畴',
+  zhangqiu: '章丘田野与舒缓山丘',
+  zibo: '淄博齐故都与老城烟火',
+  weifang: '潍坊平原与风筝之乡',
+  laizhou: '莱州湾与渤海海岸',
+  'qingdao-land': '青岛红瓦碧海与八大关',
+};
+
+/** 管家「前方还有哪些风景」：只答还没飞到的航段，不打断飞行。 */
+export function aheadSightsReply(progress: number): string {
+  const t = Math.min(1, Math.max(0, progress));
+  const remaining = SNAIL_FLIGHT_CAPTION_CUES.filter((cue) => cue.from > t + 0.02)
+    .map((cue) => AHEAD_SIGHTS[cue.id])
+    .filter((name): name is string => Boolean(name));
+  if (!remaining.length) {
+    return '前方已接近青岛降落。红瓦碧海就在眼前，落地后可以慢慢逛海边与八大关。';
+  }
+  return `前方航线上还能看到：${remaining.join('、')}。想慢慢看的话，落地后我可以帮你排一版目的地灵感。`;
+}
+
+/** 管家「帮我生成目的地行程」：落地灵感，不含订票组团。 */
+export function destinationPlanReply(): string {
+  return '落地青岛后可以按慢游来走：第一天栈桥与老城区闲逛，把空档留给海边风；第二天八大关梧桐路散步，傍晚等人少时看日落；第三天量力近郊或馆内补点。这是灵感参考，不含订票、组团服务。飞行不会暂停。';
 }

@@ -1,6 +1,7 @@
 import {
+  aheadSightsReply,
+  destinationPlanReply,
   regionBriefAt,
-  routeSightsReply,
   type CaptionPackId,
 } from '@/lib/snail-flight/captionPacks';
 
@@ -10,28 +11,19 @@ export const SNAIL_FLIGHT_BUTLER_WELCOME =
 export const SNAIL_FLIGHT_BUTLER_LEAD = '飞行途中可切换字幕，不会打断漫游。';
 
 export const SNAIL_FLIGHT_BUTLER_FALLBACK =
-  '这次是飞行漫游。可以说「切换极简诗意版」「介绍当前这片区域」或「沿途有什么景点」。';
+  '这次是飞行漫游。可以说「介绍眼前这片区域」「前方还有哪些风景」或「帮我生成目的地行程」。切换字幕不会打断飞行。';
 
-export const SNAIL_FLIGHT_FAQ_CHIPS = [
-  {
-    label: '它的劣势有哪些？',
-    text: '它的劣势有哪些？',
-    reply:
-      '沉浸式飞行漫游对设备与网络有一定要求，低配设备加载会卡顿；目前航线数量有限，需要持续扩充；侧重旅行灵感规划，不直接提供订票、酒店预订等交易服务。',
-  },
-  {
-    label: '它的目标用户群体是谁？',
-    text: '它的目标用户群体是谁？',
-    reply:
-      '喜欢结伴出游、寻找旅行灵感的年轻游客；旅游自媒体创作者；亲子家庭做地理云研学；还有爱好云旅游、提前预览目的地的旅行爱好者。',
-  },
-  {
-    label: '它的商业模式是怎样的？',
-    text: '它的商业模式是怎样的？',
-    reply:
-      '基础漫游和简易行程免费使用；高级航线、高清种草素材、深度定制行程采用增值付费；面向自媒体创作者提供素材包服务。',
-  },
+export const SNAIL_FLIGHT_SCENE_CHIPS = [
+  { label: '介绍眼前这片区域', text: '介绍眼前这片区域' },
+  { label: '前方还有哪些风景', text: '前方还有哪些风景' },
+  { label: '帮我生成目的地行程', text: '帮我生成目的地行程' },
 ] as const;
+
+export const SNAIL_FLIGHT_PACK_NOTICE = {
+  story: '已切换至【人文画面主版本】，继续本次山河漫游。',
+  verse: '已切换至【极简诗意版】，旁白变得更简洁轻盈。',
+  guide: '已切换至【科普轻叙事版】，为你带来更丰富的地理与人文解说。',
+} as const;
 
 export type SnailFlightButlerHit = {
   message: string;
@@ -101,16 +93,13 @@ export function matchSnailFlightButler(
   const key = normalize(raw);
 
   if (includesAny(key, VERSE_KEYS)) {
-    return { packId: 'verse', message: '已切换至【极简诗意版】，旁白变得更简洁轻盈。' };
+    return { packId: 'verse', message: SNAIL_FLIGHT_PACK_NOTICE.verse };
   }
   if (includesAny(key, GUIDE_KEYS)) {
-    return {
-      packId: 'guide',
-      message: '已切换至【科普轻叙事版】，为你带来更丰富的地理人文解说。',
-    };
+    return { packId: 'guide', message: SNAIL_FLIGHT_PACK_NOTICE.guide };
   }
   if (includesAny(key, STORY_KEYS)) {
-    return { packId: 'story', message: '已切换至【人文画面主版本】，继续本次山河漫游。' };
+    return { packId: 'story', message: SNAIL_FLIGHT_PACK_NOTICE.story };
   }
 
   if (includesAny(key, ['放慢飞行速度', '飞慢一点', '飞慢点', '降低漫游速度'])) {
@@ -125,21 +114,39 @@ export function matchSnailFlightButler(
   if (includesAny(key, ['继续飞行', '继续漫游'])) {
     return { message: '漫游继续，我们向前出发。' };
   }
-  if (includesAny(key, ['介绍当前这片区域', '介绍当前区域', '这是哪里', '现在飞到哪'])) {
+  if (
+    includesAny(key, [
+      '介绍眼前这片区域',
+      '介绍当前这片区域',
+      '介绍当前区域',
+      '眼前这片区域',
+      '这是哪里',
+      '现在飞到哪',
+    ])
+  ) {
     return { message: regionBriefAt(progress) };
   }
-  if (includesAny(key, ['这条路线沿途有什么景点', '沿途有什么景点', '沿途景点', '航线沿途'])) {
-    return { message: routeSightsReply() };
+  if (
+    includesAny(key, [
+      '前方还有哪些风景',
+      '前方还有什么风景',
+      '这条路线沿途有什么景点',
+      '沿途有什么景点',
+      '沿途景点',
+      '航线沿途',
+    ])
+  ) {
+    return { message: aheadSightsReply(progress) };
   }
-  const faq = SNAIL_FLIGHT_FAQ_CHIPS.find(
-    (item) => key.includes(normalize(item.text)) || key.includes(normalize(item.label)),
-  );
-  if (faq) {
-    return { message: faq.reply };
+  if (includesAny(key, ['帮我生成目的地行程', '生成目的地行程', '目的地行程'])) {
+    return { message: destinationPlanReply() };
   }
   return null;
 }
 
 export function isSnailFlightPageActive(): boolean {
-  return typeof document !== 'undefined' && document.documentElement.classList.contains('snail-flight-active');
+  return (
+    typeof document !== 'undefined' &&
+    document.documentElement.classList.contains('snail-flight-active')
+  );
 }

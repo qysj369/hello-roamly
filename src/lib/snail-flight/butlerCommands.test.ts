@@ -3,7 +3,8 @@ import {
   matchSnailFlightButler,
   SNAIL_FLIGHT_BUTLER_FALLBACK,
   SNAIL_FLIGHT_BUTLER_WELCOME,
-  SNAIL_FLIGHT_FAQ_CHIPS,
+  SNAIL_FLIGHT_PACK_NOTICE,
+  SNAIL_FLIGHT_SCENE_CHIPS,
 } from '@/lib/snail-flight/butlerCommands';
 import { useFlightButlerStore } from '@/lib/snail-flight/flightButlerStore';
 
@@ -13,6 +14,10 @@ describe('snail-flight butler commands', () => {
     expect(matchSnailFlightButler('换回默认字幕', 0)?.message).toContain('人文画面主版本');
     expect(matchSnailFlightButler('字幕精简一点', 0)?.packId).toBe('verse');
     expect(matchSnailFlightButler('增加地理人文介绍', 0)?.packId).toBe('guide');
+    expect(matchSnailFlightButler('切换科普叙事版', 0)?.message).toBe(
+      SNAIL_FLIGHT_PACK_NOTICE.guide,
+    );
+    expect(matchSnailFlightButler('切换科普叙事版', 0)?.message).toContain('地理与人文解说');
   });
 
   it('only replies in text for speed and pause', () => {
@@ -28,8 +33,14 @@ describe('snail-flight butler commands', () => {
 
   it('briefs the current region and lists route sights', () => {
     expect(matchSnailFlightButler('介绍当前这片区域', 0.36)?.message).toContain('淄博');
+    expect(matchSnailFlightButler('介绍眼前这片区域', 0.36)?.message).toContain('淄博');
     expect(matchSnailFlightButler('这条路线沿途有什么景点', 0.1)?.message).toContain(
-      '漫游结束后生成旅行灵感',
+      '前方航线上还能看到',
+    );
+    expect(matchSnailFlightButler('前方还有哪些风景', 0.36)?.message).toContain('潍坊');
+    expect(matchSnailFlightButler('帮我生成目的地行程', 0.9)?.message).toContain('八大关');
+    expect(matchSnailFlightButler('帮我生成目的地行程', 0.9)?.message).toContain(
+      '不含订票、组团服务',
     );
   });
 
@@ -42,16 +53,18 @@ describe('snail-flight butler commands', () => {
     expect(log.join('')).not.toContain('杭州3天亲子。我来规划');
   });
 
-  it('replies to paid-route FAQ chips without treating them as pack switches', () => {
+  it('replies to flight scene chips without treating them as pack switches', () => {
     useFlightButlerStore.getState().reset();
-    for (const chip of SNAIL_FLIGHT_FAQ_CHIPS) {
-      expect(matchSnailFlightButler(chip.text, 0.1)?.message).toBe(chip.reply);
+    SNAIL_FLIGHT_SCENE_CHIPS.forEach((chip) => {
+      expect(matchSnailFlightButler(chip.text, 0.1)?.message).toBeTruthy();
       useFlightButlerStore.getState().send(chip.text);
-    }
+    });
     const log = useFlightButlerStore.getState().messages;
     expect(log.filter((item) => item.role === 'user')).toHaveLength(3);
-    expect(log.filter((item) => item.role === 'assistant' && item.kind !== 'pack-switch')).toHaveLength(4);
-    expect(log.at(-1)?.text).toBe(SNAIL_FLIGHT_FAQ_CHIPS[2]?.reply);
+    expect(
+      log.filter((item) => item.role === 'assistant' && item.kind !== 'pack-switch'),
+    ).toHaveLength(4);
+    expect(log.at(-1)?.text).toContain('落地青岛');
     expect(log.filter((item) => item.kind === 'pack-switch')).toHaveLength(0);
   });
 
@@ -67,6 +80,8 @@ describe('snail-flight butler commands', () => {
     const notices = log.filter((item) => item.kind === 'pack-switch');
     expect(notices).toHaveLength(1);
     expect(notices[0]?.text).toContain('科普轻叙事版');
-    expect(log.filter((item) => item.text.includes('极简诗意版') && item.role === 'assistant')).toHaveLength(0);
+    expect(
+      log.filter((item) => item.text.includes('极简诗意版') && item.role === 'assistant'),
+    ).toHaveLength(0);
   });
 });

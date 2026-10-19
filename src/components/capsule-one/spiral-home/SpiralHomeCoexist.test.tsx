@@ -53,6 +53,6 @@ describe('spiral home butler and booking dialog', () => {
     expect(screen.getByRole('button', { name: '确认航线，登机' })).toBeTruthy();
     expect(screen.getByText('蜗牛管家已就位')).toBeTruthy();
     await user.click(screen.getByRole('button', { name: '极简诗意' }));
-    expect(screen.getByText(/已切换至【极简诗意版】/)).toBeTruthy();
+    expect(await screen.findByText(/已切换至【极简诗意版】/)).toBeTruthy();
   });
 });

@@ -265,6 +265,22 @@ body:has(.holo-home__plan-sheet[open])
   cursor: not-allowed;
 }
 
+.travel-agent-chip--next.is-flash,
+.travel-agent-chip--next.is-active {
+  border-color: var(--theme-accent, var(--color-main));
+  background: color-mix(in srgb, var(--theme-accent, #285948) 16%, transparent);
+  box-shadow: 0 0 0 3px color-mix(in srgb, var(--theme-accent, #285948) 22%, transparent);
+  color: var(--theme-title, #222c28);
+}
+
+.travel-agent-chip--scene {
+  min-height: 44px;
+  border-radius: 12px;
+  justify-content: center;
+  text-align: center;
+  padding: 8px 10px;
+}
+
 .travel-agent-remix {
   border: 1px solid var(--theme-accent, var(--color-main));
   border-radius: 999px;
@@ -318,7 +334,9 @@ body:has(.holo-home__plan-sheet[open])
 }
 
 @media (max-width: 767px) {
-  .travel-agent-host--open:not(.travel-agent-host--page):not(.travel-agent-host--embed) {
+  .travel-agent-host--open:not(.travel-agent-host--page):not(.travel-agent-host--embed):not(
+      .travel-agent-host--spiral
+    ):not(.travel-agent-host--flight) {
     inset: 0 auto 0 0;
     right: 0;
     bottom: 0;
