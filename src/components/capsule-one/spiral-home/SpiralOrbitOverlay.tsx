@@ -55,9 +55,10 @@ export default function SpiralOrbitOverlay() {
             <stop offset="48%" stopColor="#f2e2b8" stopOpacity="1" />
             <stop offset="100%" stopColor="#bcd8e8" stopOpacity="0" />
           </linearGradient>
-          <linearGradient id={`spiral-streak-${uid}`} gradientUnits="userSpaceOnUse" x1="300" y1="470" x2="40" y2="720">
-            <stop offset="0%" stopColor="#fffaf0" stopOpacity="0.95" />
-            <stop offset="48%" stopColor="#f2e2b8" stopOpacity="0.65" />
+          <linearGradient id={`spiral-streak-${uid}`} gradientUnits="userSpaceOnUse" x1="360" y1="500" x2="90" y2="680">
+            <stop offset="0%" stopColor="#fffaf0" stopOpacity="1" />
+            <stop offset="28%" stopColor="#f2e2b8" stopOpacity="0.85" />
+            <stop offset="62%" stopColor="#bcd8e8" stopOpacity="0.15" />
             <stop offset="100%" stopColor="#bcd8e8" stopOpacity="0" />
           </linearGradient>
           <radialGradient id={`spiral-core-${uid}`} cx="50%" cy="50%" r="50%">
@@ -178,9 +179,23 @@ export default function SpiralOrbitOverlay() {
           <path className="spiral-home__vortex" stroke={`url(#${flow})`} d={VORTEX} />
           <path className="spiral-home__vortex" stroke={`url(#${flow})`} d={VORTEX_INNER} />
           <path className="spiral-home__vortex-core" d={VORTEX} />
-          <path className="spiral-home__streak" stroke={`url(#spiral-streak-${uid})`} d="M268 468 C 190 530, 120 590, 36 640" />
-          <path className="spiral-home__streak" stroke={`url(#spiral-streak-${uid})`} d="M318 512 C 230 590, 150 660, 70 730" />
-          <path className="spiral-home__streak" stroke={`url(#spiral-streak-${uid})`} d="M372 548 C 280 630, 200 700, 130 760" />
+          <path className="spiral-home__vortex-core" d={VORTEX_INNER} />
+          <path className="spiral-home__streak" stroke={`url(#spiral-streak-${uid})`} d="M248 492 C 190 545, 145 578, 108 598" />
+          <path className="spiral-home__streak" stroke={`url(#spiral-streak-${uid})`} d="M300 528 C 230 590, 175 628, 128 650" />
+          <path className="spiral-home__streak" stroke={`url(#spiral-streak-${uid})`} d="M352 558 C 275 625, 215 662, 168 688" />
+        </g>
+        <g className="spiral-home__ring-cores" fill="none" stroke="#fffaf0">
+          {RINGS.map((ring) => (
+            <ellipse
+              key={`core-${ring.rot}`}
+              className="spiral-home__ring-core"
+              cx="400"
+              cy="400"
+              rx={ring.rx}
+              ry={ring.ry}
+              transform={`rotate(${ring.rot} 400 400)`}
+            />
+          ))}
         </g>
         <g className="spiral-home__sparks">
           <circle className="spiral-home__spark" cx="548" cy="268" r="3.2" />

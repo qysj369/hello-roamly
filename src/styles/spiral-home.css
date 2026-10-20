@@ -188,6 +188,53 @@ html.spiral-home-active body,
   animation-duration: 24s;
   animation-delay: -10s;
 }
+.spiral-home__star-flow i:nth-child(7) {
+  top: 6%;
+  left: 18%;
+  width: 3px;
+  height: 3px;
+  animation-duration: 22s;
+}
+.spiral-home__star-flow i:nth-child(8) {
+  top: 14%;
+  left: 46%;
+  width: 3px;
+  height: 3px;
+  animation-duration: 31s;
+  animation-delay: -6s;
+}
+.spiral-home__star-flow i:nth-child(9) {
+  top: 28%;
+  left: 6%;
+  width: 3px;
+  height: 3px;
+  animation-duration: 27s;
+  animation-delay: -12s;
+}
+.spiral-home__star-flow i:nth-child(10) {
+  top: 72%;
+  left: 12%;
+  width: 3px;
+  height: 3px;
+  animation-duration: 33s;
+  animation-delay: -3s;
+}
+.spiral-home__star-flow i:nth-child(11) {
+  top: 78%;
+  left: 58%;
+  width: 3px;
+  height: 3px;
+  animation-duration: 29s;
+  animation-delay: -16s;
+}
+.spiral-home__star-flow i:nth-child(12) {
+  top: 10%;
+  left: 74%;
+  width: 3px;
+  height: 3px;
+  animation-duration: 25s;
+  animation-delay: -9s;
+}
 
 @keyframes spiral-star-drift {
   from {
@@ -341,6 +388,11 @@ html.spiral-home-active body,
   opacity: 0.55;
 }
 
+.spiral-home__ring-core {
+  stroke-width: 2.4;
+  opacity: 0.92;
+}
+
 .spiral-home__coil {
   stroke-width: 4.4;
   stroke-dasharray: 42 180;
@@ -383,10 +435,12 @@ html.spiral-home-active body,
 
 .spiral-home__streak {
   fill: none;
-  stroke-width: 8;
+  stroke-width: 4.5;
   stroke-linecap: round;
-  opacity: 0.9;
-  filter: blur(0.4px);
+  stroke-dasharray: 36 22;
+  opacity: 0.85;
+  filter: drop-shadow(0 0 5px rgba(255, 250, 240, 0.85));
+  animation: spiral-coil-flow 2.8s linear infinite;
 }
 
 .spiral-home__spark {
@@ -1362,6 +1416,7 @@ html.spiral-home-active .spiral-home .travel-agent-host--spiral .travel-agent-fa
   }
 
   .spiral-home__coil,
+  .spiral-home__streak,
   .spiral-home__meteor,
   .spiral-home__star-flow i,
   .spiral-home.capsule-one-home::after {

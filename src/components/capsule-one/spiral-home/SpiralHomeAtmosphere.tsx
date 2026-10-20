@@ -17,6 +17,12 @@ export default function SpiralHomeAtmosphere() {
         <i />
         <i />
         <i />
+        <i />
+        <i />
+        <i />
+        <i />
+        <i />
+        <i />
       </div>
       <div className="spiral-home__glow" />
       <div className="spiral-home__mist" />
