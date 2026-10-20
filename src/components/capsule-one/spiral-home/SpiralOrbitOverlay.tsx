@@ -8,6 +8,14 @@ const WAYPOINTS = [
   { id: 'qingdao', label: '青岛', x: '70%', y: '56%' },
 ] as const;
 
+const RINGS = [
+  { rot: -18, rx: 292, ry: 168, dur: '22s' },
+  { rot: 12, rx: 248, ry: 142, dur: '18s' },
+  { rot: 38, rx: 204, ry: 118, dur: '16s' },
+  { rot: 62, rx: 164, ry: 94, dur: '13s' },
+  { rot: 86, rx: 122, ry: 70, dur: '11s' },
+] as const;
+
 /** 航点 + 轻量 SVG 螺旋光轨。CSS 描边流动，禁止粒子系统 / Three 内核 */
 export default function SpiralOrbitOverlay() {
   const uid = useId().replace(/:/g, '');
@@ -19,26 +27,121 @@ export default function SpiralOrbitOverlay() {
       <svg className="spiral-home__orbit-svg" viewBox="0 0 800 800" role="presentation" aria-hidden>
         <defs>
           <linearGradient id={glow} x1="8%" y1="12%" x2="92%" y2="88%">
-            <stop offset="0%" stopColor="#67e8f9" stopOpacity="0.15" />
-            <stop offset="42%" stopColor="#36d399" stopOpacity="0.95" />
-            <stop offset="100%" stopColor="#22c55e" stopOpacity="0.2" />
+            <stop offset="0%" stopColor="#eaf6ff" stopOpacity="0.95" />
+            <stop offset="46%" stopColor="#d9c08a" stopOpacity="1" />
+            <stop offset="100%" stopColor="#7fb4cc" stopOpacity="0.9" />
           </linearGradient>
           <linearGradient id={flow} x1="0%" y1="50%" x2="100%" y2="50%">
-            <stop offset="0%" stopColor="#e0fff4" stopOpacity="0" />
-            <stop offset="50%" stopColor="#9af7c9" stopOpacity="1" />
-            <stop offset="100%" stopColor="#67e8f9" stopOpacity="0" />
+            <stop offset="0%" stopColor="#fffaf0" stopOpacity="0" />
+            <stop offset="48%" stopColor="#f2e2b8" stopOpacity="1" />
+            <stop offset="100%" stopColor="#bcd8e8" stopOpacity="0" />
           </linearGradient>
+          <filter id={`spiral-bloom-${uid}`} x="-50%" y="-50%" width="200%" height="200%">
+            <feGaussianBlur stdDeviation="7" />
+          </filter>
         </defs>
+        <g
+          className="spiral-home__orbit-shell"
+          fill="none"
+          stroke={`url(#${glow})`}
+          filter={`url(#spiral-bloom-${uid})`}
+        >
+          <ellipse
+            className="spiral-home__ring spiral-home__ring-halo"
+            cx="400"
+            cy="400"
+            rx="292"
+            ry="168"
+            transform="rotate(-18 400 400)"
+          />
+          <ellipse
+            className="spiral-home__ring spiral-home__ring-halo"
+            cx="400"
+            cy="400"
+            rx="248"
+            ry="142"
+            transform="rotate(12 400 400)"
+          />
+          <ellipse
+            className="spiral-home__ring spiral-home__ring-halo"
+            cx="400"
+            cy="400"
+            rx="204"
+            ry="118"
+            transform="rotate(38 400 400)"
+          />
+          <ellipse
+            className="spiral-home__ring spiral-home__ring-halo"
+            cx="400"
+            cy="400"
+            rx="164"
+            ry="94"
+            transform="rotate(62 400 400)"
+          />
+          <ellipse
+            className="spiral-home__ring spiral-home__ring-halo"
+            cx="400"
+            cy="400"
+            rx="122"
+            ry="70"
+            transform="rotate(86 400 400)"
+          />
+          <path
+            className="spiral-home__coil spiral-home__coil-halo"
+            stroke={`url(#${flow})`}
+            d="M560 250c70 80 40 210-60 280-110 78-250 70-330 10-90-68-100-190-20-270 70-70 190-80 270-20 70 52 90 150 30 210"
+          />
+        </g>
         <g className="spiral-home__orbit-shell" fill="none" stroke={`url(#${glow})`}>
-          <ellipse className="spiral-home__ring" cx="400" cy="400" rx="292" ry="168" transform="rotate(-18 400 400)" />
-          <ellipse className="spiral-home__ring" cx="400" cy="400" rx="248" ry="142" transform="rotate(12 400 400)" />
-          <ellipse className="spiral-home__ring" cx="400" cy="400" rx="204" ry="118" transform="rotate(38 400 400)" />
-          <ellipse className="spiral-home__ring" cx="400" cy="400" rx="164" ry="94" transform="rotate(62 400 400)" />
-          <ellipse className="spiral-home__ring" cx="400" cy="400" rx="122" ry="70" transform="rotate(86 400 400)" />
+          <ellipse
+            className="spiral-home__ring"
+            cx="400"
+            cy="400"
+            rx="292"
+            ry="168"
+            transform="rotate(-18 400 400)"
+          />
+          <ellipse
+            className="spiral-home__ring"
+            cx="400"
+            cy="400"
+            rx="248"
+            ry="142"
+            transform="rotate(12 400 400)"
+          />
+          <ellipse
+            className="spiral-home__ring"
+            cx="400"
+            cy="400"
+            rx="204"
+            ry="118"
+            transform="rotate(38 400 400)"
+          />
+          <ellipse
+            className="spiral-home__ring"
+            cx="400"
+            cy="400"
+            rx="164"
+            ry="94"
+            transform="rotate(62 400 400)"
+          />
+          <ellipse
+            className="spiral-home__ring"
+            cx="400"
+            cy="400"
+            rx="122"
+            ry="70"
+            transform="rotate(86 400 400)"
+          />
           <path
             className="spiral-home__coil"
             stroke={`url(#${flow})`}
-            d="M548 268c48 62 38 168-28 238-72 76-188 92-268 42-78-48-98-148-46-220 46-64 138-88 208-52 58 30 86 102 54 162-28 54-96 76-148 48"
+            d="M560 250c70 80 40 210-60 280-110 78-250 70-330 10-90-68-100-190-20-270 70-70 190-80 270-20 70 52 90 150 30 210"
+          />
+          <path
+            className="spiral-home__spiral"
+            stroke={`url(#${flow})`}
+            d="M520 300c80 70 40 190-70 250-120 66-240 40-300-40-70-90-20-200 90-240 100-36 190 20 200 110 8 70-50 130-120 140-60 8-120-30-130-90"
           />
         </g>
         <g className="spiral-home__sparks">
@@ -47,6 +150,20 @@ export default function SpiralOrbitOverlay() {
           <circle className="spiral-home__spark" cx="232" cy="392" r="2.6" />
           <circle className="spiral-home__spark" cx="508" cy="512" r="2.2" />
         </g>
+        <g className="spiral-home__motes">
+          {RINGS.map((ring) => (
+            <g key={ring.rot} transform={`rotate(${ring.rot} 400 400)`}>
+              <circle className="spiral-home__mote" r="3.6" fill="#fffaf0">
+                <animateMotion
+                  dur={ring.dur}
+                  repeatCount="indefinite"
+                  rotate="auto"
+                  path={`M ${400 + ring.rx} 400 A ${ring.rx} ${ring.ry} 0 1 1 ${400 + ring.rx - 0.2} 400.2`}
+                />
+              </circle>
+            </g>
+          ))}
+        </g>
       </svg>
       <ul className="spiral-home__pins">
         {WAYPOINTS.map((point) => (
@@ -54,6 +171,7 @@ export default function SpiralOrbitOverlay() {
             <button type="button" className="spiral-home__pin-btn">
               <span className="spiral-home__pin-dot" />
               <span className="spiral-home__pin-label">{point.label}</span>
+              <span className="spiral-home__pin-land">降落这里</span>
             </button>
           </li>
         ))}

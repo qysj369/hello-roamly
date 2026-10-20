@@ -48,7 +48,7 @@ describe('HoloSearchPlanPosterPanel', () => {
   it('keeps wechat and douyin actions compact, and xhs without per-slide save', async () => {
     const user = userEvent.setup();
     const onClose = vi.fn();
-    const copyPlainText = vi.fn(async (_text: string) => true);
+    const copyPlainText = vi.fn(async () => true);
     render(
       <HoloSearchPlanPosterPanel
         plan={plan}
@@ -60,7 +60,7 @@ describe('HoloSearchPlanPosterPanel', () => {
     );
 
     expect(screen.getByRole('button', { name: '收起分享图' })).toBeTruthy();
-    expect(screen.getByText(/分享标题：上海4天丨一个人慢慢走的外滩路线/)).toBeTruthy();
+    expect(screen.getByText(/分享标题：上海4天｜一个人慢慢走的外滩路线/)).toBeTruthy();
     expect(screen.getByText(/种草短句：一个人沿着外滩慢慢逛/)).toBeTruthy();
     expect(screen.getByText(/话题标签：#上海旅行 #外滩 #街巷慢逛/)).toBeTruthy();
     expect(await screen.findByRole('button', { name: '复制图片' })).toBeTruthy();
@@ -74,7 +74,7 @@ describe('HoloSearchPlanPosterPanel', () => {
 
     await user.click(screen.getByRole('button', { name: '复制文案' }));
     expect(copyPlainText).toHaveBeenCalledWith(
-      expect.stringContaining('上海4天丨一个人慢慢走的外滩路线'),
+      expect.stringContaining('上海4天｜一个人慢慢走的外滩路线'),
     );
     expect(copyPlainText.mock.calls[0]?.[0]).toContain('#上海旅行 #外滩 #街巷慢逛');
     expect(await screen.findByText('复制成功')).toBeTruthy();

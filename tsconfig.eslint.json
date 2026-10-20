@@ -3,5 +3,12 @@
   "compilerOptions": {
     "noEmit": true
   },
-  "include": ["src", "server", "vite.config.ts", "vite-plugin-cesium-static.ts", "vitest.config.ts"]
+  "include": [
+    "src",
+    "server",
+    "vite.config.ts",
+    "vite.config.bare.ts",
+    "vite-plugin-cesium-static.ts",
+    "vitest.config.ts"
+  ]
 }

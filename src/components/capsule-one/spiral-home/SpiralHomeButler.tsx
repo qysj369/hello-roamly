@@ -12,6 +12,11 @@ const DEMO_MESSAGES = [
 ];
 
 const SpiralHomeButlerPanel = lazy(() => import('./SpiralHomeButlerPanel'));
+const DESKTOP_DOCK = '(min-width: 1024px)';
+
+function desktopDock() {
+  return typeof window !== 'undefined' && window.matchMedia(DESKTOP_DOCK).matches;
+}
 
 type SpiralHomeButlerProps = {
   onLaunch: () => void;
@@ -29,7 +34,8 @@ function SpiralButlerFab({ onOpen }: { onOpen: () => void }) {
 
 export default function SpiralHomeButler({ onLaunch }: SpiralHomeButlerProps) {
   const open = useTravelAgentStore((state) => state.open);
-  const [armed, setArmed] = useState(false);
+  const [dock, setDock] = useState(desktopDock);
+  const [armed, setArmed] = useState(desktopDock);
 
   useEffect(() => {
     const store = useTravelAgentStore.getState();
@@ -51,6 +57,26 @@ export default function SpiralHomeButler({ onLaunch }: SpiralHomeButlerProps) {
       useTravelAgentStore.getState().closeChat();
     };
   }, []);
+
+  useEffect(() => {
+    const media = window.matchMedia(DESKTOP_DOCK);
+    const sync = () => {
+      const next = media.matches;
+      setDock(next);
+      if (next) {
+        setArmed(true);
+        useTravelAgentStore.getState().openChat();
+      }
+    };
+    sync();
+    media.addEventListener('change', sync);
+    return () => media.removeEventListener('change', sync);
+  }, []);
+
+  useEffect(() => {
+    document.documentElement.classList.toggle('spiral-butler-dock', dock);
+    return () => document.documentElement.classList.remove('spiral-butler-dock');
+  }, [dock]);
 
   useEffect(() => {
     if (open) setArmed(true);

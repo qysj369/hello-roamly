@@ -152,12 +152,23 @@ function planShareBlob(plan: SearchStructuredPlan): string {
   ].join(' ');
 }
 
-function primarySharePlace(plan: SearchStructuredPlan): string {
+const SUNSET_SPOT = /八大关|日落|落日|夕阳|晚霞/u;
+const SHORE_SPOT = /栈桥|金沙滩|海边|沙滩|滨海|海滨|海湾|西湖|湖畔|湖边|大明湖/u;
+
+function concreteSharePlaces(plan: SearchStructuredPlan): string[] {
   const city = searchPlanShareCityName(plan);
-  const name = plan.dayList
+  return plan.dayList
     .flatMap((day) => day.spots)
     .map((spot) => spot.name.trim())
-    .find((spotName) => Boolean(spotName) && spotName !== city && !/^第.+天/u.test(spotName));
+    .filter((spotName) => Boolean(spotName) && spotName !== city && !/^第.+天/u.test(spotName));
+}
+
+function primarySharePlace(plan: SearchStructuredPlan): string {
+  const city = searchPlanShareCityName(plan);
+  const names = concreteSharePlaces(plan);
+  const sunset = names.find((spotName) => SUNSET_SPOT.test(spotName));
+  const shore = names.find((spotName) => SHORE_SPOT.test(spotName));
+  const name = sunset || shore || names[0];
   if (name) return name.slice(0, 8);
   const flavor = searchPlanRouteFlavor(plan);
   return flavor && flavor !== '街巷' ? flavor : city;
@@ -279,7 +290,7 @@ export function buildSearchPlanWechatPlatformCopy(
       const hook = wechatHook(focus, place, flags.sea);
       const mood = wechatMood(focus, flags);
       return {
-        title: `${city}${days}天丨${lead}的${place}路线`,
+        title: `${city}${days}天｜${lead}的${place}路线`,
         hook,
         hashtags: uniqueTags([`${city}旅行`, place, mood]),
       };

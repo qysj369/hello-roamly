@@ -6,6 +6,7 @@ import SpiralHomeChrome, {
   SPIRAL_HOME_CTA,
   SPIRAL_HOME_SUBTITLE,
   SPIRAL_HOME_TITLE,
+  SPIRAL_HOME_VERSE,
 } from '@/components/capsule-one/spiral-home/SpiralHomeChrome';
 
 describe('SpiralHomeChrome', () => {
@@ -19,6 +20,7 @@ describe('SpiralHomeChrome', () => {
     );
     expect(screen.getByText(SPIRAL_HOME_TITLE)).toBeTruthy();
     expect(screen.getByText(SPIRAL_HOME_SUBTITLE)).toBeTruthy();
+    expect(screen.getByText(SPIRAL_HOME_VERSE)).toBeTruthy();
     expect(screen.getByRole('link', { name: '首页' })).toBeTruthy();
     expect(screen.getByRole('link', { name: '探索品牌' })).toBeTruthy();
     expect(screen.getByRole('link', { name: '蜗牛旅行' })).toBeTruthy();

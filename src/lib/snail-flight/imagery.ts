@@ -34,7 +34,7 @@ export function listSnailFlightImagerySources(): SnailFlightImagerySource[] {
   return [
     {
       kind: 'amap',
-      url: `${base}cesium-sat/amap/{z}/{x}/{y}`,
+      url: `${base}cesium-sat/amap/r2/{z}/{x}/{y}`,
       credit: '卫星影像',
     },
   ];

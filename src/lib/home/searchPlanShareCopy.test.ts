@@ -85,7 +85,7 @@ describe('searchPlanShareCopy', () => {
     const wechat = buildSearchPlanWechatPlatformCopy(qingdao);
     const douyin = buildSearchPlanDouyinPlatformCopy(qingdao);
     expect(wechat).toEqual({
-      title: '青岛3天丨和情侣错峰看日落的八大关路线',
+      title: '青岛3天｜和情侣错峰看日落的八大关路线',
       hook: '沿着海边慢慢逛，在八大关等待一场橘色落日，人少安静，适合两个人慢悠悠放空。',
       hashtags: ['青岛旅行', '八大关', '海边日落'],
     });
@@ -95,8 +95,47 @@ describe('searchPlanShareCopy', () => {
       hashtags: ['青岛旅游', '八大关日落', '山东旅游'],
     });
     expect(formatSearchPlanPlatformClipboard(wechat)).toBe(
-      '青岛3天丨和情侣错峰看日落的八大关路线\n沿着海边慢慢逛，在八大关等待一场橘色落日，人少安静，适合两个人慢悠悠放空。\n#青岛旅行 #八大关 #海边日落',
+      '青岛3天｜和情侣错峰看日落的八大关路线\n沿着海边慢慢逛，在八大关等待一场橘色落日，人少安静，适合两个人慢悠悠放空。\n#青岛旅行 #八大关 #海边日落',
     );
     expect(wechat.title).not.toBe(douyin.title);
+  });
+
+  it('prefers a seaside sunset spot over an earlier indoor stop', () => {
+    const qingdao: SearchStructuredPlan = {
+      baseInfo: {
+        startCity: '济南',
+        targetCity: '青岛',
+        days: 3,
+        peopleType: '情侣',
+        budget: null,
+        theme: null,
+      },
+      budgetList: [],
+      globalTips: [],
+      dayList: [
+        {
+          day: 1,
+          title: '雨天室内',
+          hotelArea: '',
+          tips: '雨天少走路',
+          traffic: [],
+          spots: [
+            { name: '青岛啤酒博物馆', intro: '室内' },
+            { name: '八大关', intro: '海边日落' },
+            { name: '栈桥', intro: '看海' },
+          ],
+          foods: [],
+        },
+      ],
+    };
+    const wechat = buildSearchPlanWechatPlatformCopy(qingdao);
+    const douyin = buildSearchPlanDouyinPlatformCopy(qingdao);
+    expect(wechat.title).toBe('青岛3天｜和情侣错峰看日落的八大关路线');
+    expect(wechat.hook).toContain('在八大关等待一场橘色落日');
+    expect(wechat.hashtags).toEqual(['青岛旅行', '八大关', '海边日落']);
+    expect(douyin.title).toBe('青岛小众看海路线！八大关落日真的美哭✨');
+    expect(douyin.hashtags).toEqual(['青岛旅游', '八大关日落', '山东旅游']);
+    expect(wechat.title).not.toContain('博物馆');
+    expect(douyin.title).not.toContain('博物馆');
   });
 });

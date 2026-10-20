@@ -18,9 +18,18 @@ export default function SpiralHomeButlerPanel({ onLaunch }: SpiralHomeButlerPane
         </div>
       }
       extraFooter={
-        <button type="button" className="spiral-home__cta spiral-home__cta--panel" onClick={onLaunch}>
-          {SPIRAL_HOME_CTA.replace(' >', '')}
-        </button>
+        <div className="spiral-home__dock-actions">
+          <button type="button" className="spiral-home__place" onClick={onLaunch}>
+            选择地点
+          </button>
+          <button
+            type="button"
+            className="spiral-home__cta spiral-home__cta--panel"
+            onClick={onLaunch}
+          >
+            {SPIRAL_HOME_CTA.replace(' >', '')}
+          </button>
+        </div>
       }
     />
   );

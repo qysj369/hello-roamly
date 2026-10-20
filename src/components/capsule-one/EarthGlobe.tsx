@@ -1,3 +1,4 @@
+/* eslint-disable react/no-unknown-property -- React Three Fiber mesh props */
 import { useTexture } from '@react-three/drei';
 import { useFrame, type ThreeEvent } from '@react-three/fiber';
 import { Suspense, useEffect, useLayoutEffect, useRef } from 'react';
@@ -17,6 +18,7 @@ import EarthHologramShell from '@/components/capsule-one/EarthHologramShell';
 import EarthLockBeam from '@/components/capsule-one/EarthLockBeam';
 import EarthLockedPulse from '@/components/capsule-one/EarthLockedPulse';
 import EarthLockedReticle from '@/components/capsule-one/EarthLockedReticle';
+import EarthInkWashOverlay from '@/components/capsule-one/EarthInkWashOverlay';
 import EarthRimGlow from '@/components/capsule-one/EarthRimGlow';
 import EarthScanBand from '@/components/capsule-one/EarthScanBand';
 import EarthOrbitSatellites from '@/components/capsule-one/EarthOrbitSatellites';
@@ -27,7 +29,7 @@ import { handleEarthClick } from '@/lib/capsule/blindBox';
 import { useCapsuleOneStore } from '@/stores/capsuleOne/store';
 
 const EARTH_TEXTURES = {
-  color: '/textures/earth_atmos_2048.jpg',
+  color: '/textures/earth_daymap_2048.jpg',
   specular: '/textures/earth_specular_2048.jpg',
   normal: '/textures/earth_normal_2048.jpg',
 } as const;
@@ -156,6 +158,22 @@ function EarthGlobeCore({
 }: EarthGlobeCoreProps) {
   const isInk = variant === 'ink';
   const isDaylight = variant === 'daylight' || isInk;
+  const earthMaterial = {
+    bumpScale: isInk ? 0.04 : 0.08,
+    roughness: isInk ? 0.92 : 0.78,
+    metalness: isInk ? 0 : 0.04,
+    color: (isInk ? '#42505c' : '#ffffff') as string | [number, number, number],
+    emissive: isInk ? '#1a2430' : '#0c1e2a',
+    emissiveIntensity: 0.1,
+  };
+  if (variant === 'daylight') {
+    earthMaterial.bumpScale = 0.05;
+    earthMaterial.roughness = 0.68;
+    earthMaterial.metalness = 0.012;
+    earthMaterial.color = [1.48, 1.58, 1.8];
+    earthMaterial.emissive = '#7fb4cc';
+    earthMaterial.emissiveIntensity = 0.2;
+  }
   const groupRef = useRef<THREE.Group>(null);
   const wireInnerRef = useRef<THREE.Mesh>(null);
   const wireOuterRef = useRef<THREE.Mesh>(null);
@@ -303,12 +321,12 @@ function EarthGlobeCore({
         <meshStandardMaterial
           map={colorMap}
           bumpMap={bumpMap}
-          bumpScale={isInk ? 0.04 : isDaylight ? 0.05 : 0.08}
-          roughness={isInk ? 0.92 : isDaylight ? 0.68 : 0.78}
-          metalness={isInk ? 0 : isDaylight ? 0.012 : 0.04}
-          color={isInk ? '#42505c' : isDaylight ? [1.2, 1.32, 1.58] : '#ffffff'}
-          emissive={isInk ? '#1a2430' : isDaylight ? '#7fb4cc' : '#0c1e2a'}
-          emissiveIntensity={isInk ? 0.1 : isDaylight ? 0.13 : 0.1}
+          bumpScale={earthMaterial.bumpScale}
+          roughness={earthMaterial.roughness}
+          metalness={earthMaterial.metalness}
+          color={earthMaterial.color}
+          emissive={earthMaterial.emissive}
+          emissiveIntensity={earthMaterial.emissiveIntensity}
           envMapIntensity={isDaylight ? 0 : 1}
           transparent={isInk}
           opacity={1}
@@ -318,7 +336,8 @@ function EarthGlobeCore({
       {!isDaylight ? <EarthHologramReveal progressRef={entryProgressRef} /> : null}
       {!isDaylight ? <EarthEntryBurst progressRef={entryProgressRef} /> : null}
       {!isDaylight ? <EarthHologramShell colorMap={colorMap} specMap={specMap} /> : null}
-      <EarthRimGlow variant="ink" />
+      <EarthRimGlow variant={variant === 'daylight' ? 'wash' : 'ink'} />
+      {variant === 'daylight' ? <EarthInkWashOverlay subtle /> : null}
       {!isDaylight && !isInk ? <EarthScanBand /> : null}
       {!isDaylight && !isInk ? <EarthDataStream /> : null}
       <EarthClickShockwave />
@@ -349,7 +368,7 @@ function EarthGlobeFallback({
   autoRotate = false,
   onCitySelect,
   interactionMode = 'blindbox',
-}: EarthGlobeCoreProps) {
+}: Omit<EarthGlobeCoreProps, 'variant'>) {
   const groupRef = useRef<THREE.Group>(null);
   const addRipple = useCapsuleOneStore((state) => state.addRipple);
 

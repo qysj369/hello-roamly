@@ -58,12 +58,12 @@ module.exports = {
       },
     },
     {
-      files: ['vite.config.ts', 'vitest.config.ts'],
+      files: ['vite.config.ts', 'vite.config.bare.ts', 'vitest.config.ts'],
       rules: {
         '@typescript-eslint/naming-convention': 'off',
         'import/no-extraneous-dependencies': [
           'error',
-          { devDependencies: ['vite.config.ts', 'vitest.config.ts'] },
+          { devDependencies: ['vite.config.ts', 'vite.config.bare.ts', 'vitest.config.ts'] },
         ],
       },
     },

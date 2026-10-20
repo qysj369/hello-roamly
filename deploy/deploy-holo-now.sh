@@ -18,8 +18,8 @@ fi
 TAR=/root/site-motion.tar.gz
 STAMP=$(date +%Y%m%d%H%M%S)
 LEGACY_ZIP="/root/site-legacy-backup-${STAMP}.zip"
-EXPECTED_JS="${EXPECTED_JS:-index-kJQIG0r_.js}"
-EXPECTED_CSS="${EXPECTED_CSS:-assets/style-DWqPGwJx.css}"
+EXPECTED_JS="${EXPECTED_JS:-index-DgzcesJv.js}"
+EXPECTED_CSS="${EXPECTED_CSS:-assets/style-9bdqaRRh.css}"
 
 echo "========== Holo deploy (keep legacy) =========="
 echo "ZIP=$ZIP"

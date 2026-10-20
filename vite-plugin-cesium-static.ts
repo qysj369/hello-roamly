@@ -28,7 +28,9 @@ function isInside(root: string, candidate: string): boolean {
 }
 
 function parseAmapTilePath(urlPath: string): { z: number; x: number; y: number } | null {
-  const match = /^\/cesium-sat\/amap\/(\d+)\/(\d+)\/(\d+)(?:\.(?:jpg|jpeg|png))?$/.exec(urlPath);
+  const match = /^\/cesium-sat\/amap\/(?:r2\/)?(\d+)\/(\d+)\/(\d+)(?:\.(?:jpg|jpeg|png))?$/.exec(
+    urlPath,
+  );
   if (!match) return null;
   const z = Number(match[1]);
   const x = Number(match[2]);
@@ -50,7 +52,11 @@ function parseAmapTilePath(urlPath: string): { z: number; x: number; y: number }
   return { z, x, y };
 }
 
-function proxyAmapSatelliteTile(req: IncomingMessage, res: ServerResponse, next: Connect.NextFunction) {
+function proxyAmapSatelliteTile(
+  req: IncomingMessage,
+  res: ServerResponse,
+  next: Connect.NextFunction,
+) {
   const urlPath = req.url?.split('?')[0] ?? '';
   const tile = parseAmapTilePath(urlPath);
   if (!tile) {
@@ -92,18 +98,27 @@ function attachCesiumDevMiddleware(server: { middlewares: Connect.Server }, cesi
   server.middlewares.use(proxyAmapSatelliteTile);
   server.middlewares.use((req, res, next) => {
     const url = req.url?.split('?')[0] ?? '';
-    if (!url.startsWith('/cesium/')) {
+    let prefix = '';
+    if (url.startsWith('/cesium/r2/')) {
+      prefix = '/cesium/r2/';
+    } else if (url.startsWith('/cesium/')) {
+      prefix = '/cesium/';
+    }
+    if (!prefix) {
       next();
       return;
     }
-    const relative = decodeURIComponent(url.slice('/cesium/'.length));
+    const relative = decodeURIComponent(url.slice(prefix.length));
     const filePath = path.resolve(cesiumBuild, relative);
     if (!isInside(cesiumBuild, filePath) || !existsSync(filePath) || !statSync(filePath).isFile()) {
       res.statusCode = 404;
       res.end('cesium asset missing');
       return;
     }
-    res.setHeader('Content-Type', MIME[path.extname(filePath).toLowerCase()] || 'application/octet-stream');
+    res.setHeader(
+      'Content-Type',
+      MIME[path.extname(filePath).toLowerCase()] || 'application/octet-stream',
+    );
     res.setHeader('Cache-Control', 'public, max-age=86400');
     createReadStream(filePath).pipe(res);
   });
@@ -127,7 +142,7 @@ export function cesiumStaticPlugin(rootDir: string): Plugin {
         return;
       }
       const outDir = options.dir ?? path.resolve(rootDir, 'dist');
-      await fs.cp(cesiumBuild, path.join(outDir, 'cesium'), { recursive: true });
+      await fs.cp(cesiumBuild, path.join(outDir, 'cesium', 'r2'), { recursive: true });
     },
   };
 }

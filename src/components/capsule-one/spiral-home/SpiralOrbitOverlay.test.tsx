@@ -7,6 +7,7 @@ describe('SpiralOrbitOverlay', () => {
     const { container } = render(<SpiralOrbitOverlay />);
     expect(container.querySelector('.spiral-home__coil')).toBeTruthy();
     expect(container.querySelectorAll('.spiral-home__spark')).toHaveLength(4);
+    expect(container.querySelectorAll('.spiral-home__mote')).toHaveLength(5);
     expect(screen.getByRole('button', { name: '淄博' })).toBeTruthy();
     expect(screen.getByRole('button', { name: '潍坊' })).toBeTruthy();
     expect(screen.getByRole('button', { name: '济南历下' })).toBeTruthy();

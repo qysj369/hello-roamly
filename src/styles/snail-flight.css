@@ -34,46 +34,6 @@
   display: none !important;
 }
 
-.snail-flight__cockpit {
-  pointer-events: none;
-  position: absolute;
-  inset: 0;
-  z-index: 2;
-  background:
-    linear-gradient(
-      90deg,
-      rgba(10, 12, 14, 0.58) 0%,
-      transparent 8%,
-      transparent 92%,
-      rgba(10, 12, 14, 0.58) 100%
-    ),
-    linear-gradient(180deg, rgba(10, 12, 14, 0.48) 0%, transparent 13%, transparent 100%);
-  box-shadow:
-    inset 26px 0 32px rgba(6, 8, 10, 0.32),
-    inset -26px 0 32px rgba(6, 8, 10, 0.32),
-    inset 0 20px 26px rgba(6, 8, 10, 0.26);
-}
-
-.snail-flight__cockpit::before {
-  content: '';
-  position: absolute;
-  left: 0;
-  right: 0;
-  top: 0;
-  height: 16px;
-  background: linear-gradient(180deg, rgba(16, 18, 20, 0.7), rgba(16, 18, 20, 0.08));
-}
-
-.snail-flight__cockpit::after {
-  content: '';
-  position: absolute;
-  left: 7%;
-  right: 7%;
-  top: 9%;
-  height: 1px;
-  background: rgba(220, 226, 222, 0.18);
-}
-
 .snail-flight__fade {
   pointer-events: none;
   position: absolute;

@@ -45,7 +45,9 @@ export default function CapsuleOneHomePage() {
   }, [booking]);
 
   const openBooking = () => {
-    useTravelAgentStore.getState().closeChat();
+    if (!window.matchMedia('(min-width: 1024px)').matches) {
+      useTravelAgentStore.getState().closeChat();
+    }
     setBooking(true);
   };
   const openButler = () => useTravelAgentStore.getState().openChat();
@@ -55,12 +57,7 @@ export default function CapsuleOneHomePage() {
       <EarthFlyToProvider>
         <div className="capsule-one-home capsule-one-home--cockpit spiral-home">
           <h1 className="sr-only">蜗牛旅行 HelloRoamly — 身未动，心已远</h1>
-          <CapsuleOneScene
-            onCitySelect={() => undefined}
-            backdrop="#081428"
-            autoRotate
-            lowMemory
-          />
+          <CapsuleOneScene onCitySelect={() => undefined} backdrop="#081428" autoRotate lowMemory />
           <SpiralHomeAtmosphere />
           <SpiralOrbitOverlay />
           <SpiralHomeChrome

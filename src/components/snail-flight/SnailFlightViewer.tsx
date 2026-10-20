@@ -37,6 +37,14 @@ type Ambience = {
   stop: () => void;
 };
 
+function moveMeters(lon: number, lat: number, heading: number, meters: number) {
+  const east = Math.sin(heading) * meters;
+  const north = Math.cos(heading) * meters;
+  const dLat = north / 111_320;
+  const dLon = east / (111_320 * Math.cos((lat * Math.PI) / 180) || 1);
+  return { lon: lon + dLon, lat: lat + dLat };
+}
+
 function createAmbience(): Ambience | null {
   const AudioCtx =
     window.AudioContext ||
@@ -230,8 +238,16 @@ export default function SnailFlightViewer({
 
     const boot = async () => {
       try {
+        if ('serviceWorker' in navigator) {
+          const registrations = await navigator.serviceWorker.getRegistrations();
+          await Promise.all(registrations.map((registration) => registration.unregister()));
+        }
+        if ('caches' in window) {
+          const keys = await caches.keys();
+          await Promise.all(keys.map((key) => caches.delete(key)));
+        }
         (window as Window & { CESIUM_BASE_URL?: string }).CESIUM_BASE_URL =
-          `${import.meta.env.BASE_URL}cesium/`;
+          `${import.meta.env.BASE_URL}cesium/r2/`;
         const Cesium = await import('cesium');
         await import('cesium/Build/Cesium/Widgets/widgets.css');
         if (cancelled || !hostRef.current) return;
@@ -258,8 +274,9 @@ export default function SnailFlightViewer({
           return;
         }
         nextViewer.resolutionScale = snailFlightResolutionScale(quality);
-        nextViewer.scene.globe.maximumScreenSpaceError = quality === 'low' ? 2 : 1;
-        nextViewer.scene.globe.tileCacheSize = quality === 'low' ? 80 : 140;
+        nextViewer.scene.globe.maximumScreenSpaceError = quality === 'low' ? 4 : 2;
+        nextViewer.scene.globe.loadingDescendantLimit = 1;
+        nextViewer.scene.globe.tileCacheSize = quality === 'low' ? 160 : 400;
         nextViewer.scene.globe.preloadAncestors = true;
         nextViewer.scene.globe.preloadSiblings = true;
         nextViewer.scene.globe.enableLighting = false;
@@ -271,18 +288,19 @@ export default function SnailFlightViewer({
           nextViewer.scene.skyBox.show = false;
         }
         nextViewer.scene.globe.showGroundAtmosphere = false;
+        nextViewer.scene.globe.baseColor = Cesium.Color.fromCssColorString('#7d9a90');
         nextViewer.scene.backgroundColor = Cesium.Color.fromCssColorString('#1a2420');
+        nextViewer.scene.logarithmicDepthBuffer = true;
         if (nextViewer.scene.moon) {
           nextViewer.scene.moon.show = false;
         }
         nextViewer.shadows = false;
-        nextViewer.scene.logarithmicDepthBuffer = true;
         const frustum = nextViewer.camera.frustum as { near?: number; far?: number; fov?: number };
         if (typeof frustum.near === 'number') {
-          frustum.near = 1;
+          frustum.near = 20;
         }
         if (typeof frustum.far === 'number') {
-          frustum.far = 8_000_000;
+          frustum.far = 600_000;
         }
         if (typeof frustum.fov === 'number') {
           frustum.fov = (52 * Math.PI) / 180;
@@ -321,6 +339,45 @@ export default function SnailFlightViewer({
           ambienceRef.current = createAmbience();
         }
 
+        const leadProvider = nextViewer.imageryLayers.get(0)?.imageryProvider;
+        const prefetched = new Set<string>();
+        const prefetchQueue: { x: number; y: number; level: number }[] = [];
+        let lastEnqueue = 0;
+        const enqueueLead = (lon: number, lat: number, heading: number, nowMs: number) => {
+          if (!leadProvider || nowMs - lastEnqueue < 450 || prefetched.size > 12000) return;
+          lastEnqueue = nowMs;
+          const level = Math.min(maxLevel, leadProvider.maximumLevel || maxLevel);
+          const levels = quality === 'low' ? [level] : [Math.max(level - 1, 0), level];
+          const scheme = leadProvider.tilingScheme;
+          levels.forEach((tileLevel) => {
+            [2600, 4000, 5400].forEach((dist) => {
+              [-1400, -700, 0, 700, 1400].forEach((side) => {
+                const ahead = moveMeters(lon, lat, heading, dist);
+                const spot =
+                  side === 0
+                    ? ahead
+                    : moveMeters(ahead.lon, ahead.lat, heading + Math.PI / 2, side);
+                const xy = scheme.positionToTileXY(
+                  Cesium.Cartographic.fromDegrees(spot.lon, spot.lat),
+                  tileLevel,
+                );
+                if (!xy) return;
+                const key = `${tileLevel}/${xy.x}/${xy.y}`;
+                if (prefetched.has(key)) return;
+                prefetched.add(key);
+                prefetchQueue.push({ x: xy.x, y: xy.y, level: tileLevel });
+              });
+            });
+          });
+          if (prefetchQueue.length > 40) prefetchQueue.splice(0, prefetchQueue.length - 40);
+        };
+        const drainLead = () => {
+          const job = prefetchQueue.shift();
+          if (!job) return;
+          const pending = leadProvider?.requestImage(job.x, job.y, job.level);
+          pending?.catch(() => undefined);
+        };
+
         firedCuesRef.current = new Set();
         const applyProgress = (t: number) => {
           const clamped = Math.min(1, Math.max(0, t));
@@ -345,19 +402,26 @@ export default function SnailFlightViewer({
           const pose = sampleFlightPose(route, t);
           const heading = pose.heading + lookRef.current.heading;
           const shifted = offsetLonLat(pose.lon, pose.lat, heading, lookRef.current.lateral);
-          const pitch = Math.min(-0.72, Math.max(-1.05, -0.88 + lookRef.current.pitch));
+          const pitch = Math.min(-0.98, Math.max(-1.22, -1.08 + lookRef.current.pitch));
           const aheadM = pose.height / Math.tan(-pitch);
           const east = Math.sin(heading) * aheadM;
           const north = Math.cos(heading) * aheadM;
           const dLat = north / 111_320;
           const dLon = east / (111_320 * Math.cos((shifted.lat * Math.PI) / 180) || 1);
+          const range = Math.hypot(pose.height, aheadM);
           viewer.camera.lookAt(
             Cesium.Cartesian3.fromDegrees(shifted.lon + dLon, shifted.lat + dLat, 0),
-            new Cesium.HeadingPitchRange(heading, pitch, Math.hypot(pose.height, aheadM)),
+            new Cesium.HeadingPitchRange(heading, pitch, range),
           );
-          if (typeof viewer.camera.frustum.near === 'number') {
-            viewer.camera.frustum.near = 0.5;
+          const frame = viewer.camera.frustum;
+          if (typeof frame.near === 'number') {
+            frame.near = Math.min(80, Math.max(20, pose.height * 0.02));
           }
+          if (typeof frame.far === 'number') {
+            frame.far = Math.max(range * 40, 180_000);
+          }
+          enqueueLead(shifted.lon, shifted.lat, heading, now);
+          drainLead();
           applyProgress(t);
           const cue = captionCueToFire(t, firedCuesRef.current);
           if (cue && shouldHoldWaypointCaption(cue.id)) {
@@ -375,10 +439,13 @@ export default function SnailFlightViewer({
             }
             tryFinishRef.current();
             if (!landedRef.current && !landSafetyTimer) {
-              landSafetyTimer = window.setTimeout(() => {
-                arrivalCaptionDoneRef.current = true;
-                tryFinishRef.current();
-              }, captionHoldMs(fast) + SNAIL_FLIGHT_CAPTION_FADE_MS * 2);
+              landSafetyTimer = window.setTimeout(
+                () => {
+                  arrivalCaptionDoneRef.current = true;
+                  tryFinishRef.current();
+                },
+                captionHoldMs(fast) + SNAIL_FLIGHT_CAPTION_FADE_MS * 2,
+              );
             }
             return;
           }
@@ -411,7 +478,6 @@ export default function SnailFlightViewer({
   return (
     <div className="snail-flight" aria-label="蜗牛号低空观光">
       <div ref={hostRef} className="snail-flight__canvas" />
-      <div className="snail-flight__cockpit" aria-hidden="true" />
       <div className={fading ? 'snail-flight__fade is-on' : 'snail-flight__fade'} />
       {error ? <p className="snail-flight__status">{error}。可退出后重试。</p> : null}
       <SnailFlightHud

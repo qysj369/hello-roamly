@@ -188,6 +188,10 @@ export default function TravelAgentHost({
       noteLocal(trimmed, `${hit.message}${restyle}`);
       return;
     }
+    if (hit) {
+      noteLocal(trimmed, hit.message);
+      return;
+    }
     send(trimmed).catch(() => undefined);
   };
 
@@ -233,8 +237,7 @@ export default function TravelAgentHost({
     .filter(Boolean)
     .join(' ');
   const chips = (() => {
-    if (spiralMode) return FLIGHT_QUICK_CHIPS;
-    if (flightOnly) return [...FLIGHT_QUICK_CHIPS, ...SNAIL_FLIGHT_SCENE_CHIPS];
+    if (spiralMode || flightOnly) return [...FLIGHT_QUICK_CHIPS, ...SNAIL_FLIGHT_SCENE_CHIPS];
     return PLAN_QUICK_CHIPS;
   })();
   const chipsNeedPlan = !spiralMode && !flightOnly;

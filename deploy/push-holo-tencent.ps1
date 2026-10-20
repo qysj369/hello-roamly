@@ -13,7 +13,8 @@ Set-Location $root
 $env:VITE_APP_MODE = 'production'
 $env:VITE_SITE_URL = 'https://helloroamly.com'
 $env:VITE_MAP_DEV_DEMO = '0'
-$env:VITE_HOME_LAYOUT = 'holo'
+$env:VITE_HOME_LAYOUT = ''
+$env:VITE_HOME_LEGACY = ''
 
 if (-not $SkipBuild) {
   Write-Host '[1/3] Building holo production bundle...' -ForegroundColor Cyan

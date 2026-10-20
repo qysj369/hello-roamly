@@ -7,6 +7,8 @@ import '@/styles/snail-brand-logo.css';
 
 export const SPIRAL_HOME_TITLE = '身未动，心已远';
 export const SPIRAL_HOME_SUBTITLE = '低空飞越真实大地，让风景灵感直接生成行程';
+export const SPIRAL_HOME_FLIGHT = '航线，由你规划 · 降落，即抵达一个新世界';
+export const SPIRAL_HOME_VERSE = '让风声，唤醒山河';
 export const SPIRAL_HOME_CTA = '开启低空漫游 >';
 
 export const SPIRAL_HOME_NAV = [
@@ -55,7 +57,12 @@ export default function SpiralHomeChrome({
         </nav>
 
         <div className="spiral-home__tools">
-          <button type="button" className="spiral-home__search" aria-label="搜索" onClick={onSearch}>
+          <button
+            type="button"
+            className="spiral-home__search"
+            aria-label="搜索"
+            onClick={onSearch}
+          >
             <Search size={16} strokeWidth={2.2} />
           </button>
           <button type="button" className="spiral-home__soms" onClick={onSearch}>
@@ -113,6 +120,8 @@ export default function SpiralHomeChrome({
       <section className="spiral-home__hero">
         <h1 className="spiral-home__title">{SPIRAL_HOME_TITLE}</h1>
         <p className="spiral-home__subtitle">{SPIRAL_HOME_SUBTITLE}</p>
+        <p className="spiral-home__flight">{SPIRAL_HOME_FLIGHT}</p>
+        <p className="spiral-home__verse">{SPIRAL_HOME_VERSE}</p>
         <button type="button" className="spiral-home__cta" onClick={onLaunch}>
           {SPIRAL_HOME_CTA}
         </button>

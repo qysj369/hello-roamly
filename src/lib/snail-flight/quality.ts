@@ -27,7 +27,7 @@ export function detectSnailFlightQuality(): SnailFlightQuality {
 }
 
 export function snailFlightImageryMaxLevel(quality: SnailFlightQuality): number {
-  return quality === 'low' ? 16 : 18;
+  return quality === 'low' ? 15 : 16;
 }
 
 export function snailFlightResolutionScale(quality: SnailFlightQuality): number {

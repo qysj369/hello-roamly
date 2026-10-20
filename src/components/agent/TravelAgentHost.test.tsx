@@ -114,8 +114,13 @@ describe('TravelAgentHost embed drawer', () => {
     expect(screen.getByRole('button', { name: '人文主版本' })).toBeTruthy();
     expect(screen.getByRole('button', { name: '极简诗意' })).toBeTruthy();
     expect(screen.getByRole('button', { name: '科普叙事' })).toBeTruthy();
+    expect(screen.getByRole('button', { name: '介绍眼前这片区域' })).toBeTruthy();
+    expect(screen.getByRole('button', { name: '前方还有哪些风景' })).toBeTruthy();
+    expect(screen.getByRole('button', { name: '帮我生成目的地行程' })).toBeTruthy();
     expect(screen.queryByRole('button', { name: '它的劣势有哪些？' })).toBeNull();
-    expect(screen.queryByRole('button', { name: '介绍眼前这片区域' })).toBeNull();
+    expect(screen.queryByRole('button', { name: '如何优化图文旅行攻略的内容？' })).toBeNull();
+    expect(screen.queryByRole('button', { name: '如何进一步提升用户体验？' })).toBeNull();
+    expect(screen.queryByRole('button', { name: '还有哪些方面可以改进？' })).toBeNull();
     expect(screen.getByRole('textbox', { name: '对管家说' })).toBeTruthy();
     expect(screen.getAllByRole('button', { name: '确认行程，生成图文资产包' })).toHaveLength(1);
     expect(screen.getByRole('button', { name: '发送' })).toBeDisabled();
@@ -142,10 +147,32 @@ describe('TravelAgentHost embed drawer', () => {
     await waitFor(() => {
       expect(screen.getByRole('button', { name: '极简诗意' })).toHaveClass('is-active');
     });
+    await user.click(screen.getByRole('button', { name: '科普叙事' }));
+    expect(screen.getByRole('button', { name: '科普叙事' })).toHaveClass('is-flash');
+    await waitFor(() => {
+      expect(screen.getByRole('button', { name: '科普叙事' })).toHaveClass('is-active');
+      expect(
+        screen.getByText(/已切换至【科普轻叙事版】，为你带来更丰富的地理与人文解说/),
+      ).toBeTruthy();
+    });
     act(() => {
       useTravelAgentStore.setState({ busy: true });
     });
     expect(screen.getByText('正在为你规划行程…')).toBeTruthy();
+  });
+
+  it('fills the spiral composer then sends a scene card without opening a second asset button', async () => {
+    const user = userEvent.setup();
+    render(<TravelAgentHost layout="fab" variant="spiral" />);
+    const input = screen.getByRole('textbox', { name: '对管家说' });
+    await user.click(screen.getByRole('button', { name: '介绍眼前这片区域' }));
+    expect(input).toHaveValue('介绍眼前这片区域');
+    await waitFor(() => {
+      expect(screen.getByText(/趵突泉与大明湖/)).toBeTruthy();
+      expect(input).toHaveValue('');
+    });
+    expect(screen.queryByText('正在为你规划行程…')).toBeNull();
+    expect(screen.getAllByRole('button', { name: '确认行程，生成图文资产包' })).toHaveLength(1);
   });
 
   it('fills the flight composer then sends a scene card', async () => {

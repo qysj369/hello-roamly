@@ -9,7 +9,7 @@ beforeEach(() => {
   Object.defineProperty(window, 'matchMedia', {
     writable: true,
     value: (query: string) => ({
-      matches: true,
+      matches: !String(query).includes('min-width'),
       media: query,
       addEventListener: vi.fn(),
       removeEventListener: vi.fn(),
@@ -54,5 +54,28 @@ describe('spiral home butler and booking dialog', () => {
     expect(screen.getByText('蜗牛管家已就位')).toBeTruthy();
     await user.click(screen.getByRole('button', { name: '极简诗意' }));
     expect(await screen.findByText(/已切换至【极简诗意版】/)).toBeTruthy();
+  });
+
+  it('keeps the butler panel docked on a wide screen', async () => {
+    Object.defineProperty(window, 'matchMedia', {
+      writable: true,
+      value: (query: string) => ({
+        matches: true,
+        media: query,
+        addEventListener: vi.fn(),
+        removeEventListener: vi.fn(),
+      }),
+    });
+    render(
+      <div className="spiral-home">
+        <SpiralHomeButler onLaunch={vi.fn()} />
+      </div>,
+    );
+    expect(await screen.findByText('蜗牛管家已就位')).toBeTruthy();
+    expect(screen.getByRole('button', { name: '选择地点' })).toBeTruthy();
+    expect(screen.getByRole('button', { name: '人文主版本' })).toBeTruthy();
+    expect(screen.getByRole('button', { name: '极简诗意' })).toBeTruthy();
+    expect(screen.getByRole('button', { name: '科普叙事' })).toBeTruthy();
+    expect(document.documentElement.classList.contains('spiral-butler-dock')).toBe(true);
   });
 });

@@ -14,6 +14,6 @@ describe('snail-flight imagery', () => {
       return;
     }
     expect(sources[0]?.kind).toBe('amap');
-    expect(sources[0]?.url).toContain('cesium-sat/amap/{z}/{x}/{y}');
+    expect(sources[0]?.url).toContain('cesium-sat/amap/r2/{z}/{x}/{y}');
   });
 });

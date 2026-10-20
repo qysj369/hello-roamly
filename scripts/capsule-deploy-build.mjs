@@ -34,6 +34,19 @@ for (const name of ['robots.txt', 'sitemap.xml']) {
   }
 }
 
+// Cesium runtime static assets (Workers/Assets/Widgets/ThirdParty) are served
+// from /cesium/* by Nginx. The bare vite config skips cesiumStaticPlugin, so
+// copy them here exactly like that plugin's writeBundle hook does.
+const cesiumBuild = path.join(root, 'node_modules/cesium/Build/Cesium');
+const cesiumOut = path.join(distDir, 'cesium', 'r2');
+if (fs.existsSync(cesiumBuild)) {
+  fs.rmSync(path.join(distDir, 'cesium'), { recursive: true, force: true });
+  fs.cpSync(cesiumBuild, cesiumOut, { recursive: true });
+  console.info('[capsule-deploy-build] copied cesium static:', cesiumOut);
+} else {
+  console.warn('[capsule-deploy-build] cesium package missing; skip static copy');
+}
+
 const indexHtml = fs.readFileSync(path.join(distDir, 'index.html'), 'utf8');
 const indexJs = indexHtml.match(/index-[^"]+\.js/)?.[0] ?? 'unknown';
 const hasCapsule = fs

@@ -3,12 +3,13 @@ import { fileURLToPath } from 'node:url';
 import tailwindcss from '@tailwindcss/vite';
 import react from '@vitejs/plugin-react';
 import { defineConfig } from 'vite';
+import { cesiumStaticPlugin } from './vite-plugin-cesium-static';
 
 const rootDir = path.dirname(fileURLToPath(import.meta.url));
 
 /** 生产构建：本机 Three/Capsule 包在 esbuild 压缩阶段易 OOM，故关闭 minify */
 export default defineConfig({
-  plugins: [react(), tailwindcss()],
+  plugins: [react(), tailwindcss(), cesiumStaticPlugin(rootDir)],
   resolve: {
     alias: {
       '@': path.resolve(rootDir, './src'),
