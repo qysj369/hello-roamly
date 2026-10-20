@@ -51,7 +51,7 @@ if ($SkipBuild) {
   Write-Host '[1/4] Build + package...' -ForegroundColor Cyan
   & $push -NoLaunch
 }
-if ($LASTEXITCODE -ne 0) { exit $LASTEXITCODE }
+if ($null -ne $LASTEXITCODE -and $LASTEXITCODE -ne 0) { exit $LASTEXITCODE }
 
 $zip = Join-Path $root 'site-motion.zip'
 $deploySh = Join-Path $root 'deploy\deploy-holo-now.sh'
@@ -77,13 +77,13 @@ if ($LASTEXITCODE -ne 0) {
 
 Write-Host '[3/4] Uploading NEW-HOME.zip + deploy-holo-now.sh ...' -ForegroundColor Cyan
 & scp @sshArgs $desktopZip "${remote}:/root/NEW-HOME.zip"
-if ($LASTEXITCODE -ne 0) { exit $LASTEXITCODE }
+if ($null -ne $LASTEXITCODE -and $LASTEXITCODE -ne 0) { exit $LASTEXITCODE }
 & scp @sshArgs $deploySh "${remote}:/root/deploy-holo-now.sh"
-if ($LASTEXITCODE -ne 0) { exit $LASTEXITCODE }
+if ($null -ne $LASTEXITCODE -and $LASTEXITCODE -ne 0) { exit $LASTEXITCODE }
 
 Write-Host '[4/4] Remote deploy...' -ForegroundColor Cyan
 & ssh @sshArgs $remote 'sed -i "s/\r$//" /root/deploy-holo-now.sh; bash /root/deploy-holo-now.sh'
-if ($LASTEXITCODE -ne 0) { exit $LASTEXITCODE }
+if ($null -ne $LASTEXITCODE -and $LASTEXITCODE -ne 0) { exit $LASTEXITCODE }
 
 Write-Host ''
 Write-Host 'DONE. Verify: https://helloroamly.com  (Ctrl+Shift+R)' -ForegroundColor Green
