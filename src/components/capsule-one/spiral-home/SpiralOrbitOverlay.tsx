@@ -124,7 +124,19 @@ export default function SpiralOrbitOverlay() {
           <path className="spiral-home__vortex spiral-home__vortex-halo" d={VORTEX} />
           <path className="spiral-home__vortex spiral-home__vortex-halo" d={VORTEX_INNER} />
         </g>
-        <circle className="spiral-home__vortex-heart" cx="418" cy="388" r="26" fill={`url(#spiral-core-${uid})`} />
+        <g className="spiral-home__ring-wash" fill="none" stroke="#7fb4cc">
+          {RINGS.map((ring) => (
+            <ellipse
+              key={`wash-${ring.rot}`}
+              cx="400"
+              cy="400"
+              rx={ring.rx}
+              ry={ring.ry}
+              transform={`rotate(${ring.rot} 400 400)`}
+            />
+          ))}
+        </g>
+        <circle className="spiral-home__vortex-heart" cx="418" cy="388" r="38" fill={`url(#spiral-core-${uid})`} />
         <g className="spiral-home__orbit-shell" fill="none" stroke={`url(#${glow})`}>
           <ellipse
             className="spiral-home__ring"

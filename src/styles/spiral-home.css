@@ -94,8 +94,8 @@ html.spiral-home-active body,
   position: absolute;
   top: 4%;
   right: 5%;
-  width: min(18vmin, 168px);
-  height: min(18vmin, 168px);
+  width: min(26vmin, 240px);
+  height: min(26vmin, 240px);
   border-radius: 50%;
   background: radial-gradient(
     circle,
@@ -393,6 +393,11 @@ html.spiral-home-active body,
   opacity: 0.92;
 }
 
+.spiral-home__ring-wash {
+  stroke-width: 22;
+  opacity: 0.32;
+}
+
 .spiral-home__coil {
   stroke-width: 4.4;
   stroke-dasharray: 42 180;
@@ -435,10 +440,10 @@ html.spiral-home-active body,
 
 .spiral-home__streak {
   fill: none;
-  stroke-width: 4.5;
+  stroke-width: 6;
   stroke-linecap: round;
-  stroke-dasharray: 36 22;
-  opacity: 0.85;
+  stroke-dasharray: 48 18;
+  opacity: 1;
   filter: drop-shadow(0 0 5px rgba(255, 250, 240, 0.85));
   animation: spiral-coil-flow 2.8s linear infinite;
 }
