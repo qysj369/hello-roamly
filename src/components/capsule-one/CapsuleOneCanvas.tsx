@@ -56,7 +56,7 @@ export default function CapsuleOneCanvas({
   const lookAtChina = useMemo(() => {
     const city = getCapsuleCityById('chengdu') ?? { lat: 30.57, lng: 104.07 };
     const dir = latLngToVector3(city.lat, city.lng).normalize();
-    const distance = isMobile ? 16 : 13.5;
+    const distance = isMobile ? 20 : 21.5;
     return {
       position: [dir.x * distance, dir.y * distance + earthLift, dir.z * distance] as [
         number,
@@ -72,7 +72,7 @@ export default function CapsuleOneCanvas({
       className="capsule-scene__canvas"
       camera={{
         position: lookAtChina.position,
-        fov: isMobile ? 46 : 42,
+        fov: isMobile ? 48 : 46,
         near: 0.1,
         far: 400,
       }}

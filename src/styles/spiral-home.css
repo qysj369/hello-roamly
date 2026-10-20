@@ -70,16 +70,16 @@ html.spiral-home-active body,
   position: absolute;
   inset: -8%;
   background:
-    radial-gradient(ellipse at 18% 28%, rgba(186, 214, 230, 0.1), transparent 40%),
-    radial-gradient(ellipse at 78% 16%, rgba(234, 246, 255, 0.12), transparent 34%),
-    linear-gradient(118deg, transparent 28%, rgba(198, 220, 232, 0.08) 50%, transparent 70%);
+    radial-gradient(ellipse at 12% 18%, rgba(234, 246, 255, 0.2), transparent 32%),
+    radial-gradient(ellipse at 82% 8%, rgba(255, 244, 214, 0.16), transparent 28%),
+    linear-gradient(122deg, transparent 16%, rgba(186, 214, 230, 0.18) 48%, transparent 74%);
 }
 
 .spiral-home__vignette {
   position: absolute;
   inset: 0;
   background:
-    radial-gradient(ellipse at 50% 48%, transparent 52%, rgba(8, 20, 40, 0.28) 100%),
+    radial-gradient(ellipse at 46% 50%, transparent 30%, rgba(4, 10, 24, 0.62) 100%),
     linear-gradient(
       90deg,
       rgba(8, 20, 40, 0.22) 0%,
@@ -110,8 +110,8 @@ html.spiral-home-active body,
   position: absolute;
   top: 6.5%;
   right: 8%;
-  width: min(9vmin, 84px);
-  height: min(9vmin, 84px);
+  width: min(8vmin, 72px);
+  height: min(8vmin, 72px);
   border-radius: 50%;
   background: radial-gradient(
     circle at 38% 34%,
@@ -331,30 +331,30 @@ html.spiral-home-active body,
 }
 
 .spiral-home__ring {
-  stroke-width: 3.6;
+  stroke-width: 5.6;
   opacity: 1;
 }
 
 .spiral-home__ring-halo {
-  stroke-width: 22;
-  opacity: 0.5;
+  stroke-width: 36;
+  opacity: 0.72;
 }
 
 .spiral-home__coil {
-  stroke-width: 3.2;
+  stroke-width: 4.4;
   stroke-dasharray: 42 180;
   animation: spiral-coil-flow 12s linear infinite;
 }
 
 .spiral-home__coil-halo {
-  stroke-width: 14;
-  opacity: 0.55;
+  stroke-width: 22;
+  opacity: 0.62;
   stroke-dasharray: none;
   animation: none;
 }
 
 .spiral-home__spiral {
-  stroke-width: 5.5;
+  stroke-width: 8;
   stroke-linecap: round;
   opacity: 0.95;
 }
@@ -403,8 +403,8 @@ html.spiral-home-active body,
 
 .spiral-home__pin-dot {
   display: block;
-  width: 11px;
-  height: 11px;
+  width: 13px;
+  height: 13px;
   border: 2px solid rgba(255, 250, 240, 0.95);
   border-radius: 50%;
   background: #fffaf0;
@@ -1361,13 +1361,13 @@ html.spiral-home-active .spiral-home .travel-agent-host--spiral .travel-agent-fa
 }
 
 html.spiral-butler-dock .spiral-home__moon {
-  top: 7%;
-  right: 468px;
+  top: 2.4%;
+  right: 34%;
 }
 
 html.spiral-butler-dock .spiral-home__moon-halo {
-  top: 4%;
-  right: 426px;
+  top: 0.6%;
+  right: calc(34% - 28px);
 }
 
 html.spiral-butler-dock .spiral-home__moon-spill {

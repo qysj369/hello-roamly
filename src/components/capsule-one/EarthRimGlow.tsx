@@ -53,8 +53,8 @@ export default function EarthRimGlow({ variant = 'ink' }: EarthRimGlowProps) {
     if (isWash) {
       return {
         innerColor: { value: new THREE.Color('#eaf6ff') },
-        edgeColor: { value: new THREE.Color('#4d6d78') },
-        intensity: { value: 0.62 },
+        edgeColor: { value: new THREE.Color('#d7e6ee') },
+        intensity: { value: 0.82 },
         time: { value: 0 },
       };
     }
@@ -73,7 +73,7 @@ export default function EarthRimGlow({ variant = 'ink' }: EarthRimGlowProps) {
 
   const shellScale = isWash ? 1.02 : 1.045;
   const glazeScale = isGlaze ? 1.04 : shellScale;
-  const shellOpacity = isWash ? 0.02 : 0.04;
+  const shellOpacity = isWash ? 0.07 : 0.04;
   const glazeOpacity = isGlaze ? 0.08 : shellOpacity;
 
   return (

@@ -37,7 +37,7 @@ export default function SpiralOrbitOverlay() {
             <stop offset="100%" stopColor="#bcd8e8" stopOpacity="0" />
           </linearGradient>
           <filter id={`spiral-bloom-${uid}`} x="-50%" y="-50%" width="200%" height="200%">
-            <feGaussianBlur stdDeviation="7" />
+            <feGaussianBlur stdDeviation="11" />
           </filter>
         </defs>
         <g
