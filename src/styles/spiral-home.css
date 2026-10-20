@@ -70,9 +70,9 @@ html.spiral-home-active body,
   position: absolute;
   inset: -8%;
   background:
-    radial-gradient(ellipse at 12% 18%, rgba(234, 246, 255, 0.2), transparent 32%),
-    radial-gradient(ellipse at 82% 8%, rgba(255, 244, 214, 0.16), transparent 28%),
-    linear-gradient(122deg, transparent 16%, rgba(186, 214, 230, 0.18) 48%, transparent 74%);
+    radial-gradient(ellipse at 8% 12%, rgba(234, 246, 255, 0.28), transparent 26%),
+    radial-gradient(ellipse at 78% 6%, rgba(255, 244, 214, 0.22), transparent 22%),
+    linear-gradient(118deg, transparent 4%, rgba(186, 214, 230, 0.2) 18%, transparent 36%);
 }
 
 .spiral-home__vignette {
@@ -389,13 +389,13 @@ html.spiral-home-active body,
 }
 
 .spiral-home__ring-core {
-  stroke-width: 2.4;
-  opacity: 0.92;
+  stroke-width: 3.2;
+  opacity: 0.95;
 }
 
 .spiral-home__ring-wash {
-  stroke-width: 22;
-  opacity: 0.32;
+  stroke-width: 26;
+  opacity: 0.4;
 }
 
 .spiral-home__coil {
@@ -436,6 +436,15 @@ html.spiral-home-active body,
   stroke-linecap: round;
   stroke-linejoin: round;
   opacity: 0.95;
+}
+
+.spiral-home__vortex-cyan {
+  fill: none;
+  stroke: #7fb4cc;
+  stroke-width: 7;
+  stroke-linecap: round;
+  stroke-linejoin: round;
+  opacity: 0.85;
 }
 
 .spiral-home__streak {

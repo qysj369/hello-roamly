@@ -62,8 +62,9 @@ export default function SpiralOrbitOverlay() {
             <stop offset="100%" stopColor="#bcd8e8" stopOpacity="0" />
           </linearGradient>
           <radialGradient id={`spiral-core-${uid}`} cx="50%" cy="50%" r="50%">
-            <stop offset="0%" stopColor="#fffaf0" stopOpacity="0.95" />
-            <stop offset="42%" stopColor="#f2e2b8" stopOpacity="0.55" />
+            <stop offset="0%" stopColor="#fffaf0" stopOpacity="1" />
+            <stop offset="18%" stopColor="#fffaf0" stopOpacity="0.9" />
+            <stop offset="46%" stopColor="#f2e2b8" stopOpacity="0.4" />
             <stop offset="100%" stopColor="#7fb4cc" stopOpacity="0" />
           </radialGradient>
           <filter id={`spiral-bloom-${uid}`} x="-40%" y="-40%" width="180%" height="180%">
@@ -190,6 +191,7 @@ export default function SpiralOrbitOverlay() {
           />
           <path className="spiral-home__vortex" stroke={`url(#${flow})`} d={VORTEX} />
           <path className="spiral-home__vortex" stroke={`url(#${flow})`} d={VORTEX_INNER} />
+          <path className="spiral-home__vortex-cyan" d={VORTEX_INNER} />
           <path className="spiral-home__vortex-core" d={VORTEX} />
           <path className="spiral-home__vortex-core" d={VORTEX_INNER} />
           <path className="spiral-home__streak" stroke={`url(#spiral-streak-${uid})`} d="M248 492 C 190 545, 145 578, 108 598" />
