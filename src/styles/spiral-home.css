@@ -110,8 +110,8 @@ html.spiral-home-active body,
   position: absolute;
   top: 6.5%;
   right: 8%;
-  width: min(8vmin, 72px);
-  height: min(8vmin, 72px);
+  width: min(10vmin, 96px);
+  height: min(10vmin, 96px);
   border-radius: 50%;
   background: radial-gradient(
     circle at 38% 34%,
@@ -218,17 +218,18 @@ html.spiral-home-active body,
   position: absolute;
   left: 50%;
   top: 47%;
-  width: min(70vmin, 640px);
-  height: min(70vmin, 640px);
+  width: min(68vmin, 620px);
+  height: min(68vmin, 620px);
   transform: translate(-50%, -50%);
   border-radius: 50%;
   background: radial-gradient(
     ellipse,
-    rgba(226, 244, 255, 0.1) 0%,
-    rgba(210, 235, 250, 0.05) 34%,
-    transparent 66%
+    transparent 62%,
+    rgba(234, 246, 255, 0.2) 70%,
+    rgba(217, 192, 138, 0.16) 76%,
+    transparent 86%
   );
-  filter: blur(6px);
+  filter: blur(4px);
   pointer-events: none;
 }
 
@@ -331,13 +332,13 @@ html.spiral-home-active body,
 }
 
 .spiral-home__ring {
-  stroke-width: 5.6;
+  stroke-width: 12;
   opacity: 1;
 }
 
 .spiral-home__ring-halo {
-  stroke-width: 36;
-  opacity: 0.72;
+  stroke-width: 26;
+  opacity: 0.55;
 }
 
 .spiral-home__coil {
@@ -357,6 +358,35 @@ html.spiral-home-active body,
   stroke-width: 8;
   stroke-linecap: round;
   opacity: 0.95;
+}
+
+.spiral-home__vortex {
+  stroke-width: 11;
+  stroke-linecap: round;
+  stroke-linejoin: round;
+  opacity: 1;
+}
+
+.spiral-home__vortex-halo {
+  stroke-width: 28;
+  opacity: 0.5;
+}
+
+.spiral-home__vortex-core {
+  fill: none;
+  stroke: #fffaf0;
+  stroke-width: 3.5;
+  stroke-linecap: round;
+  stroke-linejoin: round;
+  opacity: 0.95;
+}
+
+.spiral-home__streak {
+  fill: none;
+  stroke-width: 8;
+  stroke-linecap: round;
+  opacity: 0.9;
+  filter: blur(0.4px);
 }
 
 .spiral-home__spark {

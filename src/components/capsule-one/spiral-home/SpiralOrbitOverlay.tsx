@@ -16,6 +16,25 @@ const RINGS = [
   { rot: 86, rx: 122, ry: 70, dur: '11s' },
 ] as const;
 
+/** 贴在球面的螺旋光涡。扁平椭圆是透视，不是粒子。 */
+function vortexPath(phase: number, startR: number, endR: number): string {
+  const steps = 96;
+  const turns = 2.45;
+  let d = '';
+  for (let i = 0; i <= steps; i += 1) {
+    const t = i / steps;
+    const ang = phase + t * turns * Math.PI * 2;
+    const radius = startR + (endR - startR) * t;
+    const x = 418 + Math.cos(ang) * radius * 1.12;
+    const y = 388 + Math.sin(ang) * radius * 0.64;
+    d += `${i === 0 ? 'M' : 'L'}${x.toFixed(1)} ${y.toFixed(1)}`;
+  }
+  return d;
+}
+
+const VORTEX = vortexPath(-0.4, 198, 16);
+const VORTEX_INNER = vortexPath(2.2, 132, 10);
+
 /** 航点 + 轻量 SVG 螺旋光轨。CSS 描边流动，禁止粒子系统 / Three 内核 */
 export default function SpiralOrbitOverlay() {
   const uid = useId().replace(/:/g, '');
@@ -36,8 +55,18 @@ export default function SpiralOrbitOverlay() {
             <stop offset="48%" stopColor="#f2e2b8" stopOpacity="1" />
             <stop offset="100%" stopColor="#bcd8e8" stopOpacity="0" />
           </linearGradient>
-          <filter id={`spiral-bloom-${uid}`} x="-50%" y="-50%" width="200%" height="200%">
-            <feGaussianBlur stdDeviation="11" />
+          <linearGradient id={`spiral-streak-${uid}`} gradientUnits="userSpaceOnUse" x1="300" y1="470" x2="40" y2="720">
+            <stop offset="0%" stopColor="#fffaf0" stopOpacity="0.95" />
+            <stop offset="48%" stopColor="#f2e2b8" stopOpacity="0.65" />
+            <stop offset="100%" stopColor="#bcd8e8" stopOpacity="0" />
+          </linearGradient>
+          <radialGradient id={`spiral-core-${uid}`} cx="50%" cy="50%" r="50%">
+            <stop offset="0%" stopColor="#fffaf0" stopOpacity="0.95" />
+            <stop offset="42%" stopColor="#f2e2b8" stopOpacity="0.55" />
+            <stop offset="100%" stopColor="#7fb4cc" stopOpacity="0" />
+          </radialGradient>
+          <filter id={`spiral-bloom-${uid}`} x="-40%" y="-40%" width="180%" height="180%">
+            <feGaussianBlur stdDeviation="4.5" />
           </filter>
         </defs>
         <g
@@ -91,7 +120,10 @@ export default function SpiralOrbitOverlay() {
             stroke={`url(#${flow})`}
             d="M560 250c70 80 40 210-60 280-110 78-250 70-330 10-90-68-100-190-20-270 70-70 190-80 270-20 70 52 90 150 30 210"
           />
+          <path className="spiral-home__vortex spiral-home__vortex-halo" d={VORTEX} />
+          <path className="spiral-home__vortex spiral-home__vortex-halo" d={VORTEX_INNER} />
         </g>
+        <circle className="spiral-home__vortex-heart" cx="418" cy="388" r="26" fill={`url(#spiral-core-${uid})`} />
         <g className="spiral-home__orbit-shell" fill="none" stroke={`url(#${glow})`}>
           <ellipse
             className="spiral-home__ring"
@@ -143,6 +175,12 @@ export default function SpiralOrbitOverlay() {
             stroke={`url(#${flow})`}
             d="M520 300c80 70 40 190-70 250-120 66-240 40-300-40-70-90-20-200 90-240 100-36 190 20 200 110 8 70-50 130-120 140-60 8-120-30-130-90"
           />
+          <path className="spiral-home__vortex" stroke={`url(#${flow})`} d={VORTEX} />
+          <path className="spiral-home__vortex" stroke={`url(#${flow})`} d={VORTEX_INNER} />
+          <path className="spiral-home__vortex-core" d={VORTEX} />
+          <path className="spiral-home__streak" stroke={`url(#spiral-streak-${uid})`} d="M268 468 C 190 530, 120 590, 36 640" />
+          <path className="spiral-home__streak" stroke={`url(#spiral-streak-${uid})`} d="M318 512 C 230 590, 150 660, 70 730" />
+          <path className="spiral-home__streak" stroke={`url(#spiral-streak-${uid})`} d="M372 548 C 280 630, 200 700, 130 760" />
         </g>
         <g className="spiral-home__sparks">
           <circle className="spiral-home__spark" cx="548" cy="268" r="3.2" />
@@ -153,7 +191,7 @@ export default function SpiralOrbitOverlay() {
         <g className="spiral-home__motes">
           {RINGS.map((ring) => (
             <g key={ring.rot} transform={`rotate(${ring.rot} 400 400)`}>
-              <circle className="spiral-home__mote" r="3.6" fill="#fffaf0">
+              <circle className="spiral-home__mote" r="6" fill="#fffaf0">
                 <animateMotion
                   dur={ring.dur}
                   repeatCount="indefinite"
