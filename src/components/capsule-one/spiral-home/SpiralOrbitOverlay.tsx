@@ -1,11 +1,11 @@
 import { useId } from 'react';
 
 const WAYPOINTS = [
-  { id: 'jinan', label: '济南历下', x: '42%', y: '28%' },
-  { id: 'zibo', label: '淄博', x: '26%', y: '44%' },
-  { id: 'weifang', label: '潍坊', x: '32%', y: '68%' },
-  { id: 'laizhou', label: '莱州湾', x: '52%', y: '80%' },
-  { id: 'qingdao', label: '青岛', x: '70%', y: '56%' },
+  { id: 'dmh', label: '大明湖', x: '48%', y: '18%' },
+  { id: 'bpt', label: '趵突泉', x: '34%', y: '34%' },
+  { id: 'hhq', label: '黑虎泉', x: '30%', y: '56%' },
+  { id: 'qfs', label: '千佛山', x: '56%', y: '70%' },
+  { id: 'jrs', label: '九如山', x: '72%', y: '44%' },
 ] as const;
 
 const RINGS = [
