@@ -430,12 +430,12 @@ export default function SnailFlightViewer({
           }
           if (t >= 1) {
             flightDoneRef.current = true;
-            const arrivalId = ['qingdao-land', 'qingdao-coast', 'approach'].find((id) =>
+            const arrivalId = ['jiuru-land', 'qingdao-land', 'qingdao-coast', 'approach'].find((id) =>
               firedCuesRef.current.has(id),
             );
             if (!arrivalId && captionsOnRef.current) {
-              firedCuesRef.current.add('qingdao-land');
-              setCaptionBeatId((prev) => (prev === 'qingdao-land' ? prev : 'qingdao-land'));
+              firedCuesRef.current.add('jiuru-land');
+              setCaptionBeatId((prev) => (prev === 'jiuru-land' ? prev : 'jiuru-land'));
             }
             tryFinishRef.current();
             if (!landedRef.current && !landSafetyTimer) {

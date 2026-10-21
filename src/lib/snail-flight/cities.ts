@@ -10,6 +10,46 @@ export type SnailFlightCity = {
 
 export const SNAIL_FLIGHT_CITIES: readonly SnailFlightCity[] = [
   {
+    id: 'baotu',
+    label: '趵突泉',
+    aliases: ['趵突泉公园', '天下第一泉'],
+    lon: 117.028,
+    lat: 36.662,
+    blurb: '泉城济南的中心泉群，三股泉水昼夜翻涌，是济南人的心头泉眼。',
+  },
+  {
+    id: 'daming',
+    label: '大明湖',
+    aliases: ['大明湖畔'],
+    lon: 117.018,
+    lat: 36.671,
+    blurb: '济南老城北面的阔水湖面，柳堤荷影，超然楼灯火映水，湖山一色。',
+  },
+  {
+    id: 'qianfo',
+    label: '千佛山',
+    aliases: ['千佛山公园'],
+    lon: 117.03,
+    lat: 36.636,
+    blurb: '济南城南的山体，舜耕历山传说与隋唐造像叠在山间，登顶可望齐烟九点。',
+  },
+  {
+    id: 'heihu',
+    label: '黑虎泉',
+    aliases: ['黑虎泉畔'],
+    lon: 117.028,
+    lat: 36.654,
+    blurb: '护城河畔的奔涌泉群，清晨打水人络绎，水声如虎啸，直通解放阁。',
+  },
+  {
+    id: 'jiuru',
+    label: '九如山',
+    aliases: ['九如山瀑布群'],
+    lon: 117.196,
+    lat: 36.53,
+    blurb: '济南南部山区的溪谷群，瀑布连潭，秋红冬冰，是离城最近的山野深呼吸。',
+  },
+  {
     id: 'jinan-lixia',
     label: '济南历下',
     aliases: ['历下', '济南', '泉城'],
@@ -140,8 +180,8 @@ export const SNAIL_FLIGHT_CITIES: readonly SnailFlightCity[] = [
   },
 ] as const;
 
-export const SNAIL_FLIGHT_DEFAULT_ORIGIN_ID = 'jinan-lixia';
-export const SNAIL_FLIGHT_DEFAULT_DEST_ID = 'qingdao';
+export const SNAIL_FLIGHT_DEFAULT_ORIGIN_ID = 'baotu';
+export const SNAIL_FLIGHT_DEFAULT_DEST_ID = 'jiuru';
 
 export function getSnailFlightCity(id: string): SnailFlightCity | undefined {
   return SNAIL_FLIGHT_CITIES.find((city) => city.id === id);

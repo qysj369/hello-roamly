@@ -7,8 +7,8 @@ export const SPIRAL_BUTLER_GUIDE =
   '可以直接说「青岛3天情侣」或「杭州周末闲逛」，我帮你排一版松弛慢游；行程出来后点确认，即可生成图文卡片。';
 
 const DEMO_MESSAGES = [
-  { id: 'spiral-u1', role: 'user' as const, text: '济南历下' },
-  { id: 'spiral-u2', role: 'user' as const, text: '潍坊' },
+  { id: 'spiral-u1', role: 'user' as const, text: '趵突泉' },
+  { id: 'spiral-u2', role: 'user' as const, text: '千佛山' },
 ];
 
 const SpiralHomeButlerPanel = lazy(() => import('./SpiralHomeButlerPanel'));

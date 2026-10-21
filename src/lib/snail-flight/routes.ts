@@ -41,7 +41,7 @@ export type SnailFlightRoute = {
 };
 
 function demoNarrations(): SnailFlightNarration[] {
-  return ['takeoff', 'lakes', 'zhangqiu', 'zibo', 'weifang', 'laizhou', 'qingdao-land'].map((id) => {
+  return ['takeoff', 'daming', 'qianfo', 'heihu', 'jiuru-land'].map((id) => {
     const beat = captionById(DEFAULT_CAPTION_PACK, id);
     if (!beat) {
       throw new Error(`missing demo caption ${id}`);
@@ -70,21 +70,21 @@ function withDistanceProgress(
 function buildDemoRoute(): SnailFlightRoute | null {
   const origin = getSnailFlightCity(SNAIL_FLIGHT_DEFAULT_ORIGIN_ID);
   const dest = getSnailFlightCity(SNAIL_FLIGHT_DEFAULT_DEST_ID);
-  const zhangqiu = getSnailFlightCity('zhangqiu');
-  const zibo = getSnailFlightCity('zibo');
-  const weifang = getSnailFlightCity('weifang');
-  if (!origin || !dest || !zhangqiu || !zibo || !weifang) {
+  const daming = getSnailFlightCity('daming');
+  const qianfo = getSnailFlightCity('qianfo');
+  const heihu = getSnailFlightCity('heihu');
+  if (!origin || !dest || !daming || !qianfo || !heihu) {
     return null;
   }
   const waypoints = withDistanceProgress([
     { id: 'takeoff', label: origin.label, lon: origin.lon, lat: origin.lat },
-    { id: 'zhangqiu', label: zhangqiu.label, lon: zhangqiu.lon, lat: zhangqiu.lat },
-    { id: 'zibo', label: zibo.label, lon: zibo.lon, lat: zibo.lat },
-    { id: 'weifang', label: weifang.label, lon: weifang.lon, lat: weifang.lat },
-    { id: 'qingdao-coast', label: dest.label, lon: dest.lon, lat: dest.lat },
+    { id: 'daming', label: daming.label, lon: daming.lon, lat: daming.lat },
+    { id: 'qianfo', label: qianfo.label, lon: qianfo.lon, lat: qianfo.lat },
+    { id: 'heihu', label: heihu.label, lon: heihu.lon, lat: heihu.lat },
+    { id: 'jiuru-land', label: dest.label, lon: dest.lon, lat: dest.lat },
   ]);
   return {
-    id: 'jinan-lixia-qingdao',
+    id: 'jinan-scenic',
     origin,
     dest,
     waypoints,
@@ -158,7 +158,7 @@ export function defaultSnailFlightRoute(): SnailFlightRoute {
 
 export function narrationAt(route: SnailFlightRoute, progress: number): SnailFlightNarration {
   const t = Math.min(1, Math.max(0, progress));
-  if (route.id === 'jinan-lixia-qingdao') {
+  if (route.id === 'jinan-scenic') {
     const cue = regionCueAt(t);
     return captionById(DEFAULT_CAPTION_PACK, cue.id) ?? route.narrations[0]!;
   }

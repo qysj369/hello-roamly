@@ -10,75 +10,58 @@ export type CaptionCue = {
 
 /** 进度区间只决定何时触发；屏上仍只停留 6～8 秒。 */
 export const SNAIL_FLIGHT_CAPTION_CUES: readonly CaptionCue[] = [
-  { id: 'takeoff', from: 0, to: 0.05 },
-  { id: 'lakes', from: 0.12, to: 0.18 },
-  { id: 'zhangqiu', from: 0.15, to: 0.2 },
-  { id: 'zibo', from: 0.35, to: 0.4 },
-  { id: 'weifang', from: 0.6, to: 0.65 },
-  { id: 'laizhou', from: 0.75, to: 0.8 },
-  { id: 'qingdao-land', from: 0.92, to: 1 },
+  { id: 'takeoff', from: 0, to: 0.08 },
+  { id: 'daming', from: 0.2, to: 0.3 },
+  { id: 'qianfo', from: 0.42, to: 0.52 },
+  { id: 'heihu', from: 0.63, to: 0.73 },
+  { id: 'jiuru-land', from: 0.9, to: 1 },
 ];
 
 const STORY: Record<string, SnailFlightNarration> = {
   takeoff: {
     id: 'takeoff',
     at: 0,
-    title: '【起飞｜济南历下】',
+    title: '【起飞｜趵突泉】',
     lines: [
-      '登机完毕，蜗牛号缓缓离地。',
-      '脚下历下，是泉城千年文脉所在。',
-      '趵突泉、大明湖静卧于此，我们向东启程，开启一场低空山河漫游。',
+      '登机完毕，蜗牛号从趵突泉畔缓缓离地。',
+      '三股清泉日夜翻涌，泉城的千年文脉在脚下展开。',
+      '我们掠过老城，开启这场低空泉城漫游。',
     ],
   },
-  lakes: {
-    id: 'lakes',
-    at: 0.12,
-    title: '【掠过湖泽】',
-    lines: ['湖水静卧在齐鲁大地，', '田畴阡陌向远方延展，', '蜗牛号继续向东，奔赴群山与城镇。'],
+  daming: {
+    id: 'daming',
+    at: 0.2,
+    title: '【掠过明湖】',
+    lines: ['前方就是大明湖，水面在柳堤间铺开。', '超然楼与历下亭静立湖岸，荷叶连天，船影缓缓。'],
   },
-  zhangqiu: {
-    id: 'zhangqiu',
-    at: 0.15,
-    title: '【飞越章丘】',
+  qianfo: {
+    id: 'qianfo',
+    at: 0.42,
+    title: '【飞越千佛山】',
     lines: [
-      '告别济南城区，向东掠过章丘。',
-      '群山慢慢舒展，田野铺向远方，齐鲁大地的底色，就在这片平原与山丘之间。',
+      '向南望，千佛山的轮廓卧在城市边缘。',
+      '舜耕历山的传说与隋唐造像叠在山间，',
+      '从空中看，山与城之间就是济南的底色。',
     ],
   },
-  zibo: {
-    id: 'zibo',
-    at: 0.35,
-    title: '【途经淄博】',
+  heihu: {
+    id: 'heihu',
+    at: 0.63,
+    title: '【俯瞰黑虎泉】',
     lines: [
-      '前方抵达淄博上空。',
-      '城镇连绵铺开，土地厚重，藏着烟火与故事。',
-      '古齐国的风，至今还吹在这片老城与工矿之间。',
+      '护城河畔，黑虎泉群的水声隐约可闻。',
+      '清晨的打水人、解放阁的影子，都收在粼粼水面里。',
+      '我们继续向南，奔赴山谷。',
     ],
   },
-  weifang: {
-    id: 'weifang',
-    at: 0.6,
-    title: '【飞越潍坊】',
+  'jiuru-land': {
+    id: 'jiuru-land',
+    at: 0.9,
+    title: '【抵达九如山｜降落阶段】',
     lines: [
-      '进入潍坊空域，大地愈发开阔。',
-      '一望无垠的齐鲁平原，河道交错，良田万顷。',
-      '这里是风筝的故乡，风，从陆地向着海洋奔去。',
-    ],
-  },
-  laizhou: {
-    id: 'laizhou',
-    at: 0.75,
-    title: '【近海初见｜莱州湾】',
-    lines: ['前方望见海岸线，渤海湾就在眼前。', '陆地到此收束，我们即将告别平原，奔赴海滨之城。'],
-  },
-  'qingdao-land': {
-    id: 'qingdao-land',
-    at: 0.92,
-    title: '【抵达青岛｜降落阶段】',
-    lines: [
-      '我们抵达青岛上空，蜗牛号准备缓缓降落。',
-      '红瓦、碧海与山峦相拥，海风迎面而来。',
-      '这段山河漫游到此结束，接下来，为你生成这座海滨之城的旅行灵感。',
+      '济南南部山区的溪谷已在眼前，九如山瀑布群层层叠落。',
+      '蜗牛号准备缓缓降落，这段泉城山河漫游到此收尾。',
+      '落地后，为你生成这趟山野之旅的旅行灵感。',
     ],
   },
 };
@@ -87,44 +70,32 @@ const VERSE: Record<string, SnailFlightNarration> = {
   takeoff: {
     id: 'takeoff',
     at: 0,
-    title: '【起飞｜历下】',
-    lines: ['蜗牛号升空，俯瞰泉城历下。', '泉水流淌千年，我们向东出发。'],
+    title: '【起飞｜趵突泉】',
+    lines: ['蜗牛号升空，三股清泉在脚下翻涌。', '泉城千年文脉，自此启程。'],
   },
-  lakes: {
-    id: 'lakes',
-    at: 0.12,
-    title: '【掠过湖泽】',
-    lines: ['湖光嵌在田野之间，平原一路向东。'],
+  daming: {
+    id: 'daming',
+    at: 0.2,
+    title: '【掠过明湖】',
+    lines: ['湖光铺在柳堤之间，超然楼灯火相映。'],
   },
-  zhangqiu: {
-    id: 'zhangqiu',
-    at: 0.15,
-    title: '【飞越章丘】',
-    lines: ['山峦渐缓，万亩田畴铺开齐鲁画卷。'],
+  qianfo: {
+    id: 'qianfo',
+    at: 0.42,
+    title: '【飞越千佛山】',
+    lines: ['山影卧城边，历山传说与隋唐造像俱在。'],
   },
-  zibo: {
-    id: 'zibo',
-    at: 0.35,
-    title: '【途经淄博】',
-    lines: ['齐国故土，城镇连绵，厚重土地藏着人间烟火。'],
+  heihu: {
+    id: 'heihu',
+    at: 0.63,
+    title: '【俯瞰黑虎泉】',
+    lines: ['护城河畔泉声如虎啸，水光里映着解放阁。'],
   },
-  weifang: {
-    id: 'weifang',
-    at: 0.6,
-    title: '【飞越潍坊】',
-    lines: ['辽阔平原，风起于此，风筝飞向天际。'],
-  },
-  laizhou: {
-    id: 'laizhou',
-    at: 0.75,
-    title: '【近海初见｜莱州湾】',
-    lines: ['平原尽头，渤海海岸映入眼帘。'],
-  },
-  'qingdao-land': {
-    id: 'qingdao-land',
-    at: 0.92,
-    title: '【抵达青岛｜降落阶段】',
-    lines: ['海风拂面，红瓦碧海相见。山河漫游落幕，开启海滨行程。'],
+  'jiuru-land': {
+    id: 'jiuru-land',
+    at: 0.9,
+    title: '【抵达九如山｜降落阶段】',
+    lines: ['溪谷层叠，瀑布连潭。漫游落幕，山野行程待启。'],
   },
 };
 
@@ -132,46 +103,34 @@ const GUIDE: Record<string, SnailFlightNarration> = {
   takeoff: {
     id: 'takeoff',
     at: 0,
-    title: '【起飞｜济南历下】',
+    title: '【起飞｜趵突泉】',
     lines: [
-      '蜗牛号自济南历下起飞，这片土地是泉城核心，承载大明湖与众多泉水古迹，齐鲁文化自此启程。',
+      '蜗牛号自趵突泉畔起飞，这里是泉城济南的核心，趵突泉、大明湖、黑虎泉等名泉环绕，泉文化自此展开。',
     ],
   },
-  lakes: {
-    id: 'lakes',
-    at: 0.12,
-    title: '【掠过湖泽】',
-    lines: ['下方湖泊镶嵌在农田之间，鲁中平原的肌理在机翼下缓缓展开。'],
+  daming: {
+    id: 'daming',
+    at: 0.2,
+    title: '【掠过明湖】',
+    lines: ['下方就是大明湖，济南老城最大的水面，柳堤荷影之间，超然楼与历下亭静立湖畔。'],
   },
-  zhangqiu: {
-    id: 'zhangqiu',
-    at: 0.15,
-    title: '【飞越章丘】',
-    lines: ['飞越章丘，泰沂余脉慢慢消散，广袤的农耕平原铺展开来。'],
+  qianfo: {
+    id: 'qianfo',
+    at: 0.42,
+    title: '【飞越千佛山】',
+    lines: ['飞越千佛山，舜耕历山的传说与隋唐摩崖造像叠在山间，登顶可望齐烟九点。'],
   },
-  zibo: {
-    id: 'zibo',
-    at: 0.35,
-    title: '【途经淄博】',
-    lines: ['抵达淄博，古齐国故都，工业老城与村落交织，延续着数千年的文明。'],
+  heihu: {
+    id: 'heihu',
+    at: 0.63,
+    title: '【俯瞰黑虎泉】',
+    lines: ['护城河畔的黑虎泉群水声如虎啸，清晨打水人络绎，泉水一路汇入大明湖。'],
   },
-  weifang: {
-    id: 'weifang',
-    at: 0.6,
-    title: '【飞越潍坊】',
-    lines: ['来到潍坊，山东最大的平原腹地，河道密布，是享誉世界的风筝之都。'],
-  },
-  laizhou: {
-    id: 'laizhou',
-    at: 0.75,
-    title: '【近海初见｜莱州湾】',
-    lines: ['前方就是莱州湾，陆地在这里和渤海相接。'],
-  },
-  'qingdao-land': {
-    id: 'qingdao-land',
-    at: 0.92,
-    title: '【抵达青岛｜降落阶段】',
-    lines: ['即将降落青岛，山海相依的滨海城市。漫游结束，为你规划本地旅行。'],
+  'jiuru-land': {
+    id: 'jiuru-land',
+    at: 0.9,
+    title: '【抵达九如山｜降落阶段】',
+    lines: ['即将降落九如山，济南南部山区的溪谷群，瀑布连潭、秋红冬冰。漫游结束，为你规划本地山野行程。'],
   },
 };
 
@@ -184,13 +143,11 @@ export const CAPTION_PACKS: Record<CaptionPackId, Record<string, SnailFlightNarr
 export const DEFAULT_CAPTION_PACK: CaptionPackId = 'story';
 
 const REGION_BRIEFS: Record<string, string> = {
-  takeoff: '此刻在济南历下上空。这里是泉城核心，趵突泉与大明湖静卧其间，齐鲁文脉由此向东铺开。',
-  lakes: '此刻掠过齐鲁大地上的湖泽。湖泊镶在田畴之间，平原肌理正缓缓向东延展。',
-  zhangqiu: '此刻飞越章丘。泰沂余脉渐渐舒缓，农耕平原铺成齐鲁大地的底色。',
-  zibo: '此刻途经淄博上空。古齐故都，老城烟火与工矿交织，土地厚重。',
-  weifang: '此刻飞越潍坊。开阔平原河道交错，风筝之乡的风正从陆地吹向海洋。',
-  laizhou: '此刻望见莱州湾。陆地在此收束，渤海海岸线已经映入眼前。',
-  'qingdao-land': '此刻抵达青岛上空。山海相依，红瓦碧海，蜗牛号正准备缓缓降落。',
+  takeoff: '此刻在趵突泉上空。三股清泉昼夜翻涌，这里是泉城济南的心脏，泉脉由此向老城铺开。',
+  daming: '此刻掠过大明湖。柳堤荷影间，超然楼与历下亭静立湖岸，湖面倒映着济南老城的天际线。',
+  qianfo: '此刻飞越千佛山。舜耕历山的传说与隋唐摩崖造像叠在山间，山与城在此相接。',
+  heihu: '此刻俯瞰黑虎泉。护城河畔泉声如虎啸，清晨打水人与解放阁的影子，都在粼粼水光里。',
+  'jiuru-land': '此刻抵达九如山上空。溪谷群层层叠落，瀑布连潭，蜗牛号正准备缓缓降落。',
 };
 
 export function isCaptionPackId(value: string | null | undefined): value is CaptionPackId {
@@ -235,16 +192,14 @@ export function regionBriefAt(progress: number): string {
 }
 
 export function routeSightsReply(): string {
-  return '我可以为你梳理本次航线沿途的游玩点位，漫游结束后生成旅行灵感。沿途可看：济南历下的趵突泉与大明湖，章丘田野，淄博齐文化与老城烟火，潍坊风筝与平原，莱州湾海岸，以及青岛的红瓦碧海。';
+  return '我可以为你梳理本次航线沿途的游玩点位，漫游结束后生成旅行灵感。沿途可看：趵突泉的三股清泉与泉池夜色，大明湖的柳堤荷影与超然楼，千佛山的历山传说与隋唐造像，黑虎泉的护城河打水人，以及九如山的溪谷瀑布。';
 }
 
 const AHEAD_SIGHTS: Record<string, string> = {
-  lakes: '齐鲁湖泽与田畴',
-  zhangqiu: '章丘田野与舒缓山丘',
-  zibo: '淄博齐故都与老城烟火',
-  weifang: '潍坊平原与风筝之乡',
-  laizhou: '莱州湾与渤海海岸',
-  'qingdao-land': '青岛红瓦碧海与八大关',
+  daming: '大明湖柳堤荷影与超然楼',
+  qianfo: '千佛山历山传说与隋唐造像',
+  heihu: '黑虎泉护城河泉群与解放阁',
+  'jiuru-land': '九如山溪谷瀑布群',
 };
 
 /** 管家「前方还有哪些风景」：只答还没飞到的航段，不打断飞行。 */
@@ -254,12 +209,12 @@ export function aheadSightsReply(progress: number): string {
     .map((cue) => AHEAD_SIGHTS[cue.id])
     .filter((name): name is string => Boolean(name));
   if (!remaining.length) {
-    return '前方已接近青岛降落。红瓦碧海就在眼前，落地后可以慢慢逛海边与八大关。';
+    return '前方已接近九如山降落。溪谷瀑布就在眼前，落地后可以沿栈道慢慢看山与潭。';
   }
-  return `前方航线上还能看到：${remaining.join('、')}。想慢慢看的话，落地后我可以帮你排一版目的地灵感。`;
+  return `前方航线上还能看到：${remaining.join('、')}。想慢慢看的话，落地后我可以帮你排一版山野慢游灵感。`;
 }
 
 /** 管家「帮我生成目的地行程」：落地灵感，不含订票组团。 */
 export function destinationPlanReply(): string {
-  return '落地青岛后可以按慢游来走：第一天栈桥与老城区闲逛，把空档留给海边风；第二天八大关梧桐路散步，傍晚等人少时看日落；第三天量力近郊或馆内补点。这是灵感参考，不含订票、组团服务。飞行不会暂停。';
+  return '落地九如山后可以按慢游来走：第一天沿瀑群栈道慢慢爬，把时间留给水声与树荫；第二天去趵突泉和大明湖沿湖散步，傍晚看超然楼亮灯；第三天量力去黑虎泉看清晨打水，或近郊补点山野。这是灵感参考，不含订票、组团服务。飞行不会暂停。';
 }

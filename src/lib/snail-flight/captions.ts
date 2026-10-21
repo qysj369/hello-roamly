@@ -5,7 +5,7 @@ import type { SnailFlightNarration, SnailFlightRoute } from '@/lib/snail-flight/
 export const SNAIL_FLIGHT_CAPTION_HOLD_MS = 7_000;
 export const SNAIL_FLIGHT_CAPTION_FADE_MS = 560;
 
-const ARRIVAL_IDS = new Set(['qingdao-land', 'qingdao-coast', 'approach']);
+const ARRIVAL_IDS = new Set(['jiuru-land', 'qingdao-land', 'qingdao-coast', 'approach']);
 
 export function shouldHoldWaypointCaption(id: string): boolean {
   return Boolean(id) && id !== 'landing';

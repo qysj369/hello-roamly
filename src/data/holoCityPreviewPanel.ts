@@ -9,10 +9,7 @@
  * 【产品底线】城市弹窗查询永久免费，见 `@/lib/config/productPositioning`
  */
 
-import {
-  getCityPreviewGallery,
-  type HoloPreviewGalleryItem,
-} from '@/data/holoCityPreviewMedia';
+import { getCityPreviewGallery, type HoloPreviewGalleryItem } from '@/data/holoCityPreviewMedia';
 import type { BusinessExtensionFields } from '@/types/domain/businessExtensions';
 
 export type HoloPreviewFoodItem = {
@@ -60,12 +57,48 @@ const PANEL_DRAFTS: Record<string, PanelDraft> = {
     transit: '地铁覆盖主要景区；到站后胡同与园外缘更适合步行或骑行，短途别反复换乘。',
     tips: ['轴线景点清晨更松', '湖边与园外缘留给傍晚', '长城只走一段就够'],
     spots: [
-      { name: '故宫', blurb: '选一条轴线慢慢看，不必求全。', tag: '世界遗产', lat: 39.9163, lng: 116.3972 },
-      { name: '天安门', blurb: '广场开阔，清晨人少更好走。', tag: '国家级', lat: 39.9087, lng: 116.3975 },
-      { name: '天坛', blurb: '柏树林里空走一圈，比赶点从容。', tag: '国家级', lat: 39.8822, lng: 116.4066 },
-      { name: '长城·八达岭', blurb: '不必冲顶，走一段城砖就够。', tag: '世界遗产', lat: 40.359, lng: 116.02 },
-      { name: '颐和园', blurb: '佛香阁隔湖望一眼，园外缘也能坐很久。', tag: '世界遗产', lat: 39.999, lng: 116.275 },
-      { name: '什刹海', blurb: '夜里灯影落在水里，比景点名单重要。', tag: '慢行湖景', lat: 39.94, lng: 116.39 },
+      {
+        name: '故宫',
+        blurb: '选一条轴线慢慢看，不必求全。',
+        tag: '世界遗产',
+        lat: 39.9163,
+        lng: 116.3972,
+      },
+      {
+        name: '天安门',
+        blurb: '广场开阔，清晨人少更好走。',
+        tag: '国家级',
+        lat: 39.9087,
+        lng: 116.3975,
+      },
+      {
+        name: '天坛',
+        blurb: '柏树林里空走一圈，比赶点从容。',
+        tag: '国家级',
+        lat: 39.8822,
+        lng: 116.4066,
+      },
+      {
+        name: '长城·八达岭',
+        blurb: '不必冲顶，走一段城砖就够。',
+        tag: '世界遗产',
+        lat: 40.359,
+        lng: 116.02,
+      },
+      {
+        name: '颐和园',
+        blurb: '佛香阁隔湖望一眼，园外缘也能坐很久。',
+        tag: '世界遗产',
+        lat: 39.999,
+        lng: 116.275,
+      },
+      {
+        name: '什刹海',
+        blurb: '夜里灯影落在水里，比景点名单重要。',
+        tag: '慢行湖景',
+        lat: 39.94,
+        lng: 116.39,
+      },
     ],
   },
   上海: {
@@ -82,7 +115,13 @@ const PANEL_DRAFTS: Record<string, PanelDraft> = {
     tips: ['天际线留给蓝调时刻', '豫园适合空走', '别把夜景排满'],
     spots: [
       { name: '外滩', blurb: '对岸陆家嘴在傍晚最好看。', tag: '城市地标', lat: 31.24, lng: 121.49 },
-      { name: '陆家嘴江岸', blurb: '夜灯亮起后，站一会儿就够。', tag: '江岸夜景', lat: 31.235, lng: 121.505 },
+      {
+        name: '陆家嘴江岸',
+        blurb: '夜灯亮起后，站一会儿就够。',
+        tag: '江岸夜景',
+        lat: 31.235,
+        lng: 121.505,
+      },
       { name: '豫园', blurb: '亭廊水影，适合慢慢晃。', tag: '慢行园林', lat: 31.23, lng: 121.49 },
     ],
   },
@@ -142,17 +181,41 @@ const PANEL_DRAFTS: Record<string, PanelDraft> = {
     transit: '古城内多走路；古镇可短途接驳，不必把园门排满。',
     tips: ['水巷夜里更松', '人多时看墙影也够', '古镇半日刚好'],
     spots: [
-      { name: '拙政园外缘', blurb: '园外墙影也有味道，不必硬挤。', tag: '世界遗产', lat: 31.324, lng: 120.629 },
-      { name: '平江路水巷', blurb: '红灯映在水里，边走边停。', tag: '慢行水巷', lat: 31.32, lng: 120.63 },
-      { name: '山塘街', blurb: '石板与河沿慢慢晃，比挤园门松。', tag: '慢行老街', lat: 31.317, lng: 120.605 },
-      { name: '同里', blurb: '游船码头坐一坐，半日刚好。', tag: '慢行古镇', lat: 31.16, lng: 120.72 },
+      {
+        name: '拙政园外缘',
+        blurb: '园外墙影也有味道，不必硬挤。',
+        tag: '世界遗产',
+        lat: 31.324,
+        lng: 120.629,
+      },
+      {
+        name: '平江路水巷',
+        blurb: '红灯映在水里，边走边停。',
+        tag: '慢行水巷',
+        lat: 31.32,
+        lng: 120.63,
+      },
+      {
+        name: '山塘街',
+        blurb: '石板与河沿慢慢晃，比挤园门松。',
+        tag: '慢行老街',
+        lat: 31.317,
+        lng: 120.605,
+      },
+      {
+        name: '同里',
+        blurb: '游船码头坐一坐，半日刚好。',
+        tag: '慢行古镇',
+        lat: 31.16,
+        lng: 120.72,
+      },
     ],
   },
   济南: {
     moodTitle: '济南·泉城漫行',
     moodTitleEn: 'Jinan · Spring city roam',
     intro:
-      '泉城因水而活：先听趵突泉，再把大明湖走一截。芙蓉街侧巷便宜坊的把子肉热乎，老城一段走路最顺，泉水与湖风会替你把城市介绍完。',
+      '泉城因水而活，一条「飞阅济南」线串起五处降落点：先听趵突泉三股水，沿护城河到黑虎泉看市民打水，大明湖环湖后登千佛山俯瞰全城，再把半天留给九如山的瀑布群。芙蓉街侧巷便宜坊的把子肉热乎，老城走路最顺，泉水与湖风替你把城市介绍完。',
     foods: [
       { name: '把子肉', shop: '便宜坊', area: '芙蓉街附近' },
       { name: '油旋', shop: '草包包子', area: '老城街口' },
@@ -161,10 +224,41 @@ const PANEL_DRAFTS: Record<string, PanelDraft> = {
     transit: '老城一段走路最顺；稍远再坐公交，泉点之间别赶点。',
     tips: ['清晨泉声更清楚', '芙蓉街侧巷比主街松', '环湖不必求全'],
     spots: [
-      { name: '趵突泉', blurb: '清晨泉声更清楚。', tag: '城市地标', lat: 36.66, lng: 117.01 },
-      { name: '大明湖', blurb: '湖面开阔，城市声远一点。', tag: '慢行湖景', lat: 36.68, lng: 117.03 },
-      { name: '芙蓉街', blurb: '侧巷吃东西，比主街松一点。', tag: '慢行小吃', lat: 36.665, lng: 117.02 },
-      { name: '五龙潭', blurb: '泉池散落巷里，适合坐一会儿。', tag: '慢行泉群', lat: 36.6658, lng: 117.015 },
+      {
+        name: '趵突泉',
+        blurb: '三股水昼夜翻滚，水温常年18℃。',
+        tag: '天下第一泉',
+        lat: 36.662,
+        lng: 117.028,
+      },
+      {
+        name: '大明湖',
+        blurb: '众泉汇流成湖，超然楼亮灯是仪式感。',
+        tag: '慢行湖景',
+        lat: 36.671,
+        lng: 117.018,
+      },
+      {
+        name: '千佛山',
+        blurb: '舜耕历山，登一览亭俯瞰全城。',
+        tag: '登高远眺',
+        lat: 36.636,
+        lng: 117.03,
+      },
+      {
+        name: '黑虎泉',
+        blurb: '三个虎头吐水，市民清晨排队打水。',
+        tag: '泉水生活',
+        lat: 36.654,
+        lng: 117.028,
+      },
+      {
+        name: '九如山',
+        blurb: '泰山北麓瀑布群，夏瀑冬冰。',
+        tag: '山野慢行',
+        lat: 36.53,
+        lng: 117.196,
+      },
     ],
   },
   南京: {
@@ -180,9 +274,21 @@ const PANEL_DRAFTS: Record<string, PanelDraft> = {
     transit: '地铁到站后湖边多走路；陵园只走外缘缓坡，不必冲顶。',
     tips: ['日落前后去湖边', '缓坡走到哪算哪', '梧桐道适合空走'],
     spots: [
-      { name: '中山陵', blurb: '石阶缓坡，走到哪里算哪里。', tag: '国家级', lat: 32.05, lng: 118.85 },
+      {
+        name: '中山陵',
+        blurb: '石阶缓坡，走到哪里算哪里。',
+        tag: '国家级',
+        lat: 32.05,
+        lng: 118.85,
+      },
       { name: '玄武湖', blurb: '日落前后，风刚好。', tag: '慢行湖景', lat: 32.07, lng: 118.8 },
-      { name: '老门东', blurb: '石板街走走停停，适合歇脚。', tag: '慢行街区', lat: 32.014, lng: 118.79 },
+      {
+        name: '老门东',
+        blurb: '石板街走走停停，适合歇脚。',
+        tag: '慢行街区',
+        lat: 32.014,
+        lng: 118.79,
+      },
     ],
   },
   广州: {
@@ -198,7 +304,13 @@ const PANEL_DRAFTS: Record<string, PanelDraft> = {
     transit: '地铁到老城后江边步行；短途别换乘太勤，把时间留给骑楼。',
     tips: ['早茶别赶点', '夜风起来再去江边', '骑楼适合空走'],
     spots: [
-      { name: '珠江边', blurb: '广州塔夜灯亮起后，站一会儿就够。', tag: '江岸夜景', lat: 23.11, lng: 113.32 },
+      {
+        name: '珠江边',
+        blurb: '广州塔夜灯亮起后，站一会儿就够。',
+        tag: '江岸夜景',
+        lat: 23.11,
+        lng: 113.32,
+      },
       { name: '永庆坊', blurb: '骑楼底下，适合慢慢逛。', tag: '慢行骑楼', lat: 23.12, lng: 113.24 },
       { name: '沙面', blurb: '林荫道空走，比主街松。', tag: '慢行林荫', lat: 23.11, lng: 113.24 },
     ],
@@ -217,7 +329,13 @@ const PANEL_DRAFTS: Record<string, PanelDraft> = {
     tips: ['落日前后去栈道', '海岸城适合歇脚', '别把湾区排满'],
     spots: [
       { name: '深圳湾栈道', blurb: '落日前后，风最大。', tag: '慢行海风', lat: 22.52, lng: 113.99 },
-      { name: '深圳湾落日', blurb: '站在栏杆边看一会儿就够。', tag: '湾区氛围', lat: 22.515, lng: 113.995 },
+      {
+        name: '深圳湾落日',
+        blurb: '站在栏杆边看一会儿就够。',
+        tag: '湾区氛围',
+        lat: 22.515,
+        lng: 113.995,
+      },
       { name: '海岸城', blurb: '补给、歇脚，都方便。', tag: '都市歇脚', lat: 22.52, lng: 113.94 },
     ],
   },
@@ -253,7 +371,13 @@ const PANEL_DRAFTS: Record<string, PanelDraft> = {
     tips: ['租车半圈就够', '夜灯亮了再去塔外缘', '回坊别追网红店'],
     spots: [
       { name: '城墙', blurb: '租车半圈，比硬走轻松。', tag: '国家级', lat: 34.26, lng: 108.94 },
-      { name: '大雁塔', blurb: '塔影看一眼就够，外缘慢慢晃。', tag: '城市地标', lat: 34.22, lng: 108.96 },
+      {
+        name: '大雁塔',
+        blurb: '塔影看一眼就够，外缘慢慢晃。',
+        tag: '城市地标',
+        lat: 34.22,
+        lng: 108.96,
+      },
       { name: '回坊', blurb: '边走边吃，别追网红店。', tag: '慢行小吃', lat: 34.26, lng: 108.94 },
     ],
   },
@@ -272,7 +396,13 @@ const PANEL_DRAFTS: Record<string, PanelDraft> = {
     spots: [
       { name: '鼓浪屿', blurb: '找安静海岸，坐一会儿。', tag: '海岛慢游', lat: 24.45, lng: 118.06 },
       { name: '环岛路', blurb: '傍晚海风，骑一段就够。', tag: '慢行海湾', lat: 24.44, lng: 118.12 },
-      { name: '对岸海岸', blurb: '红瓦与海面，站一会儿也值。', tag: '海岛氛围', lat: 24.45, lng: 118.07 },
+      {
+        name: '对岸海岸',
+        blurb: '红瓦与海面，站一会儿也值。',
+        tag: '海岛氛围',
+        lat: 24.45,
+        lng: 118.07,
+      },
     ],
   },
   黄山: {
@@ -288,7 +418,13 @@ const PANEL_DRAFTS: Record<string, PanelDraft> = {
     transit: '进城后转景区接驳；山路段量力而行，可坐索道。',
     tips: ['雾大时别赶景', '留一段空走看云', '不必硬冲顶'],
     spots: [
-      { name: '黄山主峰外缘', blurb: '云海与奇松，走到哪算哪。', tag: '世界遗产', lat: 30.13, lng: 118.16 },
+      {
+        name: '黄山主峰外缘',
+        blurb: '云海与奇松，走到哪算哪。',
+        tag: '世界遗产',
+        lat: 30.13,
+        lng: 118.16,
+      },
     ],
   },
   泉州: {
@@ -304,7 +440,13 @@ const PANEL_DRAFTS: Record<string, PanelDraft> = {
     transit: '古城内多走路；稍远再换乘公交，寺外缘比中心松。',
     tips: ['寺外缘比人流中心松', '西街边走边吃就好', '旧巷适合空走'],
     spots: [
-      { name: '开元寺双塔', blurb: '石塔立在绿树里，半日刚好。', tag: '世界遗产', lat: 24.91, lng: 118.59 },
+      {
+        name: '开元寺双塔',
+        blurb: '石塔立在绿树里，半日刚好。',
+        tag: '世界遗产',
+        lat: 24.91,
+        lng: 118.59,
+      },
     ],
   },
 };

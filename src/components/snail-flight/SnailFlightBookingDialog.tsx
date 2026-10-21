@@ -35,7 +35,7 @@ export default function SnailFlightBookingDialog({
     >
       <form className="snail-flight-modal__card snail-flight-form" onSubmit={onSubmit}>
         <h2 id="snail-flight-book-title">选择航线</h2>
-        <p>本阶段仅国内城市低空观光。演示示例：济南历下 → 青岛。</p>
+        <p>本阶段仅国内城市低空观光。演示示例：趵突泉 → 九如山。</p>
         <label htmlFor="snail-flight-origin">
           起飞地点
           <select
