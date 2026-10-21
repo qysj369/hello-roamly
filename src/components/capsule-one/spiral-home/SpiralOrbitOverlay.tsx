@@ -211,6 +211,19 @@ export default function SpiralOrbitOverlay() {
             />
           ))}
         </g>
+        <g className="spiral-home__ring-flows" fill="none" stroke="#fffaf0">
+          {RINGS.map((ring) => (
+            <ellipse
+              key={`flow-${ring.rot}`}
+              className="spiral-home__ring-flow"
+              cx="400"
+              cy="400"
+              rx={ring.rx}
+              ry={ring.ry}
+              transform={`rotate(${ring.rot} 400 400)`}
+            />
+          ))}
+        </g>
         <g className="spiral-home__sparks">
           <circle className="spiral-home__spark" cx="548" cy="268" r="3.2" />
           <circle className="spiral-home__spark" cx="420" cy="176" r="2.4" />
@@ -220,7 +233,7 @@ export default function SpiralOrbitOverlay() {
         <g className="spiral-home__motes">
           {RINGS.map((ring) => (
             <g key={ring.rot} transform={`rotate(${ring.rot} 400 400)`}>
-              <circle className="spiral-home__mote" r="6" fill="#fffaf0">
+              <circle className="spiral-home__mote" r="7.5" fill="#fffaf0">
                 <animateMotion
                   dur={ring.dur}
                   repeatCount="indefinite"
