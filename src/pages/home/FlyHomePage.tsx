@@ -212,7 +212,7 @@ export default function FlyHomePage() {
           <svg viewBox="0 0 24 24" fill="none" aria-hidden>
             <path
               d="M12 4c-5 2-8 6-8 10 0 5 4 8 8 8s8-3 8-7c0-2-1.4-2.7-2.8-1.8-1 .6-1.4 1.8-.8 3 .5 1.6 2.6 1.5 3-.5.5-2-.4-4.4-2.9-6S13 7.4 11 9.4c-1.8 1.8-1.8 5.4.5 7.3"
-              stroke="#77E0C3"
+              stroke="#1E8E6E"
               strokeWidth="1.6"
               strokeLinecap="round"
             />
