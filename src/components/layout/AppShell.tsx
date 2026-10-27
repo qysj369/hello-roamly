@@ -16,7 +16,6 @@ import FutureTravelMotion from '@/components/layout/FutureTravelMotion';
 import { useI18n } from '@/i18n/useI18n';
 import RoutePrefetchOnIdle from '@/router/RoutePrefetchOnIdle';
 import { paths } from '@/router/paths';
-import { isCapsuleOneHomeEnabled } from '@/lib/config/capsuleOne';
 import { isHoloHomeEnabled } from '@/lib/config/holoHome';
 import { isCapsuleAiSession } from '@/lib/capsule/capsuleAiSession';
 import type { AiChatPageState } from '@/types/router-state';
@@ -57,12 +56,12 @@ export default function AppShell() {
   const isFeedback = Boolean(useMatch({ path: paths.feedback, end: true }));
   const isHoloDrive = Boolean(useMatch({ path: `${paths.drive}/:cityName`, end: true }));
   const isSnailFlight = Boolean(useMatch({ path: paths.snailFlight, end: true }));
+  const isFlyLogin = Boolean(useMatch({ path: paths.login, end: true }));
   /** 合规页自带壳，勿与首页共用 isHoloExperience Outlet（会触发 React #300） */
-  const isHoloLegalSelfPage = isHoloHomeEnabled() && (isPrivacy || isTerms || isContact || isFeedback);
-  const isCapsuleHome = isHome && isCapsuleOneHomeEnabled();
-  const isHoloHome = isHome && isHoloHomeEnabled();
-  /** 仅首页 + 驾驶舱；城市列表走内页壳，避免同壳替换崩溃 */
-  const isHoloExperience = isHoloHomeEnabled() && (isHoloHome || isHoloDrive);
+  const isHoloLegalSelfPage =
+    isHoloHomeEnabled() && (isPrivacy || isTerms || isContact || isFeedback);
+  /** 驾驶舱仍走全息壳；首页固定为飞行视角，不再进这层 */
+  const isHoloExperience = isHoloHomeEnabled() && isHoloDrive;
   /** Holo 内页统一壳：避免 Tab 跳转时壳层切换导致异常 */
   const isCapsuleAi = isAi && (routeState?.source === 'capsule_one' || isCapsuleAiSession());
   const isHoloInnerPage =
@@ -84,40 +83,38 @@ export default function AppShell() {
       isMp ||
       isInspire);
 
-  const innerPageLabel = isGuidesPublish
-    ? '发布攻略'
-    : isGuideDetail
-      ? '攻略详情'
-      : isGuidesIndex
-        ? t.nav.guides
-        : isDiscover
-          ? t.tabs.stories
-          : isAi
-            ? t.tabs.advisor
-          : isAiSnail
-            ? 'AI蜗牛'
-            : isTravelBuddies || isTravelBuddyNew
-              ? t.tabs.buddy
-              : isProfile
-                ? t.tabs.me
-                : isMessages
-                  ? t.tabs.messages
-                  : isPlanDetail || isSavedPlanDetail
-                    ? '行程详情'
-                    : isAbout
-                      ? '关于我们'
-                      : isMp
-                        ? '行程工具'
-                      : isInspire
-                        ? '慢行灵感'
-                      : isCities
-                        ? t.nav.cities
-                        : t.nav.guides;
+  let innerPageLabel = t.nav.guides;
+  if (isGuidesPublish) innerPageLabel = '发布攻略';
+  else if (isGuideDetail) innerPageLabel = '攻略详情';
+  else if (isGuidesIndex) innerPageLabel = t.nav.guides;
+  else if (isDiscover) innerPageLabel = t.tabs.stories;
+  else if (isAi) innerPageLabel = t.tabs.advisor;
+  else if (isAiSnail) innerPageLabel = 'AI蜗牛';
+  else if (isTravelBuddies || isTravelBuddyNew) innerPageLabel = t.tabs.buddy;
+  else if (isProfile) innerPageLabel = t.tabs.me;
+  else if (isMessages) innerPageLabel = t.tabs.messages;
+  else if (isPlanDetail || isSavedPlanDetail) innerPageLabel = '行程详情';
+  else if (isAbout) innerPageLabel = '关于我们';
+  else if (isMp) innerPageLabel = '行程工具';
+  else if (isInspire) innerPageLabel = '慢行灵感';
+  else if (isCities) innerPageLabel = t.nav.cities;
+
+  if (isHome || isCapsuleAi || isSnailFlight || isFlyLogin) {
+    return (
+      <div className="capsule-app-shell">
+        <SkipToMainLink />
+        <main id="main-content" tabIndex={-1} className="outline-none">
+          <RouteErrorBoundary>
+            <Outlet />
+          </RouteErrorBoundary>
+        </main>
+      </div>
+    );
+  }
 
   if (isHoloExperience) {
-    const shellKey = isHoloHome ? 'holo-home' : 'holo-drive';
     return (
-      <div key={shellKey} className="holo-app-shell">
+      <div key="holo-drive" className="holo-app-shell">
         <SkipToMainLink />
         <HoloShellToast />
         <main id="main-content" tabIndex={-1} className="outline-none">
@@ -125,9 +122,8 @@ export default function AppShell() {
             <Outlet />
           </RouteErrorBoundary>
         </main>
-        {isHoloDrive ? <SiteComplianceBar className="holo-drive__compliance" /> : null}
+        <SiteComplianceBar className="holo-drive__compliance" />
         <GlobalPlanResultHost />
-        {isHoloHome ? <TravelAgentHost /> : null}
       </div>
     );
   }
@@ -168,19 +164,6 @@ export default function AppShell() {
         <RoutePrefetchOnIdle />
         <GlobalPlanResultHost />
         {isAi ? null : <TravelAgentHost />}
-      </div>
-    );
-  }
-
-  if (isCapsuleHome || isCapsuleAi || isSnailFlight) {
-    return (
-      <div className="capsule-app-shell">
-        <SkipToMainLink />
-        <main id="main-content" tabIndex={-1} className="outline-none">
-          <RouteErrorBoundary>
-            <Outlet />
-          </RouteErrorBoundary>
-        </main>
       </div>
     );
   }

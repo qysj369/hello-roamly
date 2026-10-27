@@ -1,0 +1,375 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>AI 飞行视角目的地 · 九如山 — 瀑布秋色</title>
+<meta name="description" content="趵突泉、黑虎泉、大明湖、千佛山、九如山——跟着老舍的笔，慢飞一次泉城。" />
+<meta property="og:title" content="蜗牛旅行 · 飞遍济南的冬天" />
+<meta property="og:description" content="趵突泉、黑虎泉、大明湖、千佛山、九如山——跟着老舍的笔，慢飞一次泉城。" />
+<link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 64 64'%3E%3Ccircle cx='32' cy='32' r='28' fill='%230B1F2A'/%3E%3Cpath d='M14 26c8-2 16 4 24 2s12-6 16-3' stroke='%2377E0C3' stroke-width='5' fill='none' stroke-linecap='round'/%3E%3Cpath d='M20 40c7-1 13 3 20 1s10-4 14-2' stroke='%23C9A227' stroke-width='4' fill='none' stroke-linecap='round'/%3E%3C/svg%3E">
+<link rel="stylesheet" href="https://miaoda.feishu.cn/fonts/css2?family=Noto+Serif+SC:wght@500;700;900&family=Noto+Sans+SC:wght@300;400;500;700&display=swap">
+<style>
+  :root{
+    --night:#0B1F2A; --night-2:#10293A; --night-3:#163447;
+    --spring:#1E8E6E; --spring-soft:#77E0C3; --spring-pale:#EAF6F1;
+    --gold:#C9A227; --gold-soft:#E8C76A;
+    --ink:#1A2B33; --ink-soft:#52636C; --line:rgba(255,255,255,.14);
+    --card:rgba(255,255,255,.96);
+  }
+  *{margin:0;padding:0;box-sizing:border-box}
+  html{scroll-behavior:smooth}
+  body{
+    font-family:"Noto Sans SC","Microsoft YaHei",system-ui,sans-serif;
+    background:var(--night); color:#EAF6F1; line-height:1.7;
+  }
+  .serif{font-family:"Noto Serif SC","Songti SC",serif}
+  img{display:block;max-width:100%}
+  a{color:inherit}
+
+  /* ===== 顶部沉浸区 ===== */
+  .hero{
+    position:relative; min-height:86vh; display:flex; align-items:center; justify-content:center;
+    text-align:center; overflow:hidden; background:var(--night-2);
+  }
+  .hero-bg{position:absolute; inset:0; width:100%; height:100%; max-width:none; object-fit:cover; object-position:center; opacity:.55}
+  .hero::after{
+    content:""; position:absolute; inset:0;
+    background:linear-gradient(180deg, rgba(11,31,42,.28) 0%, rgba(11,31,42,.55) 55%, rgba(11,31,42,.96) 100%);
+  }
+  .hero-inner{position:relative; z-index:1; padding:4rem 1.5rem 6rem; max-width:1080px}
+  .hero-kicker{
+    display:inline-flex; align-items:center; gap:.55rem;
+    font-size:.85rem; letter-spacing:.28em; color:var(--spring-soft);
+    border:1px solid rgba(119,224,195,.4); border-radius:999px; padding:.35rem 1rem .35rem 1.15rem;
+  }
+  .hero-kicker svg{width:1rem;height:1rem}
+  .hero h1{
+    font-family:"Noto Serif SC","Songti SC",serif; font-weight:900;
+    font-size:clamp(2.1rem,6vw,4.4rem); line-height:1.25; margin:1.4rem 0 .9rem;
+    text-shadow:0 4px 28px rgba(0,0,0,.5);
+  }
+  .hero h1 .hl{color:var(--gold-soft)}
+  .hero-sub{font-size:clamp(.95rem,2.4vw,1.2rem); color:rgba(234,246,241,.82); font-weight:300; max-width:34em; margin:0 auto}
+  .hero-meta{
+    margin-top:1.6rem; display:flex; gap:.6rem 1.2rem; justify-content:center; flex-wrap:wrap;
+    font-size:.9rem; color:rgba(234,246,241,.7);
+  }
+  .hero-meta b{color:var(--spring-soft); font-weight:500}
+
+  /* ===== 核心交互区 ===== */
+  .stage{max-width:1180px; margin:0 auto; padding:3.5rem 1.25rem 4.5rem}
+  .stage-title{
+    font-family:"Noto Serif SC",serif; font-weight:700; font-size:clamp(1.3rem,3.4vw,1.8rem);
+    color:var(--spring-soft); margin-bottom:1.8rem; display:flex; align-items:baseline; gap:.8rem;
+  }
+  .stage-title small{font-size:.8rem; color:rgba(234,246,241,.5); font-weight:400; letter-spacing:.12em}
+  .duo{display:grid; grid-template-columns:1fr; gap:1.5rem}
+
+  /* 播放器 */
+  .player{
+    background:#000; border-radius:18px; overflow:hidden; position:relative;
+    border:1px solid rgba(119,224,195,.25); box-shadow:0 24px 60px rgba(0,0,0,.45);
+    aspect-ratio:16/9;
+  }
+  .player-cover{position:absolute; inset:0; object-fit:cover; width:100%; height:100%; transition:opacity .5s ease; z-index:1}
+  .player-video{position:absolute; inset:0; width:100%; height:100%; object-fit:cover; display:block}
+  .player.is-playing .player-cover{opacity:0}
+  .player-shade{position:absolute; inset:0; z-index:1; pointer-events:none; background:linear-gradient(180deg,rgba(0,0,0,.15) 0%,rgba(0,0,0,.05) 40%,rgba(0,0,0,.62) 100%)}
+  .player.is-playing .player-shade{background:linear-gradient(180deg,rgba(0,0,0,.05) 0%,rgba(0,0,0,.28) 78%,rgba(0,0,0,.62) 100%)}
+  .ai-badge{
+    position:absolute; top:.9rem; left:.9rem; z-index:3;
+    display:inline-flex; align-items:center; gap:.4rem; font-size:.75rem; color:#EAF6F1;
+    background:rgba(11,31,42,.72); border:1px solid rgba(255,255,255,.28);
+    padding:.28rem .7rem; border-radius:999px; letter-spacing:.08em;
+  }
+  .ai-badge svg{width:.9rem;height:.9rem}
+  .play-btn{
+    position:absolute; inset:0; margin:auto; width:76px; height:76px; z-index:2;
+    border-radius:50%; border:none; cursor:pointer; background:rgba(234,246,241,.16);
+    backdrop-filter:blur(6px); -webkit-backdrop-filter:blur(6px);
+    display:flex; align-items:center; justify-content:center; transition:transform .2s ease;
+  }
+  .play-btn:hover{transform:scale(1.08); background:rgba(201,162,39,.42)}
+  .play-btn svg{width:34px;height:34px;fill:#fff}
+  .player.is-playing .play-btn{inset:auto auto .55rem .75rem; width:34px; height:34px; margin:0}
+  .player.is-playing .play-btn svg{width:14px;height:14px}
+  .player.is-playing .player-controls{padding-left:3.2rem}
+  .player-controls{
+    position:absolute; left:0; right:0; bottom:0; z-index:2; padding:.7rem 1rem;
+    display:flex; align-items:center; gap:1rem; color:rgba(234,246,241,.92); font-size:.8rem;
+  }
+  .ctrl-btn{
+    background:none; border:none; color:rgba(234,246,241,.9); font-size:.78rem; cursor:pointer;
+    display:inline-flex; align-items:center; gap:.3rem; padding:.2rem .3rem;
+  }
+  .ctrl-btn:hover{color:var(--gold-soft)}
+  .ctrl-btn svg{width:1rem;height:1rem}
+  .bar{flex:1; height:3px; background:rgba(255,255,255,.28); border-radius:2px; position:relative}
+  .bar i{position:absolute; left:0; top:0; bottom:0; width:0; background:var(--gold); border-radius:2px}
+  .player-side{position:absolute; right:1rem; bottom:.7rem; z-index:2; display:flex; gap:.4rem; align-items:center}
+
+  /* 飞行日志 */
+  .log{
+    background:var(--card); color:var(--ink); border-radius:18px; padding:1.6rem 1.5rem;
+    box-shadow:0 24px 60px rgba(0,0,0,.32);
+  }
+  .log-head{display:flex; align-items:baseline; justify-content:space-between; flex-wrap:wrap; gap:.5rem; border-bottom:1px solid rgba(26,43,51,.14); padding-bottom:.9rem; margin-bottom:1.1rem}
+  .log-title{font-family:"Noto Serif SC",serif; font-weight:700; font-size:1.35rem}
+  .log-head small{color:var(--ink-soft); font-size:.85rem}
+  .log-item{display:grid; grid-template-columns:auto 1fr; gap:.7rem 1rem; padding:.62rem 0; border-bottom:1px dashed rgba(26,43,51,.14); align-items:start}
+  .log-item:last-of-type{border-bottom:none}
+  .log-tag{font-size:.82rem; color:#fff; background:var(--night-3); border-radius:8px; padding:.14rem .6rem; white-space:nowrap; margin-top:.12rem}
+  .log-item .t{font-weight:500; margin-bottom:.12rem}
+  .log-item .d{color:var(--ink-soft); font-size:.9rem}
+  .stars{color:var(--gold); letter-spacing:.08em; font-size:1rem}
+  .pick-list{margin:.5rem 0 0; padding-left:1.1rem; color:var(--ink-soft); font-size:.9rem}
+  .pick-list li{margin:.22rem 0}
+  .food-line{margin-top:.5rem; font-size:.9rem; color:var(--ink-soft)}
+  .log-cta{display:flex; gap:.7rem; margin-top:1.2rem; flex-wrap:wrap}
+  .btn{
+    border:none; cursor:pointer; border-radius:12px; font-size:.95rem; font-weight:500;
+    padding:.72rem 1.3rem; font-family:inherit; transition:transform .15s ease, box-shadow .15s ease;
+  }
+  .btn:active{transform:translateY(1px)}
+  .btn-primary{background:var(--gold); color:#10293A}
+  .btn-primary:hover{box-shadow:0 8px 24px rgba(201,162,39,.45); transform:translateY(-1px)}
+  .btn-ghost{background:transparent; color:var(--ink); border:1px solid rgba(26,43,51,.35)}
+  .btn-ghost:hover{border-color:var(--spring)}
+
+  /* ===== 底部互动 ===== */
+  .interact{max-width:1180px; margin:0 auto; padding:0 1.25rem 4rem}
+  .react-row{display:flex; align-items:center; gap:1.2rem; flex-wrap:wrap}
+  .react-btn{
+    display:inline-flex; align-items:center; gap:.45rem; background:none; border:1px solid rgba(234,246,241,.26);
+    color:#EAF6F1; border-radius:999px; padding:.5rem 1.1rem; cursor:pointer; font-size:.9rem; font-family:inherit;
+    transition:border-color .15s ease, color .15s ease;
+  }
+  .react-btn:hover{border-color:var(--spring-soft); color:var(--spring-soft)}
+  .react-btn.is-on{border-color:var(--gold); color:var(--gold-soft)}
+  .react-btn svg{width:1rem;height:1rem}
+  .comment-box{margin-top:1.2rem; display:flex; gap:.7rem; flex-wrap:wrap}
+  .comment-box input{
+    flex:1; min-width:220px; background:rgba(255,255,255,.06); border:1px solid rgba(234,246,241,.26);
+    border-radius:999px; color:#EAF6F1; padding:.7rem 1.2rem; font-size:1rem; font-family:inherit; outline:none;
+  }
+  .comment-box input::placeholder{color:rgba(234,246,241,.4)}
+  .comment-box input:focus{border-color:var(--spring-soft)}
+
+  .foot{
+    border-top:1px solid rgba(234,246,241,.14); padding:1.6rem 1.25rem 2.2rem; text-align:center;
+    font-size:.82rem; color:rgba(234,246,241,.55);
+  }
+  .foot .ai-note{
+    display:inline-flex; align-items:center; gap:.4rem; border:1px solid rgba(119,224,195,.35);
+    color:var(--spring-soft); border-radius:999px; padding:.3rem .9rem; margin-bottom:.9rem;
+  }
+  .foot .ai-note svg{width:.85rem;height:.85rem}
+
+  #toast{
+    position:fixed; left:50%; bottom:2.2rem; transform:translateX(-50%) translateY(24px);
+    background:rgba(16,41,58,.95); color:#EAF6F1; border:1px solid rgba(119,224,195,.4);
+    padding:.7rem 1.3rem; border-radius:999px; font-size:.9rem; opacity:0; pointer-events:none;
+    transition:opacity .25s ease, transform .25s ease; z-index:99; max-width:88vw; text-align:center;
+  }
+  #toast.show{opacity:1; transform:translateX(-50%) translateY(0)}
+
+  @media (min-width:768px){
+    .duo{grid-template-columns:1.15fr 1fr; gap:1.6rem}
+    .player{position:sticky; top:1.2rem}
+    .hero{min-height:92vh}
+  }
+  @media (prefers-reduced-motion:reduce){
+    *{transition:none!important; scroll-behavior:auto!important}
+  }
+</style>
+</head>
+<body>
+
+<!-- ===== 顶部沉浸区 ===== -->
+<header class="hero">
+  <img class="hero-bg" src="assets/jiuru-poster.jpg" alt="九如山瀑布与秋色栈道">
+  <div class="hero-inner">
+    <span class="hero-kicker">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M2 12c4-6 6-9 10-9s6 3 10 9M2 12l10-3 10 3M8 12v6m8-6v6"/></svg>
+      AI 飞行视角目的地 · 山野
+    </span>
+    <h1 class="serif">像鸟儿一样俯瞰<span class="hl">九如山</span></h1>
+    <p class="hero-sub">「九如听瀑，山不见我，我自去见山」</p>
+    <div class="hero-meta">
+      <span>坐标 <b>117.196, 36.530</b></span>
+      <span>济南 · 山东 · <b>瀑布群 · 山野慢行</b></span>
+      <span>片长 <b>15 秒 · 秋色</b></span>
+    </div>
+  </div>
+</header>
+
+<!-- ===== 核心交互区：播放器 + 飞行日志 ===== -->
+<main class="stage">
+  <h2 class="stage-title serif">飞越泉城 <small>视觉层 · 信息层</small></h2>
+  <div class="duo">
+
+    <!-- 左：AI 飞行播放器 -->
+    <div class="player">
+      <video class="player-video" src="assets/jiuru-fly.mp4?v=3" preload="metadata" playsinline></video>
+      <img class="player-cover" src="assets/jiuru-poster.jpg" alt="九如山瀑布秋色画面">
+      <div class="player-shade"></div>
+      <span class="ai-badge"><svg viewBox="0 0 24 24" fill="currentColor"><path d="M12 2l2.2 5.6L20 9.8l-5.8 2.2L12 17.6l-2.2-5.6L4 9.8l5.8-2.2z"/></svg>AI 视角</span>
+      <button class="play-btn" id="playBtn" aria-label="播放飞行视角视频">
+        <svg id="playIcon" viewBox="0 0 24 24"><path d="M8 5v14l11-7z"/></svg>
+      </button>
+      <div class="player-controls">
+        <button class="ctrl-btn" id="rateBtn">1.0x 倍速</button>
+        <span class="bar"><i id="playBar"></i></span>
+        <button class="ctrl-btn" id="fullBtn"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M8 3H5a2 2 0 0 0-2 2v3m18 0V5a2 2 0 0 0-2-2h-3m0 18h3a2 2 0 0 0 2-2v-3M3 16v3a2 2 0 0 0 2 2h3"/></svg>全屏</button>
+      </div>
+    </div>
+
+    <!-- 右：飞行日志 -->
+    <aside class="log">
+      <div class="log-head">
+        <div class="log-title serif">飞行日志 · 九如山</div>
+        <small>编辑于济南 · 穷游定位</small>
+      </div>
+
+      <div class="log-item">
+        <span class="log-tag">坐标</span>
+        <div><div class="t">九如山 · 南部山区</div><div class="d">经度 117.196 · 纬度 36.530</div></div>
+      </div>
+      <div class="log-item">
+        <span class="log-tag">穷游指数</span>
+        <div><div class="t"><span class="stars" aria-hidden="true"><svg viewBox="0 0 24 24" width="15" height="15" fill="#C9A227"><path d="M12 2l2.9 6.6 7.1.6-5.4 4.7 1.6 7L12 17.2 5.8 20.9l1.6-7L2 9.2l7.1-.6z"/></svg><svg viewBox="0 0 24 24" width="15" height="15" fill="#C9A227"><path d="M12 2l2.9 6.6 7.1.6-5.4 4.7 1.6 7L12 17.2 5.8 20.9l1.6-7L2 9.2l7.1-.6z"/></svg><svg viewBox="0 0 24 24" width="15" height="15" fill="#C9A227"><path d="M12 2l2.9 6.6 7.1.6-5.4 4.7 1.6 7L12 17.2 5.8 20.9l1.6-7L2 9.2l7.1-.6z"/></svg><svg viewBox="0 0 24 24" width="15" height="15" fill="none" stroke="#C9A227" stroke-width="1.6"><path d="M12 2l2.9 6.6 7.1.6-5.4 4.7 1.6 7L12 17.2 5.8 20.9l1.6-7L2 9.2l7.1-.6z"/></svg><svg viewBox="0 0 24 24" width="15" height="15" fill="none" stroke="#C9A227" stroke-width="1.6"><path d="M12 2l2.9 6.6 7.1.6-5.4 4.7 1.6 7L12 17.2 5.8 20.9l1.6-7L2 9.2l7.1-.6z"/></svg></span> 穷游指数 3 / 5</div><div class="d">离老城有一段路。留半天沿栈道看瀑，不赶场。</div></div>
+      </div>
+      <div class="log-item">
+        <span class="log-tag">AI 亮点</span>
+        <div><div class="d">瀑布连潭 · 峡谷木栈道 · 秋红从石缝里探出来</div></div>
+      </div>
+      <div class="log-item">
+        <span class="log-tag">落地攻略</span>
+        <div>
+          <div class="t">交通 · 门票 · 避坑</div>
+          <ul class="pick-list">
+            <li>在济南南部山区，离老城有一段路，留出半天再进山。</li>
+            <li>沿栈道看瀑布和潭，走到哪算哪，不必冲完整条线。</li>
+            <li>山里早晚凉。秋色这季栈道人会多一些，错开上午更松。</li>
+          </ul>
+        </div>
+      </div>
+      <div class="log-item">
+        <span class="log-tag">落地吃法</span>
+        <div><div class="d">炖土鸡 · 泉水豆腐 · 山栗子。看完瀑在山里吃一顿就够，不必再赶回城赶场。</div></div>
+      </div>
+
+      <div class="log-cta">
+        <button class="btn btn-primary" id="flyBtn">开启 3D 飞行演示</button>
+        <button class="btn btn-ghost" id="planBtn">生成图文资产包</button>
+      </div>
+    </aside>
+  </div>
+</main>
+
+<!-- ===== 底部互动 ===== -->
+<section class="interact">
+  <div class="react-row">
+    <button class="react-btn" id="likeBtn"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M20.8 4.6a5.5 5.5 0 0 0-7.8 0L12 5.7l-1-1.1a5.5 5.5 0 0 0-7.8 7.8l1 1.1L12 21l7.8-7.5 1-1.1a5.5 5.5 0 0 0 0-7.8z"/></svg>赞 <span id="likeCount">18</span></button>
+    <button class="react-btn" id="favBtn"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M6 3h12a1 1 0 0 1 1 1v17l-7-4-7 4V4a1 1 0 0 1 1-1z"/></svg>收藏</button>
+    <span style="color:rgba(234,246,241,.45);font-size:.85rem">评论区 · 一期仅开放点赞与简单评论</span>
+  </div>
+  <form class="comment-box" id="commentForm">
+    <input type="text" id="commentInput" placeholder="写一句想看这里的理由…" aria-label="评论输入">
+    <button class="btn btn-primary" type="submit" style="padding:.6rem 1.2rem">发送</button>
+  </form>
+</section>
+
+<!-- ===== 页脚 ===== -->
+<footer class="foot">
+  <span class="ai-note"><svg viewBox="0 0 24 24" fill="currentColor"><path d="M12 2l2.2 5.6L20 9.8l-5.8 2.2L12 17.6l-2.2-5.6L4 9.8l5.8-2.2z"/></svg>AI 生成飞行视角，仅供参考，非真实航拍</span>
+  <p>飞阅济南 · 蜗牛旅行演示样板页 ｜ 飞行路线与落点基于真实地理坐标设计 ｜ 票价与交通信息源自济南市政府公开口径</p>
+</footer>
+
+<div id="toast" role="status"></div>
+
+<script>
+  var toast = document.getElementById('toast');
+  function showToast(msg, hold){
+    toast.textContent = msg;
+    toast.classList.add('show');
+    clearTimeout(showToast._t);
+    showToast._t = setTimeout(function(){ toast.classList.remove('show'); }, hold || 2600);
+  }
+  /* 真实视频播放 */
+  var video = document.querySelector('.player-video');
+  var playerBox = document.querySelector('.player');
+  var playBtn = document.getElementById('playBtn');
+  var playIcon = document.getElementById('playIcon');
+  var playBar = document.getElementById('playBar');
+  var rateBtn = document.getElementById('rateBtn');
+  var rates = [1, 1.5, 2];
+  var ri = 0;
+  function revealPicture(){
+    if (video.videoWidth > 0) playerBox.classList.add('is-playing');
+  }
+  video.addEventListener('playing', revealPicture);
+  video.addEventListener('loadeddata', revealPicture);
+  playBtn.addEventListener('click', function(){
+    if(video.paused){
+      var pending = video.play();
+      if (pending && pending.catch) pending.catch(function(){ showToast('这台浏览器播不出画面'); });
+      playIcon.setAttribute('viewBox','0 0 24 24');
+      playIcon.innerHTML = '<path d="M6 5h4v14H6zM14 5h4v14h-4z"/>';
+    } else {
+      video.pause();
+      playerBox.classList.remove('is-playing');
+      playIcon.setAttribute('viewBox','0 0 24 24');
+      playIcon.innerHTML = '<path d="M8 5v14l11-7z"/>';
+    }
+  });
+  video.addEventListener('timeupdate', function(){
+    if(video.duration){ playBar.style.width = (video.currentTime / video.duration * 100) + '%'; }
+  });
+  video.addEventListener('ended', function(){
+    playerBox.classList.remove('is-playing');
+    playIcon.innerHTML = '<path d="M8 5v14l11-7z"/>';
+    playBar.style.width = '0';
+  });
+  rateBtn.addEventListener('click', function(){
+    ri = (ri + 1) % rates.length;
+    video.playbackRate = rates[ri];
+    rateBtn.textContent = rates[ri] + 'x 倍速';
+    showToast('已切换至 ' + rates[ri] + 'x 倍速');
+  });
+  document.getElementById('fullBtn').addEventListener('click', function(){
+    if(video.requestFullscreen){ video.requestFullscreen(); }
+  });
+  /* 3D 飞行演示跳转 */
+  document.getElementById('flyBtn').addEventListener('click', function(){
+    window.open('https://helloroamly.com/', '_blank');
+    showToast('已在新窗口打开线上飞行演示');
+  });
+  /* 图文资产包：演示占位 */
+  document.getElementById('planBtn').addEventListener('click', function(){
+    showToast('图文资产包：演示中，正式版将在管家面板开放', 3200);
+  });
+  /* 点赞 */
+  var likeBtn = document.getElementById('likeBtn'), likeCount = document.getElementById('likeCount');
+  likeBtn.addEventListener('click', function(){
+    var on = likeBtn.classList.toggle('is-on');
+    likeCount.textContent = on ? (Number(likeCount.textContent) + 1) : (Number(likeCount.textContent) - 1);
+  });
+  /* 收藏 */
+  var favBtn = document.getElementById('favBtn');
+  favBtn.addEventListener('click', function(){
+    var on = favBtn.classList.toggle('is-on');
+    showToast(on ? '已收藏该飞行视角目的地' : '已取消收藏');
+  });
+  /* 评论 */
+  document.getElementById('commentForm').addEventListener('submit', function(e){
+    e.preventDefault();
+    var v = document.getElementById('commentInput').value.trim();
+    if(!v){ showToast('先写一句再发送吧'); return; }
+    showToast('评论功能演示中，正式版将接入内容管理后台');
+    document.getElementById('commentInput').value = '';
+  });
+</script>
+</body>
+</html>

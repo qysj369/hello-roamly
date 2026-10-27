@@ -4,20 +4,33 @@ import { DEFAULT_SITE_DESCRIPTION } from '@/lib/seo/config';
 import type { PageSeo } from '@/lib/seo/types';
 import { paths } from '@/router/paths';
 
-function page(title: string, description: string, path: string, ogType: PageSeo['ogType'] = 'website'): PageSeo {
+function page(
+  title: string,
+  description: string,
+  path: string,
+  ogType: PageSeo['ogType'] = 'website',
+): PageSeo {
   return { title, description, path, ogType };
 }
 
-function titled(pageLabel: string, description: string, path: string, ogType?: PageSeo['ogType']): PageSeo {
+function titled(
+  pageLabel: string,
+  description: string,
+  path: string,
+  ogType?: PageSeo['ogType'],
+): PageSeo {
   return page(`${pageLabel} — ${APP_TITLE_SUFFIX}`, description, path, ogType);
 }
 
+export const FLY_HOME_OG_TITLE = '蜗牛旅行 · 飞遍济南的冬天';
+
+export const FLY_HOME_OG_DESCRIPTION =
+  '趵突泉、黑虎泉、大明湖、千佛山、九如山——跟着老舍的笔，慢飞一次泉城。';
+
+export const FLY_HOME_SHARE_CARD_TITLE = FLY_HOME_OG_DESCRIPTION.slice(0, 36);
+
 export const homePageSeo = (): PageSeo =>
-  page(
-    APP_TITLE_SUFFIX,
-    `${BRAND_FUNCTION_DESC}。覆盖城市周末漫游、单人短途旅行灵感、亲子出游思路；搜索城市即可生成结构化漫行攻略，不从事组团预订。`,
-    paths.home,
-  );
+  page(FLY_HOME_OG_TITLE, FLY_HOME_OG_DESCRIPTION, paths.home);
 
 export const citiesPageSeo = (): PageSeo =>
   titled(
@@ -63,11 +76,7 @@ export const guidesPageSeo = (): PageSeo =>
   );
 
 export const mapPageSeo = (): PageSeo =>
-  titled(
-    '地图',
-    `${BRAND_FUNCTION_DESC}。地图一键规划漫行方案。`,
-    paths.home,
-  );
+  titled('地图', `${BRAND_FUNCTION_DESC}。地图一键规划漫行方案。`, paths.home);
 
 export const aiChatPageSeo = (): PageSeo =>
   titled(

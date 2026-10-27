@@ -2,6 +2,7 @@ import { lazy, type ComponentType } from 'react';
 import { withRouteSuspense } from '@/router/withRouteSuspense';
 
 /** 与路由懒加载共用的动态 import，供 prefetch 复用 */
+// eslint-disable-next-line react-refresh/only-export-components -- loaders are shared with prefetch, not components
 export const routeLoaders = {
   discover: () => import('@/pages/discover/DiscoverPage'),
   ai: () => import('@/pages/ai/AiChatPage'),
@@ -28,6 +29,7 @@ export const routeLoaders = {
   inspire: () => import('@/pages/inspire/TravelInspirePage'),
   drivePanorama: () => import('@/pages/drive/DrivePanoramaPage'),
   snailFlight: () => import('@/pages/snail-flight/SnailFlightPage'),
+  login: () => import('@/pages/auth/FlyLoginPage'),
   notFound: () => import('@/pages/error/NotFoundPage'),
 } as const;
 
@@ -65,4 +67,5 @@ export const WechatToolPage = lazyPage(routeLoaders.mp);
 export const TravelInspirePage = lazyPage(routeLoaders.inspire);
 export const DrivePanoramaPage = lazyPage(routeLoaders.drivePanorama);
 export const SnailFlightPage = lazyPage(routeLoaders.snailFlight);
+export const FlyLoginPage = lazyPage(routeLoaders.login);
 export const NotFoundPage = lazyPage(routeLoaders.notFound);

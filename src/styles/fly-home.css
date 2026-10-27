@@ -1,0 +1,749 @@
+/* 飞阅首页。色值对齐豆包样板，仅作用于 .fly-home。 */
+
+.fly-home {
+  --night: #0b1f2a;
+  --night-2: #10293a;
+  --night-3: #163447;
+  --spring: #1e8e6e;
+  --spring-soft: #77e0c3;
+  --gold: #c9a227;
+  --gold-soft: #e8c76a;
+  --ink: #eaf6f1;
+  min-height: 100dvh;
+  background: var(--night);
+  color: var(--ink);
+  font-family: 'Noto Sans SC', 'Microsoft YaHei', system-ui, sans-serif;
+  line-height: 1.7;
+}
+
+.capsule-app-shell:has(.fly-home) {
+  height: auto;
+  min-height: 100dvh;
+  overflow: visible;
+  background: #0b1f2a;
+}
+
+html:has(.fly-home),
+body:has(.fly-home) {
+  background: #0b1f2a;
+  height: auto;
+  overflow: auto;
+}
+
+.fly-home .serif {
+  font-family: 'Noto Serif SC', 'Songti SC', serif;
+}
+
+.fly-home a {
+  color: inherit;
+  text-decoration: none;
+}
+
+.fly-home button {
+  font-family: inherit;
+  cursor: pointer;
+}
+
+.fly-home .nav {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  z-index: 50;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 1rem 1.25rem;
+  background: linear-gradient(180deg, rgba(11, 31, 42, 0.72), rgba(11, 31, 42, 0));
+  transition:
+    background 0.3s ease,
+    padding 0.3s ease;
+}
+
+.fly-home .nav.solid {
+  background: rgba(11, 31, 42, 0.88);
+  backdrop-filter: blur(10px);
+  padding: 0.7rem 1.25rem;
+}
+
+.fly-home .logo {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  font-family: 'Noto Serif SC', serif;
+  font-weight: 700;
+  font-size: 1.05rem;
+  letter-spacing: 0.06em;
+}
+
+.fly-home .logo svg {
+  width: 1.5rem;
+  height: 1.5rem;
+}
+
+.fly-home .logo .en {
+  font-family: 'Noto Sans SC', sans-serif;
+  font-weight: 700;
+  font-size: 0.82em;
+  letter-spacing: 0.14em;
+  color: var(--gold-soft);
+}
+
+.fly-home .nav-links {
+  display: none;
+  align-items: center;
+  gap: 1.6rem;
+  font-size: 0.85rem;
+  color: rgba(234, 246, 241, 0.82);
+}
+
+.fly-home .nav-links a:hover {
+  color: var(--gold-soft);
+}
+
+.fly-home .nav-right {
+  display: flex;
+  align-items: center;
+  gap: 0.6rem;
+}
+
+.fly-home .lang-btn,
+.fly-home .login-btn {
+  border-radius: 999px;
+  font-size: 0.78rem;
+}
+
+.fly-home .lang-btn {
+  background: transparent;
+  border: 1px solid rgba(234, 246, 241, 0.35);
+  color: rgba(234, 246, 241, 0.9);
+  padding: 0.28rem 0.85rem;
+  letter-spacing: 0.1em;
+}
+
+.fly-home .lang-btn:hover {
+  border-color: var(--spring-soft);
+  color: var(--spring-soft);
+}
+
+.fly-home .login-btn {
+  background: var(--gold);
+  border: none;
+  color: #10293a;
+  font-weight: 700;
+  padding: 0.3rem 0.95rem;
+}
+
+.fly-home .login-btn:hover {
+  background: var(--gold-soft);
+}
+
+.fly-home .hero {
+  position: relative;
+  min-height: 100vh;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  text-align: center;
+  overflow: hidden;
+  background: #050d12;
+}
+
+.fly-home .hero-video {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  opacity: 0;
+  transform: scale(1.14);
+  filter: brightness(0.78) saturate(1.05);
+  transition:
+    opacity 2.2s ease,
+    transform 14s ease;
+}
+
+.fly-home .hero-video.on {
+  opacity: 1;
+  transform: scale(1.02);
+}
+
+.fly-home .hero::after {
+  content: '';
+  position: absolute;
+  inset: 0;
+  z-index: 1;
+  pointer-events: none;
+  background: radial-gradient(ellipse at center, transparent 30%, rgba(5, 13, 18, 0.72) 100%);
+}
+
+.fly-home .hero-pre {
+  position: absolute;
+  inset: 0;
+  z-index: 2;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-direction: column;
+  gap: 0.4rem;
+  transition: opacity 1.4s ease;
+}
+
+.fly-home .hero-pre p {
+  font-size: clamp(1.1rem, 3.2vw, 1.7rem);
+  letter-spacing: 0.5em;
+  color: rgba(234, 246, 241, 0.9);
+  font-weight: 300;
+}
+
+.fly-home .hero-pre p:nth-child(2) {
+  letter-spacing: 0.3em;
+  font-size: clamp(0.8rem, 2vw, 1rem);
+  color: rgba(119, 224, 195, 0.75);
+}
+
+.fly-home .hero-pre.gone {
+  opacity: 0;
+  pointer-events: none;
+}
+
+.fly-home .hero-main {
+  position: relative;
+  z-index: 3;
+  padding: 6rem 1.5rem 7rem;
+  max-width: 1000px;
+  opacity: 0;
+  transition: opacity 1.2s ease;
+}
+
+.fly-home .hero-main.show {
+  opacity: 1;
+}
+
+.fly-home .hero-kicker {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.5rem;
+  font-size: 0.8rem;
+  letter-spacing: 0.32em;
+  color: var(--spring-soft);
+  border: 1px solid rgba(119, 224, 195, 0.4);
+  border-radius: 999px;
+  padding: 0.32rem 0.95rem 0.32rem 1.1rem;
+  margin-bottom: 1.6rem;
+}
+
+.fly-home .hero h1 {
+  font-family: 'Noto Serif SC', 'Songti SC', serif;
+  font-weight: 900;
+  font-size: clamp(2.2rem, 6.4vw, 5rem);
+  line-height: 1.24;
+  text-shadow: 0 6px 40px rgba(0, 0, 0, 0.6);
+}
+
+.fly-home .hero h1 .hl {
+  color: var(--gold-soft);
+}
+
+.fly-home .hero-sub {
+  margin: 1.2rem auto 0;
+  max-width: 32em;
+  font-size: clamp(0.95rem, 2.3vw, 1.18rem);
+  color: rgba(234, 246, 241, 0.82);
+  font-weight: 300;
+}
+
+.fly-home .narration-btn {
+  margin-top: 1.35rem;
+  background: rgba(11, 31, 42, 0.45);
+  border: 1px solid rgba(232, 199, 106, 0.75);
+  color: var(--gold-soft);
+  border-radius: 999px;
+  padding: 0.48rem 1.15rem;
+  letter-spacing: 0.18em;
+  font-size: 0.86rem;
+}
+
+.fly-home .narration-btn.is-on {
+  background: var(--gold);
+  color: #10293a;
+  border-color: var(--gold);
+}
+
+.fly-home .hero-scroll {
+  position: absolute;
+  bottom: 1.7rem;
+  left: 50%;
+  transform: translateX(-50%);
+  z-index: 4;
+  color: rgba(234, 246, 241, 0.65);
+  font-size: 0.78rem;
+  letter-spacing: 0.24em;
+}
+
+.fly-home .wrap {
+  max-width: 1180px;
+  margin: 0 auto;
+  padding: 4.5rem 1.25rem;
+}
+
+.fly-home .sec-head {
+  display: flex;
+  align-items: baseline;
+  justify-content: space-between;
+  flex-wrap: wrap;
+  gap: 0.5rem;
+  margin-bottom: 1.9rem;
+}
+
+.fly-home .sec-head.spaced {
+  margin-top: 4.5rem;
+}
+
+.fly-home .sec-title {
+  font-family: 'Noto Serif SC', serif;
+  font-weight: 700;
+  font-size: clamp(1.4rem, 3.4vw, 1.9rem);
+  color: var(--spring-soft);
+}
+
+.fly-home .sec-note {
+  font-size: 0.84rem;
+  color: rgba(234, 246, 241, 0.48);
+  letter-spacing: 0.1em;
+}
+
+.fly-home .routes,
+.fly-home .picks,
+.fly-home .feeds {
+  display: grid;
+  grid-template-columns: 1fr;
+  gap: 1.2rem;
+}
+
+.fly-home .route {
+  position: relative;
+  border-radius: 18px;
+  overflow: hidden;
+  border: 1px solid rgba(119, 224, 195, 0.22);
+  background: var(--night-3);
+  aspect-ratio: 16 / 9;
+  cursor: pointer;
+  display: block;
+  width: 100%;
+  padding: 0;
+  color: inherit;
+  text-align: left;
+}
+
+.fly-home .route:hover {
+  border-color: var(--spring-soft);
+}
+
+.fly-home .route video,
+.fly-home .route img,
+.fly-home .feed img {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+
+.fly-home .route::after,
+.fly-home .feed::after {
+  content: '';
+  position: absolute;
+  inset: 0;
+  background: linear-gradient(180deg, rgba(11, 31, 42, 0.05) 35%, rgba(11, 31, 42, 0.85) 100%);
+}
+
+.fly-home .ai,
+.fly-home .feed-open {
+  position: absolute;
+  z-index: 2;
+  font-size: 0.72rem;
+  border-radius: 999px;
+  letter-spacing: 0.08em;
+}
+
+.fly-home .ai {
+  top: 0.8rem;
+  left: 0.8rem;
+  color: #eaf6f1;
+  background: rgba(11, 31, 42, 0.7);
+  border: 1px solid rgba(255, 255, 255, 0.3);
+  padding: 0.2rem 0.6rem;
+  display: inline-flex;
+  align-items: center;
+  gap: 0.3rem;
+}
+
+.fly-home .route-info,
+.fly-home .feed-body {
+  position: absolute;
+  left: 1.1rem;
+  right: 1.1rem;
+  bottom: 1rem;
+  z-index: 2;
+}
+
+.fly-home .route-name {
+  display: block;
+  font-family: 'Noto Serif SC', serif;
+  font-weight: 700;
+  font-size: 1.3rem;
+}
+
+.fly-home .route-desc {
+  display: block;
+  font-size: 0.86rem;
+  color: rgba(234, 246, 241, 0.82);
+  font-weight: 300;
+  margin-top: 0.15rem;
+}
+
+.fly-home .pick {
+  background: var(--night-3);
+  border: 1px solid rgba(234, 246, 241, 0.14);
+  border-radius: 16px;
+  padding: 1.3rem 1.35rem;
+}
+
+.fly-home .pick .k {
+  font-size: 0.76rem;
+  letter-spacing: 0.2em;
+  color: var(--gold-soft);
+  margin-bottom: 0.4rem;
+}
+
+.fly-home .pick h3 {
+  font-family: 'Noto Serif SC', serif;
+  font-size: 1.14rem;
+  margin-bottom: 0.45rem;
+}
+
+.fly-home .pick p,
+.fly-home .challenge p {
+  font-size: 0.9rem;
+  color: rgba(234, 246, 241, 0.75);
+  font-weight: 300;
+}
+
+.fly-home .route-tags,
+.fly-home .dots {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.45rem;
+}
+
+.fly-home .route-tags {
+  margin-top: 0.75rem;
+}
+
+.fly-home .node {
+  font-size: 0.76rem;
+  color: var(--spring-soft);
+  border: 1px solid rgba(119, 224, 195, 0.35);
+  border-radius: 999px;
+  padding: 0.16rem 0.7rem;
+}
+
+.fly-home .feed {
+  position: relative;
+  border-radius: 18px;
+  overflow: hidden;
+  border: 1px solid rgba(234, 246, 241, 0.14);
+  min-height: 250px;
+  background: var(--night-3);
+  color: inherit;
+  text-align: left;
+  padding: 0;
+  width: 100%;
+}
+
+.fly-home .feed-open {
+  top: 0.8rem;
+  right: 0.8rem;
+  color: var(--spring-soft);
+  border: 1px solid rgba(119, 224, 195, 0.4);
+  background: rgba(11, 31, 42, 0.6);
+  padding: 0.2rem 0.65rem;
+}
+
+.fly-home .feed-by {
+  font-size: 0.76rem;
+  color: var(--gold-soft);
+  letter-spacing: 0.14em;
+}
+
+.fly-home .feed-text {
+  font-family: 'Noto Serif SC', serif;
+  font-size: 1.05rem;
+  line-height: 1.5;
+}
+
+.fly-home .challenge {
+  background: linear-gradient(150deg, var(--night-3) 0%, #0e2532 100%);
+  border: 1px solid rgba(201, 162, 39, 0.3);
+  border-radius: 20px;
+  padding: 1.8rem 1.6rem;
+}
+
+.fly-home .challenge .k {
+  font-size: 0.78rem;
+  letter-spacing: 0.22em;
+  color: var(--gold-soft);
+}
+
+.fly-home .challenge h3 {
+  font-family: 'Noto Serif SC', serif;
+  font-size: 1.3rem;
+  margin: 0.4rem 0 0.6rem;
+}
+
+.fly-home .bar {
+  height: 6px;
+  background: rgba(255, 255, 255, 0.12);
+  border-radius: 3px;
+  margin: 1.2rem 0 0.9rem;
+  overflow: hidden;
+}
+
+.fly-home .bar i {
+  display: block;
+  height: 100%;
+  width: 100%;
+  background: linear-gradient(90deg, var(--spring), var(--gold));
+}
+
+.fly-home .dot,
+.fly-home .earth-link {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.35rem;
+  padding: 0.55rem 0.85rem;
+  border-radius: 12px;
+  border: 1px solid rgba(234, 246, 241, 0.16);
+  background: transparent;
+  color: rgba(234, 246, 241, 0.8);
+  font-size: 0.8rem;
+}
+
+.fly-home .dot.on,
+.fly-home .earth-link {
+  border-color: rgba(119, 224, 195, 0.5);
+  color: var(--spring-soft);
+}
+
+.fly-home .dot.off {
+  opacity: 0.55;
+}
+
+.fly-home .earth-row {
+  margin-top: 1rem;
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 0.7rem;
+}
+
+.fly-home .earth-note {
+  font-size: 0.78rem;
+  color: rgba(234, 246, 241, 0.55);
+}
+
+.fly-home .foot {
+  border-top: 1px solid rgba(234, 246, 241, 0.14);
+  padding: 1.7rem 1.25rem 2.3rem;
+  text-align: center;
+  font-size: 0.82rem;
+  color: rgba(234, 246, 241, 0.55);
+}
+
+.fly-home .slogan {
+  font-size: 1rem;
+  color: rgba(234, 246, 241, 0.85);
+  letter-spacing: 0.12em;
+  margin-bottom: 1.1rem;
+}
+
+.fly-home .ai-note {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.4rem;
+  border: 1px solid rgba(119, 224, 195, 0.35);
+  color: var(--spring-soft);
+  border-radius: 999px;
+  padding: 0.3rem 0.9rem;
+  margin-bottom: 0.9rem;
+}
+
+.fly-home .foot-links {
+  display: flex;
+  justify-content: center;
+  gap: 1.4rem;
+  flex-wrap: wrap;
+  margin-bottom: 0.6rem;
+}
+
+.fly-home .toast {
+  position: fixed;
+  left: 50%;
+  bottom: 2.2rem;
+  transform: translateX(-50%) translateY(24px);
+  background: rgba(16, 41, 58, 0.96);
+  color: #eaf6f1;
+  border: 1px solid rgba(119, 224, 195, 0.4);
+  padding: 0.7rem 1.3rem;
+  border-radius: 999px;
+  font-size: 0.9rem;
+  opacity: 0;
+  pointer-events: none;
+  transition:
+    opacity 0.25s ease,
+    transform 0.25s ease;
+  z-index: 99;
+  max-width: 88vw;
+  text-align: center;
+}
+
+.fly-home .toast.show {
+  opacity: 1;
+  transform: translateX(-50%) translateY(0);
+}
+
+.fly-home .login-page {
+  min-height: 100dvh;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 5.5rem 1rem 2rem;
+}
+
+.fly-home .login-card {
+  width: min(92vw, 380px);
+  background: linear-gradient(160deg, #10293a, #0c2230);
+  border: 1px solid rgba(119, 224, 195, 0.3);
+  border-radius: 18px;
+  padding: 1.9rem 1.6rem 1.5rem;
+  text-align: center;
+}
+
+.fly-home .login-card h1 {
+  font-family: 'Noto Serif SC', serif;
+  font-size: 1.15rem;
+  margin-bottom: 0.2rem;
+}
+
+.fly-home .login-card .m-sub,
+.fly-home .demo-note {
+  font-size: 0.78rem;
+  color: rgba(234, 246, 241, 0.55);
+  margin-bottom: 1.2rem;
+}
+
+.fly-home .demo-note {
+  color: rgba(119, 224, 195, 0.8);
+  margin: 1rem 0 0;
+}
+
+.fly-home .login-card input {
+  width: 100%;
+  background: rgba(11, 31, 42, 0.7);
+  border: 1px solid rgba(234, 246, 241, 0.2);
+  color: #eaf6f1;
+  border-radius: 10px;
+  padding: 0.7rem 0.9rem;
+  font-size: 1rem;
+  margin-bottom: 0.6rem;
+  font-family: inherit;
+}
+
+.fly-home .btn-primary {
+  width: 100%;
+  background: var(--gold);
+  border: none;
+  color: #10293a;
+  font-weight: 700;
+  font-size: 0.9rem;
+  border-radius: 10px;
+  padding: 0.72rem;
+}
+
+.fly-home .divider {
+  display: flex;
+  align-items: center;
+  gap: 0.6rem;
+  color: rgba(234, 246, 241, 0.4);
+  font-size: 0.72rem;
+  margin: 0.95rem 0;
+}
+
+.fly-home .divider::before,
+.fly-home .divider::after {
+  content: '';
+  flex: 1;
+  height: 1px;
+  background: rgba(234, 246, 241, 0.15);
+}
+
+.fly-home .sns {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 0.6rem;
+}
+
+.fly-home .sns button {
+  background: rgba(234, 246, 241, 0.08);
+  border: 1px solid rgba(234, 246, 241, 0.18);
+  color: #eaf6f1;
+  border-radius: 10px;
+  padding: 0.6rem;
+  font-size: 0.82rem;
+}
+
+@media (min-width: 768px) {
+  .fly-home .nav-links {
+    display: flex;
+  }
+
+  .fly-home .picks,
+  .fly-home .feeds,
+  .fly-home .routes.global {
+    grid-template-columns: 1fr 1fr;
+  }
+}
+
+@media (min-width: 900px) {
+  .fly-home .routes {
+    grid-template-columns: repeat(3, 1fr);
+  }
+
+  .fly-home .routes.global,
+  .fly-home .routes.jinan {
+    grid-template-columns: repeat(2, 1fr);
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .fly-home *,
+  .fly-home *::before,
+  .fly-home *::after {
+    transition: none !important;
+    animation: none !important;
+  }
+
+  .fly-home .hero-video {
+    transform: none;
+    opacity: 1;
+  }
+
+  .fly-home .hero-main {
+    opacity: 1;
+  }
+
+  .fly-home .hero-pre {
+    display: none;
+  }
+}

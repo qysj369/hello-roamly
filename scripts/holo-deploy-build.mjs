@@ -11,5 +11,5 @@ process.env.VITE_HOME_LEGACY = '';
 // Empty string blocks .env.local from injecting the real key into Vite.
 process.env.VITE_DEEPSEEK_API_KEY = '';
 
-console.info('[holo-deploy-build] VITE_HOME_LAYOUT=(default flight cockpit)');
+console.info('[holo-deploy-build] VITE_HOME_LAYOUT=(default fly-view homepage)');
 execSync('node scripts/capsule-deploy-build.mjs', { stdio: 'inherit' });

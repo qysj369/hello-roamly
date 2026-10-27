@@ -33,6 +33,8 @@ export const paths = {
   drive: '/drive',
   /** 登上蜗牛号 · 国内低空观光（独立入口） */
   snailFlight: '/snail-flight',
+  /** 飞阅首页登录占位，演示模式，不创建账号。 */
+  login: '/login',
 } as const;
 
 /** 驾驶舱街景页 */
